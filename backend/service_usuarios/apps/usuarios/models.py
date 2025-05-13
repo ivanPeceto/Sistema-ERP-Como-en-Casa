@@ -9,6 +9,7 @@ class UserManager(BaseUserManager):
             raise ValueError('El usuario debe tener un correo electrónico')
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
+        #guarda la contraseña ya hasheada con SHA256 y le aplica salt automaticamente
         user.set_password(password)
         user.save(using=self._db)
         return user
