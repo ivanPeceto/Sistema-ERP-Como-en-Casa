@@ -1,8 +1,10 @@
 FROM python:3.9-slim
 
-WORKDIR /app
+WORKDIR /usuarios
 
-COPY /app/
+COPY . /usuarios/
+
+RUN apt-get update && apt-get install -y libmysqlclient-dev
 
 RUN pip install --no--chache-dir -r requirements.txt
 
