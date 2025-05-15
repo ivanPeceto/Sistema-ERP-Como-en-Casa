@@ -1,12 +1,21 @@
-FROM python:3.9-slim
+FROM python:3.11-slim
 
 WORKDIR /usuarios
 
 COPY . /usuarios/
 
-RUN apt-get update && apt-get install -y libmysqlclient-dev
+RUN apt-get update && \
+    apt-get install -y \
+    default-libmysqlclient-dev gcc\
+    pkg-config
 
-RUN pip install --no--chache-dir -r requirements.txt
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+EXPOSE 8001
 
 EXPOSE 8001
 
