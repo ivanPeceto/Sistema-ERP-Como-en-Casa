@@ -41,6 +41,7 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'SIGNING_KEY': 'clave_secreta_123',
 }
 
 MIDDLEWARE = [

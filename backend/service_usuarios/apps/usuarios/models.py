@@ -5,20 +5,27 @@ from django.utils import timezone
 
 #hereda de baseusermanager ya que esta clase por defecto encripta las contraseñas
 class UserManager(BaseUserManager):
-    def create_user(self, email, password=None, **extra_fields):
+    def create_user(self, email, password, nombre):
         if not email:
             raise ValueError('El usuario debe tener un correo electrónico')
         email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
+        user = self.model(email=email, nombre=nombre)
         #guarda la contraseña ya hasheada con SHA256 y le aplica salt automaticamente
         user.set_password(password)
         user.save(using=self._db)
         return user
-
-    def create_superuser(self, email, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-        return self.create_user(email, password, **extra_fields)
+    
+    def create_superuser(self, email, password, nombre):
+        if not email:
+            raise ValueError('El usuario debe tener un correo electrónico')
+        email = self.normalize_email(email)
+        user = self.model(email=email,
+                           nombre=nombre,
+                           is_staff=True,
+                           is_superuser=True)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
 
 class Usuario(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True, db_column='email_usuario')

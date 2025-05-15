@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Usuario, UserManager
+from .models import Usuario
 from django.contrib.auth import authenticate
 #----- Los serializers transforman las clases de django en json y validan datos-------##
 
@@ -16,8 +16,8 @@ class SignInSerializer(serializers.ModelSerializer):
         model = Usuario
         fields = ['email', 'nombre', 'password']
 
-        def create(self, validated_data):
-            return UserManager.objects.create_user(**validated_data)
+    def create(self, validated_data):
+        return Usuario.objects.create_user(**validated_data)
         
 class LogInSerializer(serializers.Serializer):
     ##Define los tipos de campos
