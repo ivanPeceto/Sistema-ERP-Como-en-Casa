@@ -11,6 +11,7 @@ La aplicación incluye funcionalidades como autenticación de usuarios, registro
 ## Tecnologías Utilizadas
 
 Para el desarrollo del backend optamos por utilizar Django ya que incorpora de manera muy comoda y fluida la comunicación y diseño de la base de datos con sus ORM's incorporados, además de que cuenta con el ecosistema de analisis de datos de python que nos permite expandir con mucha comodidad las funcionalidades de la aplicación base con el fin de promoción.
+
 ---
 
 ## Diagrama de Arquitectura
