@@ -1,0 +1,138 @@
+/* ESTILOS PARA EL LOGIN Y REGISTER */
+.authPageContainer {
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    min-height: 100%; 
+    width: 100%;
+    background-color: #ffffff; 
+    padding: 2rem; 
+    box-sizing: border-box;
+    font-family: 'ubuntu_custom', sans-serif;
+  }
+  
+  .formContainer {
+    background-color: #f8f9fa; /* Un gris muy claro para el contenedor del formulario, o blanco si prefieres */
+    padding: 2.5rem 3rem; /* Aumentamos el padding para más espacio interno */
+    border-radius: 12px; /* Bordes más redondeados */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* Sombra más pronunciada */
+    width: 100%;
+    max-width: 450px; /* Ancho máximo del formulario */
+    text-align: center;
+  }
+  
+  .formLogo {
+    width: 70px; /* Tamaño del logo */
+    height: 70px;
+    background-color: #fc4700; /* Un color morado similar al del ejemplo */
+    border-radius: 50%;
+    margin: 0 auto 1.5rem auto; /* Centrar y margen inferior */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 2rem; /* Para un ícono o iniciales */
+    /* Si usas una imagen:
+    content: url('path/to/your/logo.svg');
+    background-color: transparent;
+    */
+  }
+  
+  .formLogo svg { /* Si usas un SVG dentro del div del logo */
+      width: 50%;
+      height: 50%;
+      fill: white; /* Color del SVG */
+  }
+  
+  
+  .title {
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+    color: #333;
+    font-weight: 600;
+  }
+  
+  .formGroup {
+    margin-bottom: 1.5rem;
+    text-align: left;
+  }
+  
+  .formGroup label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #555;
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+  
+  .inputField {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    border: 1px solid #ced4da;
+    border-radius: 8px; /* Bordes más redondeados para inputs */
+    font-size: 1rem;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  }
+  
+  .inputField:focus {
+    border-color: #fc4700; /* Color morado al enfocar */
+    box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25); /* Sombra de enfoque */
+    outline: none;
+  }
+  
+  .optionsContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    font-size: 0.85rem;
+  }
+  
+  .checkboxContainer {
+    display: flex;
+    align-items: center;
+    color: #555;
+  }
+  
+  .checkboxContainer input[type="checkbox"] {
+    margin-right: 0.5rem;
+    accent-color: #fc4700; /* Color del check */
+  }
+  
+  .forgotPasswordLink {
+    color: #fc4700;
+    text-decoration: none;
+  }
+  
+  .forgotPasswordLink:hover {
+    text-decoration: underline;
+  }
+  
+  .submitButton {
+    width: 100%;
+    padding: 0.9rem 1.5rem;
+    background-color: #fc4700; /* Color morado principal */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+  }
+  
+  .submitButton:hover {
+    background-color: #eb0901; /* Morado más oscuro al pasar el mouse */
+  }
+  
+  .switchFormLink {
+    display: block;
+    margin-top: 1.5rem;
+    color: #000000;
+    text-decoration: none;
+    font-size: 0.9rem;
+  }
+  
+  .switchFormLink:hover {
+    text-decoration: underline;
+  }
