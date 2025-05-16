@@ -69,7 +69,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'clients.clients.wsgi.application'
 
-# Configuración base de datos para clientes
+# Config BDD
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',

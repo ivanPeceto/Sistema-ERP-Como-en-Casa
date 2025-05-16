@@ -7,6 +7,8 @@ For more information on this file, see
 https://docs.djangoproject.com/en/4.2/howto/deployment/wsgi/
 """
 
+"""esto es una interfaz estandar entre servidores web y aplicaciones web en Python."""
+
 import os
 
 from django.core.wsgi import get_wsgi_application
