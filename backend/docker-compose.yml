@@ -57,7 +57,7 @@ services:
       MYSQL_PASSWORD: rootpassword
       MYSQL_ROOT_PASSWORD: rootpassword
     ports:
-      - "3310:3306"
+      - "3309:3306"
     volumes:
       - productos_data:/var/lib/mysql
 
@@ -67,7 +67,7 @@ services:
     volumes:
       - ./service_productos:/app
     ports:
-      - "8003:8002"
+      - "8003:8003"
     depends_on:
       - db_productos
 
