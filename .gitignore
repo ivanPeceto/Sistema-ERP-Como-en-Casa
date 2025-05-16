@@ -174,3 +174,77 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Sección: Logs
+# Ignorar archivos de log generados por diferentes herramientas y procesos.
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Sección: Dependencias del Proyecto
+# La carpeta node_modules contiene todas las librerías de terceros.
+# Estas se pueden reinstalar usando 'npm install' o 'yarn install' según el package.json.
+node_modules/
+
+# Sección: Archivos de Entorno
+# Estos archivos suelen contener variables de entorno, claves de API,
+# contraseñas de bases de datos y otra información sensible que no debe
+# ser versionada públicamente.
+.env
+.env.local
+.env.development.local
+.env.production.local
+.env.*.local
+
+# Sección: Carpetas y Archivos de Build/Distribución
+# Archivos y carpetas generados por el proceso de compilación de la aplicación.
+# Estos se generan para producción y no se editan directamente.
+dist/
+dist-ssr/ # Para builds de Server-Side Rendering si se utiliza
+*.local # Patrón general para archivos de configuración local específicos
+
+# Sección: Archivos de Configuración de Editores e IDEs
+# Configuraciones y archivos temporales específicos del entorno de desarrollo de cada programador.
+# Ayuda a evitar conflictos y ruido en el repositorio.
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+
+# JetBrains IDEs (WebStorm, IntelliJ IDEA, etc.)
+.idea/
+
+# macOS
+.DS_Store
+
+# Otros archivos de editores y sistemas operativos
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*.swo
+*.~
+
+# Sección: Archivos de Caché de Herramientas
+# Archivos de caché generados por diversas herramientas de desarrollo.
+
+# Caché de Vite
+.vite/ # A veces Vite genera una caché aquí dentro de node_modules, pero por si acaso.
+       # La caché principal de Vite suele estar en node_modules/.vite, ya cubierta por 'node_modules/'
+
+# Caché de TypeScript
+*.tsbuildinfo
+
+# Sección: Reportes de Pruebas y Cobertura
+# Archivos y carpetas generados por herramientas de testing.
+coverage/
+.nyc_output/
+
+

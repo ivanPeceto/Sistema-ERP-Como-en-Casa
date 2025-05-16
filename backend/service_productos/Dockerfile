@@ -21,7 +21,7 @@ COPY scripts/wait-for-it.sh /usr/local/bin/wait-for-it.sh
 
 RUN chmod +x /usr/local/bin/wait-for-it.sh
 
-ENTRYPOINT ["wait-for-it.sh", "db_productos:3306", "--"]
+ENTRYPOINT ["wait-for-it.sh", "db_productos:3306", "--timeout=60", "--"]
 
 EXPOSE 8003
 
