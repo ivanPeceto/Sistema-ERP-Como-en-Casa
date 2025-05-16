@@ -48,6 +48,30 @@ services:
     depends_on:
       - db_clientes
 
+  db_productos:
+    image: mysql:8.0
+    container_name: db_productos
+    restart: always
+    environment:
+      MYSQL_DATABASE: productos_db
+      MYSQL_PASSWORD: rootpassword
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "3310:3306"
+    volumes:
+      - productos_data:/var/lib/mysql
+
+  productos:
+    build: ./service_productos
+    container_name: productos
+    volumes:
+      - ./service_productos:/app
+    ports:
+      - "8003:8002"
+    depends_on:
+      - db_productos
+
 volumes:
   usuarios_data:
   clientes_data:
+  productos_data:
