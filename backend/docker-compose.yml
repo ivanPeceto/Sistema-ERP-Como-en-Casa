@@ -1,3 +1,4 @@
+version: '3.8'
 
 services:
 
@@ -10,7 +11,7 @@ services:
       MYSQL_PASSWORD: rootpassword
       MYSQL_ROOT_PASSWORD: rootpassword
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - usuarios_data:/var/lib/mysql
 
@@ -24,6 +25,29 @@ services:
     depends_on:
       - db_usuarios
 
+  db_clientes:
+    image: mysql:8.0
+    container_name: db_clientes
+    restart: always
+    environment:
+      MYSQL_DATABASE: clientes_db
+      MYSQL_PASSWORD: rootpassword
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "3309:3306"
+    volumes:
+      - clientes_data:/var/lib/mysql
+
+  clientes:
+    build: ./service_clientes
+    container_name: clientes
+    volumes:
+      - ./service_clientes:/app
+    ports:
+      - "8002:8002"
+    depends_on:
+      - db_clientes
 
 volumes:
   usuarios_data:
+  clientes_data:
