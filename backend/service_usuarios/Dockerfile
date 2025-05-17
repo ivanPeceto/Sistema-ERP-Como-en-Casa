@@ -10,12 +10,18 @@ RUN apt-get update && \
     pkg-config
 
 WORKDIR /app
+
 COPY requirements.txt .
+
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-EXPOSE 8001
+COPY scripts/wait-for-it.sh /usr/local/bin/wait-for-it.sh
+
+RUN chmod +x /usr/local/bin/wait-for-it.sh
+
+ENTRYPOINT ["wait-for-it.sh", "db_usuarios:3306", "--timeout=60", "--"]
 
 EXPOSE 8001
 
