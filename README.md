@@ -22,6 +22,14 @@ A continuación se presenta un bosquejo del diagrama de arquitectura que represe
 
 ---
 
+## Diagrama Entidad-Relacion de la Base de Datos
+
+Presentamos el esquema que representa las diversas entidades y relaciones que conforman los circuitos internos de la aplicación:
+![Diagrama de Base de Datos](graficos/grafico_bdd.jpg)
+
+
+---
+
 ## Autores
 
 - [Comas Tavella Juan Cruz](https://github.com/juancruzct12)
@@ -33,3 +41,4 @@ A continuación se presenta un bosquejo del diagrama de arquitectura que represe
 ## Scripts externos
 
 - [wait-for-it](https://github.com/vishnubob/wait-for-it): Para la conexión entre microservicios y bases de datos.
+
