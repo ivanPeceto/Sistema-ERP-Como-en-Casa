@@ -1,0 +1,244 @@
+/* src/pages/gestion_pedidos_page.module.css */
+
+/* Estilos para el contenedor principal de esta página específica */
+.gestionPedidosContainer {
+    background: rgb(224, 224, 224);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    width: 100%;
+    min-height: 100vh; /* Ocupa al menos toda la altura de la vista */
+    font-family: sans-serif;
+    box-sizing: border-box; /* Aplicar box-sizing aquí o globalmente */
+  }
+  
+  /* Estilos globales que estaban en '*' y 'body'/'html' en el original. */
+  /* Es mejor poner 'margin: 0; padding: 0;' y 'box-sizing: border-box;' */
+  /* en un reset más global (ej. index.css) si aplica a toda la app. */
+  /* Por ahora, los efectos de 'margin:0; padding:0;' en elementos hijos se manejan directamente. */
+  
+  .gestionPedidosContainer h1 {
+    margin-bottom: 2rem;
+    font-size: 2.5rem;
+    letter-spacing: 2px;
+    text-align: center;
+    padding: 0; /* Reseteo por si acaso */
+    margin-top: 0; /* Reseteo por si acaso */
+  }
+  
+  .contenidoPrincipal {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .categorias {
+    display: none; /* O gestiona con estado React para mostrar/ocultar */
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .categoria {
+    background: orange;
+    border-radius: 10px;
+    padding: 1.5rem;
+    width: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .categoria:hover {
+    transform: scale(1.05);
+  }
+  
+  .categoria img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+  }
+  
+  .categoria span {
+    margin-top: 0.75rem;
+    font-weight: bold;
+  }
+  
+  .paneles {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between; /* o space-around si prefieres más espacio */
+    width: 100%;
+    padding: 0 1rem; /* Espaciado lateral para los paneles */
+    gap: 1rem; /* Espacio entre paneles */
+  }
+  
+  .panel {
+    background: #aaaaaa;
+    border-radius: 5px;
+    color: white;
+    overflow: hidden; /* Para que el contenido no se desborde visualmente del border-radius */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1; /* Por defecto, los paneles ocupan el mismo espacio */
+  }
+  
+  .central { /* Clase modificadora para el panel central */
+    flex: 2; /* Hace que el panel central sea el doble de ancho que los otros */
+  }
+  
+  .panel h2 {
+    /* El fondo ya lo da .panel, no es necesario aquí a menos que sea diferente */
+    padding: 1rem;
+    font-size: 1.2rem;
+    width: 100%;
+    text-align: center;
+    margin: 0; /* Reseteo */
+  }
+  
+  .contenido { /* Contenedor del contenido desplazable dentro de cada panel */
+    background: white;
+    color: black;
+    padding: 0; /* El padding se maneja en las filas si es necesario */
+    flex-grow: 1; /* Para que ocupe el espacio disponible en el panel */
+    overflow-y: auto; /* Scroll vertical si el contenido excede la altura */
+    max-height: 300px; /* Altura máxima antes de que aparezca el scroll */
+    width: 100%;
+  }
+  
+  .fila {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid #ccc;
+    width: 100%;
+    box-sizing: border-box; /* Importante para que el padding no aumente el width */
+  }
+  
+  .fila:last-child {
+    border-bottom: none; /* Quitar borde de la última fila del contenido */
+  }
+  
+  .encabezado { /* Aplicar junto con .fila */
+    background-color: #f0f0f0;
+    font-weight: bold;
+  }
+  
+  .pedido { /* Aplicar junto con .fila para estilos de ítems de pedido */
+    background-color: #f9f9f9; /* Un color base ligeramente diferente para pedidos */
+  }
+  
+  .pedido:nth-child(even) { /* Para alternar colores en filas de pedido */
+    background-color: #e9e9e9;
+  }
+  
+  .cantidad {
+    width: 80px; /* Ancho fijo para la cantidad */
+    font-weight: bold;
+    text-align: center;
+    flex-shrink: 0; /* Para que no se encoja si el producto es largo */
+  }
+  
+  .producto {
+    flex-grow: 2; /* El producto ocupa la mayor parte del espacio */
+    margin-left: 10px;
+    text-align: left;
+    word-break: break-word; /* Para que nombres largos no rompan el layout */
+  }
+  
+  .precio {
+    margin: 0 1rem;
+    width: 80px; /* Ancho fijo para el precio */
+    text-align: right;
+    flex-shrink: 0;
+  }
+  
+  .acciones {
+    display: flex; /* Para alinear los botones si hay varios */
+    justify-content: flex-end; /* Alinea botones a la derecha */
+    min-width: 70px; /* Espacio para los botones */
+    flex-shrink: 0;
+  }
+  
+  .acciones button {
+    margin-left: 0.5rem;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    border-radius: 3px;
+  }
+  
+  .acciones button:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .resumen {
+    /* El fondo ya lo da .panel */
+    padding: 1rem;
+    margin-top: 1rem; /* Espacio entre el contenido y el resumen */
+    color: white;
+    /* border-radius: 0 0 5px 5px; No es necesario si el panel ya tiene su border-radius y overflow:hidden */
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+  }
+  
+  .resumen div {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .resumen button {
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 20px;
+    background: white;
+    color: #4e4e4e;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+  
+  .resumen button:hover {
+    background-color: #f0f0f0;
+  }
+  
+  /* Media Queries */
+  @media (max-width: 768px) {
+    .paneles {
+      flex-direction: column;
+      align-items: stretch; /* Para que los paneles ocupen el ancho completo */
+      padding: 0; /* Sin padding lateral en móvil para los paneles */
+    }
+  
+    .panel {
+      margin-bottom: 1rem; /* Espacio entre paneles cuando están en columna */
+    }
+  
+    .panel:last-child {
+      margin-bottom: 0;
+    }
+  
+    .categorias {
+      flex-direction: column;
+      align-items: stretch; /* Categorías ocupan ancho */
+      /* display: flex; Para que se muestre en móvil si decides ocultarla por defecto */
+    }
+  
+    .categoria {
+      width: auto; /* Ancho automático para las categorías en móvil */
+      margin-bottom: 0.5rem;
+    }
+  }

@@ -1,5 +1,5 @@
 # Gestor de ventas para Rotisería
-
+---
 ## Resumen
 
 Este Trabajo Práctico Final correspondiente a la materia Programación 3 tiene como objetivo desarrollar una aplicación web que permita a una rotisería gestionar eficientemente los pedidos diarios, sus productos y los datos de los clientes.
@@ -22,6 +22,14 @@ A continuación se presenta un bosquejo del diagrama de arquitectura que represe
 
 ---
 
+## Diagrama Entidad-Relacion de la Base de Datos
+
+Presentamos el esquema que representa las diversas entidades y relaciones que conforman los circuitos internos de la aplicación:
+![Diagrama de Base de Datos](graficos/grafico_bdd.png)
+
+
+---
+
 ## Autores
 
 - [Comas Tavella Juan Cruz](https://github.com/juancruzct12)
@@ -29,3 +37,8 @@ A continuación se presenta un bosquejo del diagrama de arquitectura que represe
 - [Iván Gabriel Peceto](https://github.com/ivanPeceto)
 
 ---
+
+## Scripts externos
+
+- [wait-for-it](https://github.com/vishnubob/wait-for-it): Para la conexión entre microservicios y bases de datos.
+

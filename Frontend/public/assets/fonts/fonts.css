@@ -1,0 +1,7 @@
+@font-face {
+    font-family: 'ubuntu_custom'; /* Elige un nombre para tu fuente */
+    src: url('../assets/fonts/Ubuntu-Regular.ttf') format('woff2');
+    font-weight: normal; /* o 400 */
+    font-style: normal;
+    font-display: swap; /* Importante para el rendimiento */
+  }

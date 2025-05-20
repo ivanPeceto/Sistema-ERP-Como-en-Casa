@@ -1,8 +1,8 @@
 FROM python:3.11-slim
 
-WORKDIR /usuarios
+WORKDIR /clientes
 
-COPY . /usuarios/
+COPY . /clientes/
 
 RUN apt-get update && \
     apt-get install -y \
@@ -21,8 +21,8 @@ COPY scripts/wait-for-it.sh /usr/local/bin/wait-for-it.sh
 
 RUN chmod +x /usr/local/bin/wait-for-it.sh
 
-ENTRYPOINT ["wait-for-it.sh", "db_usuarios:3306", "--timeout=60", "--"]
+ENTRYPOINT ["wait-for-it.sh", "db_clientes:3306", "--timeout=60","--"]
 
-EXPOSE 8001
+EXPOSE 8002
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8001"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8002"]
