@@ -20,6 +20,7 @@ from apps.productos.views import (
     ProductoEditarView,
     ProductoEliminarView,
     ProductoListarView,
+    ProductoBuscarView
 )
 
 urlpatterns = [
@@ -27,4 +28,5 @@ urlpatterns = [
     path('productos/editar/<int:pk>/', ProductoEditarView.as_view(), name='producto_editar'),
     path('productos/eliminar/<int:pk>/', ProductoEliminarView.as_view(), name='producto_eliminar'),
     path('productos/listar/', ProductoListarView.as_view(), name='producto_listar'),
+    path('productos/<int:pk>/', ProductoBuscarView.as_view(), name='producto_buscar'),  
 ]

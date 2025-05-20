@@ -29,7 +29,7 @@ class ProductoEliminarView(APIView):
     def delete(self, request, pk):
         producto = get_object_or_404(Producto, pk=pk)
         producto.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({'mensaje': 'Producto eliminado correctamente.'}, status=status.HTTP_200_OK)
 
 class ProductoListarView(APIView):
     def get(self, request):
