@@ -21,7 +21,19 @@ class PedidoSerializer(serializers.ModelSerializer):
                   'entregado',
                   'pagado',
                   'total']
-        
+    
+    def create(self, validated_data):
+        productos = validated_data.pop('productos')
+        pedido = Pedido.objects.create(**validated_data)
+        for producto in productos:
+            PedidoProductos.objects.create(
+                id_pedido = pedido['id'],
+                id_producto = producto['id_producto'],
+                nombre_producto= producto['nombre_producto'],
+                cantidad_producto= producto['cantidad_producto'] 
+            )
+        return pedido
+
     def get_productos(self, pedido):
         ##Busca en la tabla pedidoProductos todas las filas donde
         ##id_pedido sea el mismo que en el argumento pedido

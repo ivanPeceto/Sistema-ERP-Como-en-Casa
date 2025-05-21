@@ -1,4 +1,5 @@
 from rest_framework.generics import ListAPIView
+from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
@@ -14,7 +15,7 @@ class PedidoListView(ListAPIView):
         fecha = self.request.query_params.get('fecha')
         numero_pedido = self.request.query_params.get('numero_pedido')
 
-        #Devuelve un pedido vacío si la fecha es invalida
+        ##Devuelve un pedido vacío si la fecha es invalida
         if not fecha:
             return Pedido.objects.none()
 
@@ -27,4 +28,17 @@ class PedidoListView(ListAPIView):
         if numero_pedido:
             queryset = queryset.filter(numero_pedido=numero_pedido)     
         return queryset
+        
+class CrearPedidoView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        pedidoSerializer = PedidoSerializer(data=request.data)
+
+        if pedidoSerializer.is_valid():
+            pedido = pedidoSerializer.save()
+            return Response(PedidoSerializer(pedido).data, status=status.HTTP_200_OK)
+        else:
+            return Response(pedidoSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
         
