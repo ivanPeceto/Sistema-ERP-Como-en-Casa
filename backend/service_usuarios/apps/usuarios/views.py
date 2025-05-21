@@ -48,5 +48,5 @@ class UserSignIngView(APIView):
                 'refresh': str(refresh_token),
                 'access': str(access_token),
                 'user': UsuarioSerializer(user).data,
-            },status=status.HTTP_201_CREATED)
+            },status=status.HTTP_200_OK)
         return Response(signinserializer.errors, status=status.HTTP_400_BAD_REQUEST)

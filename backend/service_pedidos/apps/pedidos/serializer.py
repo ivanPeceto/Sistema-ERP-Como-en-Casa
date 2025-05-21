@@ -42,8 +42,6 @@ class PedidoSerializer(serializers.ModelSerializer):
             
         return round(total,2)
 
-
-
 class PedidoProductosSerializer(serializers.ModelSerializer):
     precio_unitario = serializers.SerializerMethodField()
     subtotal = serializers.SerializerMethodField()
@@ -66,3 +64,4 @@ class PedidoProductosSerializer(serializers.ModelSerializer):
             return float(precio) * float(producto.cantidad_producto)
         else:
             return None
+        
