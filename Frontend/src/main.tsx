@@ -1,37 +1,38 @@
-// src/main.tsx
+// Este es el punto de entrada principal de nuestra aplicación React.
+// Desde aquí, nuestra aplicación se inicia y se "monta" en el navegador.
 
-// --- Importaciones Esenciales ---
-// React y ReactDOM para renderizar la aplicación en el navegador.
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
-// RouterProvider para habilitar el enrutamiento en la aplicación.
-// router (importado abajo) contiene la configuración de nuestras rutas.
-import { RouterProvider } from 'react-router-dom';
-import router from './router'; // Importa la configuración de rutas definida en src/router/index.tsx
+// -------        -------        -------        -------        -------        -------
 
-// Estilos globales para toda la aplicación.
+// Importamos el RouterProvider para habilitar la navegación en toda la app.
+// 'router' (que importamos de './router') contiene todas las reglas de nuestras rutas.
+
+import { RouterProvider } from 'react-router-dom';
+import router from './router'; 
 import './index.css';
 
-// --- Lógica de Renderizado Principal ---
-// Busca el elemento HTML con id 'root' en tu index.html.
-// Este div es el contenedor donde se montará toda la aplicación React.
+// -------        -------        -------        -------        -------        -------
+
+// Buscamos el elemento HTML con el 'id="root"' en nuestro archivo 'public/index.html'.
+// Este será el contenedor principal donde se va a renderizar toda nuestra aplicación React.
+
 const rootElement = document.getElementById('root');
 
-// Verifica que el elemento 'root' exista antes de intentar renderizar.
+// Verificamos si encontramos el elemento 'root' antes de intentar renderizar.
+
+/* El RouterProvider se encarga de que todas nuestras rutas estén disponibles */
+/* en cualquier parte de la aplicación, permitiendo la navegación. */
+
+// <React.StrictMode> es una herramienta de React que nos ayuda a encontrar problemas
+// potenciales durante el desarrollo. No afecta el rendimiento en producción.
 if (rootElement) {
-  // Crea un "root" de React para la renderización concurrente (método moderno).
   ReactDOM.createRoot(rootElement).render(
-    // React.StrictMode es una herramienta para destacar problemas potenciales en la aplicación.
-    // Ayuda durante el desarrollo, no afecta el build de producción.
     <React.StrictMode>
-      {/* RouterProvider toma la configuración de 'router' y hace que las rutas
-          estén disponibles para toda la aplicación, permitiendo la navegación. */}
       <RouterProvider router={router} />
     </React.StrictMode>
   );
 } else {
-  // Si no se encuentra el elemento 'root', muestra un error en la consola.
-  // Esto usualmente indica un problema con el archivo public/index.html.
-  console.error("Failed to find the root element. Ensure your 'public/index.html' has an element with id 'root'.");
+  console.error("No se encontró el elemento 'root'. Asegurate de que tu archivo 'public/index.html' tenga un elemento con id 'root'.");
 }
