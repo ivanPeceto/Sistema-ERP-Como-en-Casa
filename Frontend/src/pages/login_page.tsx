@@ -1,42 +1,52 @@
-// src/pages/LoginPage.tsx
+// Esta página es para que los usuarios puedan iniciar sesión en la aplicación.
+
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // Para enlaces y navegación
-import styles from '../styles/login.module.css'; // Importamos los estilos compartidos
+import { Link } from 'react-router-dom'; 
+import styles from '../styles/login.module.css'; 
+
+// -------        -------        -------        -------        -------        -------
 
 const LoginPage: React.FC = () => {
+  // Acá guardariamos los datos que el usuario ingresa en los campos de usuario y contraseña.
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
-  const navigate = useNavigate();
+  const [rememberMe, setRememberMe] = useState(false); 
 
+  // Esta función se ejecuta cuando el usuario hace click en "Login".
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    // Aquí iría la lógica de autenticación
-    console.log('Login attempt:', { username, password, rememberMe });
-    // Ejemplo de redirección después de un login exitoso (simulado):
-    // if (username === "user" && password === "pass") {
-    //   navigate('/'); // Redirige a la página principal
-    // } else {
-    //   alert("Credenciales incorrectas");
-    // }
+    // Evitamos que la página se recargue por defecto.
+    event.preventDefault(); 
+    console.log('Intento de login:', { username, password, rememberMe });
+    // Cuando el backend este listo, acá se manejara la autenticación real y la redirección.
   };
 
-  // Ícono de ejemplo para el logo (puedes usar react-icons o un SVG)
+  // -------        -------        -------        -------        -------        -------
+
+  // Componente simple para mostrar un ícono que seria del logo.
   const LogoIcon = () => (
     <svg viewBox="0 0 24 24" fill="currentColor" height="1em" width="1em">
-      <path d="M12.375 3h- argumentos.75L3 12.375v- argumentos.75L12.375 3zm0 0L21 12.375v- argumentos.75L12.375 3zm0 0L3 20.999l9.375-9.374-9.375-9.375zM12.375 3l9.375 9.375-9.375 9.374 9.375-9.374z" />
+      <path d="M12.375 3h-.75L3 12.375v-.75L12.375 3zm0 0L21 12.375v-.75L12.375 3zm0 0L3 20.999l9.375-9.374-9.375-9.375zM12.375 3l9.375 9.375-9.375 9.374 9.375-9.374z" />
     </svg>
   );
 
+  // -------        -------        -------        -------        -------        -------
 
   return (
+    // Contenedor principal de la página de login
     <div className={styles.authPageContainer}>
       <div className={styles.formContainer}>
+
+        // -------        -------        -------        -------        -------        -------
+
+        {/* El área del logo en la parte superior del formulario. */}
         <div className={styles.formLogo}>
-          {/* Puedes poner una imagen aquí o un ícono SVG */}
           <LogoIcon />
         </div>
         <h2 className={styles.title}>LOG IN</h2>
+
+        // -------        -------        -------        -------        -------        -------
+
+        {/* formulario */}
         <form onSubmit={handleSubmit}>
           <div className={styles.formGroup}>
             <label htmlFor="username">Username</label>
@@ -60,6 +70,10 @@ const LoginPage: React.FC = () => {
               required
             />
           </div>
+
+          // -------        -------        -------        -------        -------        -------
+
+          {/* Contenedor para la opción "Recordarme" y "Olvidé mi contraseña". */}
           <div className={styles.optionsContainer}>
             <label className={styles.checkboxContainer}>
               <input
@@ -67,22 +81,36 @@ const LoginPage: React.FC = () => {
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
               />
-              Remember me
+              Recordarme
             </label>
-            <Link to="/forgot-password" className={styles.forgotPasswordLink}> {/* Necesitarás una ruta para esto */}
-              Forgot password?
+
+            // -------        -------        -------        -------        -------        -------
+
+            {/* Enlace para la función de recuperación de contraseña */}
+            <Link to="/forgot-password" className={styles.forgotPasswordLink}>
+              Olvidaste la contraseña?
             </Link>
           </div>
+
+          // -------        -------        -------        -------        -------        -------
+
+          {/* Botón para iniciar sesión. */}
           <button type="submit" className={styles.submitButton}>
             Login
           </button>
         </form>
+
+        // -------        -------        -------        -------        -------        -------
+
+        {/* Enlace para ir a la página de registro si el usuario no tiene una cuenta. */}
         <Link to="/register" className={styles.switchFormLink}>
-          Don't have an account? Register
+          No tienes una cuenta? Registrarse
         </Link>
       </div>
     </div>
   );
 };
 
-export default LoginPage;
+// -------        -------        -------        -------        -------        -------
+
+export default LoginPage; // Exportamos esta página para que pueda ser usada por el router.

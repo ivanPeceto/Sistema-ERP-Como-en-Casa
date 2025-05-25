@@ -1,26 +1,25 @@
+// Este es el componente principal de nuestra aplicación React.
+// Funciona como un contenedor global para todas las rutas que definimos.
 import { Outlet } from 'react-router-dom';
+import './App.css'; // Estilos generales que aplicamos a la raíz de nuestra app.
 
-import './App.css';
+// -------        -------        -------        -------        -------        -------
 
-/**
- * Componente App: El componente principal o "layout" para un conjunto de rutas.
- * Define la estructura común (si la hay, como un menú o pie de página) y
- * utiliza <Outlet /> para mostrar el contenido de la página actual según la ruta.
- */
+/* El <Outlet /> es el punto donde React Router va a renderizar el componente */
+/*    de la ruta que coincida con la URL actual. */
+/*   Por ejemplo, si la URL es '/', renderizará nuestro main_layout. */
+/*    Si es '/login', renderizará login_page. */
+
 function App() {
   return (
-
     <>
-      {/* 'main' es el contenedor principal para el contenido de las páginas. */}
-      <main className="content">
-        {/* Outlet: Punto de inserción para las rutas hijas.
-            React Router renderizará aquí el componente de página correspondiente
-            a la URL actual. */}
-        <Outlet />
-      </main>
+      <Outlet />
     </>
   );
 }
 
+// -------        -------        -------        -------        -------        -------
 
-export default App;
+export default App; // Exportamos App para que lo pueda usar el main.tsx como punto de entrada.
+
+// -------        -------        -------        -------        -------        -------

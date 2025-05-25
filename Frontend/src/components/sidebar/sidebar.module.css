@@ -1,0 +1,233 @@
+.sidebarContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; 
+  width: 100%;
+  /*overflow-x: hidden; */
+  box-shadow: 0px 15px 20px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.compact {
+  width: 4rem;
+  align-items: center;
+}
+
+.expanded {
+  width: 13rem;
+  align-items: center;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+/* Themes */
+.darkTheme {
+  background-color: #1a202c;
+  color: #a0aec0;
+}
+
+.lightTheme {
+  background-color: #f7fafc;
+  color: #4a5568;
+}
+
+.indigoTheme {
+  background-color: #312e81;
+  color: #a5b4fc;
+}
+
+/* Logo Section */
+.logoLink {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-top: 1.25rem;
+  text-decoration: none;
+  color: inherit;
+  justify-content: center;
+}
+
+.logoIcon {
+  width: 2rem;
+  height: 2rem;
+}
+
+.fillDark {
+  fill: #4a5568;
+}
+
+.fillLight {
+  fill: #e2e8f0;
+}
+
+.fillIndigoLight {
+  fill: #e0e7ff;
+}
+
+.logoText {
+  margin-top: .6rem;
+  margin-left: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Menu Sections */
+.menuSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-top: 2.85rem;
+  border-top-width: 1px;
+}
+
+
+.darkTheme .menuSection,
+.indigoTheme .menuSection {
+  border-color: #2d3748;
+}
+
+.lightTheme .menuSection {
+  border-color: #cbd5e0;
+}
+
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  height: 3rem;
+  margin-top: 0.5rem;
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+  position: relative;
+}
+
+.compactItem {
+  width: 3rem;
+  justify-content: center;
+  padding: 0;
+}
+
+.expandedItem {
+  width: 100%;
+  padding-right: 1rem;
+  justify-content: center;
+}
+
+
+.darkTheme .menuItem:hover,
+.darkTheme .menuItem.activeDark {
+  background-color: #2d3748;
+  color: #cbd5e0;
+}
+
+.lightTheme .menuItem:hover,
+.lightTheme .menuItem.activeLight {
+  background-color: #e2e8f0;
+  color: #2d3748;
+}
+
+.indigoTheme .menuItem:hover,
+.indigoTheme .menuItem.activeIndigo {
+  background-color: #4338ca;
+  color: #e0e7ff;
+}
+
+
+.darkTheme .menuItem:nth-child(3),
+.indigoTheme .menuItem:nth-child(3) {
+  color: #cbd5e0;
+  background-color: #2d3748;
+}
+.lightTheme .menuItem:nth-child(3) {
+  background-color: #cbd5e0;
+}
+
+
+.icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  stroke: currentColor;
+}
+
+.menuItemText {
+  margin-left: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Notification Dot */
+.notificationDot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-top: 0.5rem;
+  margin-left: 0.5rem;
+  background-color: #667eea;
+  border-radius: 9999px;
+}
+
+/* Account Link (bottom) */
+.accountLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 4rem;
+  margin-top: auto;
+  text-decoration: none;
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+  color: inherit;
+}
+
+.compactAccountLink {
+  width: 4rem;
+  justify-content: center;
+  padding: 0;
+}
+
+.expandedAccountLink {
+  width: 100%;
+  padding-left: 0.75rem;
+  justify-content: flex-start;
+}
+
+.darkTheme .accountLink {
+  background-color: #2d3748;
+}
+.darkTheme .accountLink:hover {
+  background-color: #2d3748;
+  color: #cbd5e0;
+}
+
+.lightTheme .accountLink {
+  background-color: #edf2f7;
+  color: #4a5568;
+}
+.lightTheme .accountLink:hover {
+  background-color: #e2e8f0;
+}
+
+.indigoTheme .accountLink {
+  background-color: #4338ca;
+}
+.indigoTheme .accountLink:hover {
+  background-color: #4338ca;
+  color: #e0e7ff;
+}
+
+.accountText {
+  margin-left: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.bottomSection {
+  margin-top: 0rem; 
+  border-top-width: 1px; 
+}
