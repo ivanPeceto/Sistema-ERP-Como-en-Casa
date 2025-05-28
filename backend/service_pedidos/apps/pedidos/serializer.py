@@ -34,6 +34,9 @@ class PedidoSerializer(serializers.ModelSerializer):
             )
         return pedido
 
+   # def delete(self, ):
+
+
     def get_productos(self, pedido):
         ##Busca en la tabla pedidoProductos todas las filas donde
         ##id_pedido sea el mismo que en el argumento pedido
@@ -76,4 +79,6 @@ class PedidoProductosSerializer(serializers.ModelSerializer):
             return float(precio) * float(producto.cantidad_producto)
         else:
             return None
+        
+        
         
