@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializer import LogInSerializer, SignInSerializer, UsuarioSerializer
+from .serializer import LogInSerializer, SignUpSerializer, UsuarioSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 from .jwt_serializer import CustomTokenObtainPairSerializer
@@ -33,13 +33,13 @@ class UserLoginView(APIView):
                 })
         return Response(loginserializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-class UserSignIngView(APIView):
+class UserSignUpView(APIView):
     def post(self, request):
-        signinserializer = SignInSerializer(data=request.data)
+        signupserializer = SignUpSerializer(data=request.data)
 
-        if signinserializer.is_valid():
+        if signupserializer.is_valid():
             ##El metodo save llama automaticamente a create()
-            user = signinserializer.save()
+            user = signupserializer.save()
 
             refresh_token = RefreshToken.for_user(user)
             access_token = refresh_token.access_token
@@ -49,4 +49,4 @@ class UserSignIngView(APIView):
                 'access': str(access_token),
                 'user': UsuarioSerializer(user).data,
             },status=status.HTTP_200_OK)
-        return Response(signinserializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(signupserializer.errors, status=status.HTTP_400_BAD_REQUEST)

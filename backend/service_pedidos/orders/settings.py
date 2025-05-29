@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'apps.pedidos',
+    'apps.pedidosProductos',
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
@@ -46,6 +47,7 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'AUTH_HEADER_TYPES': ('Bearer'),
+    'ALGORITHM': "HS256",
     'SIGNING_KEY': 'clave_secreta_123',
 }
 

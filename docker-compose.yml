@@ -71,6 +71,30 @@ services:
     depends_on:
       - db_productos
 
+  db_pedidos:
+    image: mysql:8.0
+    container_name: db_pedidos
+    restart: always
+    environment:
+      MYSQL_DATABASE: pedidos_db
+      MYSQL_PASSWORD: rootpassword
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "3310:3306"
+    volumes:
+      - pedidos_data:/var/lib/mysql
+
+  pedidos:
+    build: ./service_pedidos
+    container_name: pedidos
+    volumes:
+      - ./service_pedidos:/app
+    ports:
+      - "8004:8004"
+    depends_on:
+      - db_pedidos
+
+
 volumes:
   usuarios_data:
   pedidos_data:

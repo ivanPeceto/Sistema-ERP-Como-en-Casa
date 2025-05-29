@@ -9,7 +9,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
         model = Usuario
         fields = ['id', 'email', 'nombre', 'fecha_creacion']
 
-class SignInSerializer(serializers.ModelSerializer):
+class SignUpSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
 
     class Meta:
