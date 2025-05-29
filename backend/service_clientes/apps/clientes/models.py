@@ -10,8 +10,5 @@ class Cliente(models.Model):
     direccion = models.TextField(db_column='direccion_cliente')
     email = models.EmailField(max_length=100, db_column='email_cliente')
 
-    def __str__(self):
-        return self.nombre
-
     class Meta:
         db_table = 'cliente'
