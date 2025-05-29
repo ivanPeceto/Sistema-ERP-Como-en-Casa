@@ -2,12 +2,13 @@
 
 html,
 body,
-#root { /* El div donde se monta tu app React */
-  height: 100%;
+#root {
+  height: 100vh;
   width: 100%;
   margin: 0;
   padding: 0;
-  box-sizing: border-box; /* Buena práctica tenerlo aquí */
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 a {
@@ -20,10 +21,7 @@ a:hover {
 }
 
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  background-color: #818181;
+  font-family: 'ubuntu_custom', sans-serif;
 }
 
 h1 {

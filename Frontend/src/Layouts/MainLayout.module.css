@@ -1,0 +1,70 @@
+.mainLayoutContainer {
+  display: flex;
+  width: 100vw; 
+  height: 100vh;
+  overflow: hidden; 
+  box-sizing: border-box;
+  background-color: #1a202c;
+}
+
+.contentArea {
+  flex-grow: 1; 
+  padding: 1.5rem; 
+  overflow-y: auto; 
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .mainLayoutContainer {
+    flex-direction: column; 
+  }
+
+  .contentArea {
+    padding: 0.5rem;
+  }
+
+  .mainLayoutContainer .sidebarContainer {
+    width: 100% !important;
+    height: auto !important;
+    flex-direction: row !important;
+    padding: 0.5rem;
+    border-radius: 0;
+    box-shadow: none;
+    border-top: 1px solid #2d3748;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+  }
+
+  .mainLayoutContainer .sidebarContainer .logoLink,
+  .mainLayoutContainer .sidebarContainer .menuSection,
+  .mainLayoutContainer .sidebarContainer .accountLink {
+    flex-direction: row;
+    justify-content: space-around;
+    width: 100%;
+    padding: 0;
+    border-top-width: 0;
+  }
+
+  .mainLayoutContainer .sidebarContainer .menuItem,
+  .mainLayoutContainer .sidebarContainer .accountLink {
+    width: auto;
+    height: 3rem;
+    margin: 0;
+  }
+
+  .mainLayoutContainer .sidebarContainer .menuItemText,
+  .mainLayoutContainer .sidebarContainer .logoText,
+  .mainLayoutContainer .sidebarContainer .accountText {
+    display: none;
+  }
+
+  .mainLayoutContainer .sidebarContainer .icon {
+    margin: 0;
+  }
+
+  .mainLayoutContainer .contentArea {
+    padding-bottom: calc(3rem + 1rem);
+  }
+}

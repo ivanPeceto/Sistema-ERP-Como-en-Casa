@@ -1,26 +1,35 @@
-// src/router/index.tsx
-import { createBrowserRouter} from 'react-router-dom'; // <--- IMPORTANTE
-import App from '../App';
-import LoginPage from '../pages/login_page';        
-import RegisterPage from '../pages/register_page';  
+// Aca se define que componente se ve en cada url.
+import { createBrowserRouter } from 'react-router-dom';
+import App from '../App'; 
+import LoginPage from '../pages/login_page';
+import RegisterPage from '../pages/register_page';
+import GestionPedidosPage from '../pages/gestion_pedidos_page';
+import MainLayout from '../Layouts/MainLayout'; 
 
-// Asegúrate de que el nombre del archivo y la importación coincidan exactamente en mayúsculas/minúsculas
-import GestionPedidosPage from '../pages/gestion_pedidos_page'; // Si tu archivo es GestionPedidosPage.tsx
-// (El resto de tus componentes de página si los tienes)
+  // -------        -------        -------        -------        -------        -------
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <App />, // App contiene el MainMenu y el Outlet
+    // -- App es el punto de partida del router
+    element: <App />, 
     children: [
       {
-        index: true,
-        element: <GestionPedidosPage />,
+        path: '/', 
+        element: <MainLayout />,
+        children: [
+          {
+            index: true, // Esto hace que gestion_pedidos_page sea la página por defecto en '/'
+            element: <GestionPedidosPage />,
+          },
+        ],
       },
-
     ],
   },
-  { // Rutas que NO USAN el layout de App (sin MainMenu)
+
+  // -------        -------        -------        -------        -------        -------
+
+  { // Estas son rutas que NO usan el layout principal (sin sidebar). Por ejmplo el login o registro
     path: '/login',
     element: <LoginPage />,
   },
@@ -30,4 +39,6 @@ const router = createBrowserRouter([
   },
 ]);
 
-export default router; // Exportas el objeto router directamente
+  // -------        -------        -------        -------        -------        -------
+
+export default router; 
