@@ -24,7 +24,7 @@ class ProductoEditarView(APIView):
         return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
 
 class ProductoEliminarView(APIView):
-    def delete(self, request, pk):
+    def post(self, request, pk):
         producto = get_object_or_404(Producto, pk=pk)
         producto.delete()
         return Response({'mensaje': 'Producto eliminado correctamente.'}, status=status.HTTP_200_OK)

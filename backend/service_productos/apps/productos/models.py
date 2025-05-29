@@ -8,8 +8,5 @@ class Producto(models.Model):
     precio_por_bulto = models.DecimalField(max_digits=10, decimal_places=2, db_column='precio_por_bulto_producto')
     disponible = models.BooleanField(default=True, db_column='disponible_producto')
 
-    def __str__(self):
-        return self.nombre
-
     class Meta:
         db_table = 'producto'

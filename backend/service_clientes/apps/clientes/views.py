@@ -24,7 +24,7 @@ class ClienteEditarView(APIView):
         return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
 
 class ClienteEliminarView(APIView):
-    def delete(self, request, pk):
+    def post(self, request, pk):
         cliente = get_object_or_404(Cliente, pk=pk)
         cliente.delete()
         return Response({'mensaje': 'Cliente eliminado correctamente.'}, status=status.HTTP_200_OK)
