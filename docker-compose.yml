@@ -70,7 +70,7 @@ services:
       - "8003:8003"
     depends_on:
       - db_productos
-    
+
   db_pedidos:
     image: mysql:8.0
     container_name: db_pedidos

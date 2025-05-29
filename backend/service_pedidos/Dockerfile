@@ -1,8 +1,8 @@
 FROM python:3.11-slim
 
-WORKDIR /clientes
+WORKDIR /pedidos
 
-COPY . /clientes/
+COPY . /pedidos/
 
 RUN apt-get update && \
     apt-get install -y \
@@ -21,7 +21,7 @@ COPY scripts/wait-for-it.sh /usr/local/bin/wait-for-it.sh
 
 RUN chmod +x /usr/local/bin/wait-for-it.sh
 
-ENTRYPOINT ["wait-for-it.sh", "db_clientes:3306", "--timeout=60","--"]
+ENTRYPOINT ["wait-for-it.sh", "db_pedidos:3306", "--timeout=60","--"]
 
 EXPOSE 8002
 
