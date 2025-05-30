@@ -25,4 +25,4 @@ ENTRYPOINT ["wait-for-it.sh", "db_pedidos:3306", "--timeout=60","--"]
 
 EXPOSE 8002
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8002"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8004"]

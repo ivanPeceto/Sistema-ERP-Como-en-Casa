@@ -4,9 +4,12 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Cliente
 from .serializer import ClienteSerializer
+from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 
 class ClienteCrearView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
         serializer = ClienteSerializer(data=request.data)
         if serializer.is_valid():
@@ -15,6 +18,8 @@ class ClienteCrearView(APIView):
         return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
 
 class ClienteEditarView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def put(self, request, pk):
         cliente = get_object_or_404(Cliente, pk=pk)
         serializer = ClienteSerializer(cliente, data=request.data)
@@ -24,18 +29,24 @@ class ClienteEditarView(APIView):
         return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
 
 class ClienteEliminarView(APIView):
-    def delete(self, request, pk):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
         cliente = get_object_or_404(Cliente, pk=pk)
         cliente.delete()
         return Response({'mensaje': 'Cliente eliminado correctamente.'}, status=status.HTTP_200_OK)
 
 class ClienteListarView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         clientes = Cliente.objects.all()
         serializer = ClienteSerializer(clientes, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class ClienteBuscarView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, pk):
         cliente = get_object_or_404(Cliente, pk=pk)
         serializer = ClienteSerializer(cliente)
