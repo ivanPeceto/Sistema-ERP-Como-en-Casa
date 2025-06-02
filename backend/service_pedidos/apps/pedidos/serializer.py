@@ -59,6 +59,29 @@ class PedidoSerializer(serializers.ModelSerializer):
                 precio_unitario= producto['precio_unitario']
             )
         return pedido
+    
+
+    def update(self, instance, validated_data):
+        productos = validated_data.pop('productos', [])
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        # Eliminar los productos anteriores
+        PedidoProductos.objects.filter(id_pedido=instance).delete()
+
+        # Crear los nuevos productos
+        for producto in productos:
+            PedidoProductos.objects.create(
+                id_pedido=instance,
+                id_producto=producto['id_producto'],
+                nombre_producto=producto['nombre_producto'],
+                cantidad_producto=producto['cantidad_producto'],
+                precio_unitario=producto['precio_unitario']
+            )
+
+        return instance
 
     #chequear la posibilidad de sacar esto
     #o explicarlo bien
