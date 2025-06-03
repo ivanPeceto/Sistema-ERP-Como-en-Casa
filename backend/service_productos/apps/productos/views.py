@@ -32,6 +32,7 @@ class ProductoEditarView(APIView):
             productoSerializer = ProductoSerializer(producto, data=request.data)
 
             if productoSerializer.is_valid():
+                productoSerializer.save()
                 return Response({'detail':'Producto editado exitosamente'}, status=status.HTTP_200_OK)
             else:
                 return Response(productoSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -41,7 +42,7 @@ class ProductoEditarView(APIView):
 class ProductoEliminarView(APIView):
     permission_classes = [IsAuthenticated, IsSuperUser]
 
-    def post(self, request, pk):
+    def post(self, request):
         id = request.query_params.get('id')
 
         if not id:
@@ -58,7 +59,7 @@ class ProductoListarView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        productos = Producto.objects.filter(disponible=True)
+        productos = Producto.objects.all()
         serializer = ProductoSerializer(productos, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -75,7 +76,7 @@ class ProductoBuscarView(ListAPIView):
 
         try:
             if not id:
-                producto = Producto.objects.filter(nombre_pedido=nombre, disponible=True)
+                producto = Producto.objects.filter(nombre=nombre, disponible=True)
                 return producto
             else:
                 producto = Producto.objects.filter(id=id)
