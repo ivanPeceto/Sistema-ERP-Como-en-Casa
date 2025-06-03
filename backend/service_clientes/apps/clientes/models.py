@@ -8,7 +8,6 @@ class Cliente(models.Model):
     nombre = models.CharField(max_length=100, db_column='nombre_cliente')
     telefono = models.CharField(max_length=20, db_column='telefono_cliente')
     direccion = models.TextField(db_column='direccion_cliente')
-    email = models.EmailField(max_length=100, db_column='email_cliente')
 
     class Meta:
         db_table = 'cliente'
