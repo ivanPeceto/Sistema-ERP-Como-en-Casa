@@ -2,13 +2,15 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import authenticate
 from rest_framework import serializers
 
-    ##NO USADO - BORRAR DESPUES##
+##DEFINITIVAMENTE NO USADO BORRAR DESPEUS
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
+        token['email'] = user.email
         token['nombre'] = user.nombre
+        token['is_superuser'] = user.is_superuser
         return token
     
     def validate(self, attrs):

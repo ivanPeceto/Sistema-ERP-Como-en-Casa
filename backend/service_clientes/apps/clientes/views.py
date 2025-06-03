@@ -5,10 +5,11 @@ from rest_framework import status
 from .models import Cliente
 from .serializer import ClienteSerializer
 from rest_framework.permissions import IsAuthenticated
+from utils.permissions import IsSuperUser
 from django.shortcuts import get_object_or_404
 
 class ClienteCrearView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsSuperUser]
 
     def post(self, request):
         serializer = ClienteSerializer(data=request.data)

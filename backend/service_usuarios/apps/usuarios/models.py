@@ -9,7 +9,8 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError('El usuario debe tener un correo electrónico')
         email = self.normalize_email(email)
-        user = self.model(email=email, nombre=nombre)
+        user = self.model(email=email,
+                            nombre=nombre)
         #guarda la contraseña ya hasheada con SHA256 y le aplica salt automaticamente
         user.set_password(password)
         user.save(using=self._db)
@@ -21,7 +22,6 @@ class UserManager(BaseUserManager):
         email = self.normalize_email(email)
         user = self.model(email=email,
                            nombre=nombre,
-                           is_staff=True,
                            is_superuser=True)
         user.set_password(password)
         user.save(using=self._db)
@@ -31,8 +31,6 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True, db_column='email_usuario')
     nombre = models.CharField(max_length=255, db_column='nombre_usuario')
     fecha_creacion = models.DateTimeField(default=timezone.now, db_column='fecha_creacion_usuario')
-    is_active = models.BooleanField(default=True, db_column='activo_usuario')
-    is_staff = models.BooleanField(default=False, db_column='admin_usuario')
 
     objects = UserManager()
 

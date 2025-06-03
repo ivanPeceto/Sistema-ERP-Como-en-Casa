@@ -27,6 +27,14 @@ class UserLoginView(APIView):
             refresh_token = RefreshToken.for_user(user)
             access_token = refresh_token.access_token
 
+            refresh_token['email'] = user.email
+            refresh_token['nombre'] = user.nombre
+            refresh_token['is_superuser'] = user.is_superuser
+
+            access_token['email'] = user.email
+            access_token['nombre'] = user.nombre
+            access_token['is_superuser'] = user.is_superuser
+
             return Response({
                     'refresh': str(refresh_token),
                     'access': str(access_token),
@@ -44,6 +52,14 @@ class UserSignUpView(APIView):
 
             refresh_token = RefreshToken.for_user(user)
             access_token = refresh_token.access_token
+
+            refresh_token['email'] = user.email
+            refresh_token['nombre'] = user.nombre
+            refresh_token['is_superuser'] = user.is_superuser
+
+            access_token['email'] = user.email
+            access_token['nombre'] = user.nombre
+            access_token['is_superuser'] = user.is_superuser
             
             return Response({
                 'refresh': str(refresh_token),
