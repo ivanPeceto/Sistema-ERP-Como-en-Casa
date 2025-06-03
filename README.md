@@ -18,7 +18,13 @@ Para el desarrollo del backend optamos por utilizar Django ya que incorpora de m
 
 A continuación se presenta un bosquejo del diagrama de arquitectura que representa la estructura general de la aplicación, separando claramente el frontend del backend y mostrando los flujos principales entre las distintas funcionalidades:
 
-![Diagrama de Arquitectura](graficos/grafico_arquitectura_latest.jpg)
+![Diagrama de Usuarios](graficos/usuarios.jpg)
+![Diagrama de Clientes](graficos/clientes.jpg)
+![Diagrama de Productos](graficos/productos.jpg)
+![Diagrama de Pedidos](graficos/pedidos.jpg)
+
+
+
 
 ---
 
