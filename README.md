@@ -20,7 +20,7 @@ A continuación se presenta un bosquejo del diagrama de arquitectura que represe
 
 Microservicio Usuarios:
 
-![Diagrama de Usuarios](graficos/usuarios.jpg)
+![Diagrama de Usuarios](graficos/usuariosnew.jpg)
 
 Microservicio Clientes:
 
