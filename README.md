@@ -43,7 +43,7 @@ Microservicio Pedidos.
 
 Presentamos el esquema que representa las diversas entidades y relaciones que conforman los circuitos internos de la aplicación:
 
-![Diagrama de Base de Datos](graficos/grafico_bdd.png)
+![Diagrama de Base de Datos](graficos/grafico2modif.jpg)
 
 
 ---
