@@ -1,17 +1,15 @@
+/* src/components/order_panel/OrderPanel.module.css */
 .panel {
-background-color: #1a202c;
+  background-color: #1a202c;
   border-radius: 5px;
   color: white;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  flex: 1;
-  height: 100%; 
+  flex: 1; /* Mantenido para distribución horizontal si es el comportamiento deseado */
 }
 
 .central {
-  flex: 2; 
+  flex: 2;
 }
 
 .panel h2 {
@@ -20,15 +18,20 @@ background-color: #1a202c;
   width: 100%;
   text-align: center;
   margin: 0;
+  background-color: #323b4e;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
 }
 
 .contenido {
   background: white;
   color: black;
   padding: 0;
-  flex-grow: 1; /* Para que ocupe el espacio disponible en el panel */
-  overflow-y: auto; /* ¡AQUÍ ES DONDE APARECERÁ LA BARRA DE SCROLL VERTICAL PARA EL CONTENIDO DEL PANEL! */
+  flex-grow: 1;
+  overflow-y: auto;
   width: 100%;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
 }
 
 .fila {
@@ -52,11 +55,11 @@ background-color: #1a202c;
 
 .pedido {
   background-color: #f9f9f9;
-  cursor: pointer; /* Para indicar que es clickeable */
+  cursor: pointer;
 }
 
 .pedido:hover {
-  background-color: #e0e0e0; /* Hover para filas de pedido */
+  background-color: #e0e0e0;
 }
 
 .pedido:nth-child(even) {
@@ -81,12 +84,10 @@ background-color: #1a202c;
   width: 80px;
   text-align: right;
   flex-shrink: 0;
-  padding-right: 3rem;
+  /* padding-right: 3rem; Ya no es necesario si se ajusta diferente */
   margin-left: auto;
-  padding-right: -0.5rem;
+  /* padding-right: -0.5rem; */
 }
-
-
 
 .acciones {
   display: flex;
@@ -103,7 +104,7 @@ background-color: #1a202c;
   border: 1px solid #ccc;
   background-color: #f0f0f0;
   border-radius: 3px;
-  color: black; /* Asegura el color del texto del botón */
+  color: black;
 }
 
 .acciones button:hover {
@@ -112,13 +113,15 @@ background-color: #1a202c;
 
 .resumen {
   padding: 1rem;
-  margin-top: 1rem;
   color: white;
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   box-sizing: border-box;
+  background-color: #323b4e;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
 }
 
 .resumen div {
@@ -141,16 +144,15 @@ background-color: #1a202c;
   background-color: #f0f0f0;
 }
 
-/* Media Queries (ya las tienes, asegúrate de que estén en gestion_pedidos.module.css para el contenedor principal) */
-/* Estas media queries ahora solo afectarían a los paneles si los reubicaras */
-/* Es importante que las media queries del layout general estén en MainLayout.module.css
-   y las de la página de pedidos en gestion_pedidos.module.css */
+/* Media Queries (si las tenías antes, asegúrate de que estén en el lugar correcto) */
 @media (max-width: 768px) {
-
   .panel {
     margin-bottom: 1rem;
   }
   .panel:last-child {
     margin-bottom: 0;
+  }
+  .paneles { /* Asegura que los paneles se apilen en pantallas pequeñas */
+    flex-direction: column;
   }
 }
