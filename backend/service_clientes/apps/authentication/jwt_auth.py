@@ -6,9 +6,11 @@ class MicroservicesJWTAuthentication(JWTAuthentication):
         #Es necesario crear un usuario ficticio que sirva para verificar
         #el JWT dentro de cada microservicio
         class FalseUser:
-            def __init__(self, user_id):
+            def __init__(self, user_id, is_superuser=False):
                 self.id = user_id
                 self.is_authenticated = True
+                self.is_superuser = is_superuser
 
         user_id = validated_token[api_settings.USER_ID_CLAIM]
-        return FalseUser(user_id)
+        is_superuser = validated_token.get('is_superuser', False)
+        return FalseUser(user_id, is_superuser)

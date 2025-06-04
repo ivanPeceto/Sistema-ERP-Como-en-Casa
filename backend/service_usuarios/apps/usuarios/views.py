@@ -5,13 +5,6 @@ from rest_framework.permissions import IsAuthenticated
 from .serializer import LogInSerializer, SignUpSerializer, UsuarioSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
-from .jwt_serializer import CustomTokenObtainPairSerializer
-
-
-class CustomTokenObtainPairView(TokenObtainPairView):
-    ##Necesitamos crear un tokemobtainpair custom porque usamos el email como user_field
-    ##y el metodo del que heredamos por defecto usa el nombre del usuario como user_field
-    serializer_class = CustomTokenObtainPairSerializer
 
 
 class UserLoginView(APIView):
@@ -26,6 +19,14 @@ class UserLoginView(APIView):
             #Y el de access 10 minutos
             refresh_token = RefreshToken.for_user(user)
             access_token = refresh_token.access_token
+
+            refresh_token['email'] = user.email
+            refresh_token['nombre'] = user.nombre
+            refresh_token['is_superuser'] = user.is_superuser
+
+            access_token['email'] = user.email
+            access_token['nombre'] = user.nombre
+            access_token['is_superuser'] = user.is_superuser
 
             return Response({
                     'refresh': str(refresh_token),
@@ -44,6 +45,14 @@ class UserSignUpView(APIView):
 
             refresh_token = RefreshToken.for_user(user)
             access_token = refresh_token.access_token
+
+            refresh_token['email'] = user.email
+            refresh_token['nombre'] = user.nombre
+            refresh_token['is_superuser'] = user.is_superuser
+
+            access_token['email'] = user.email
+            access_token['nombre'] = user.nombre
+            access_token['is_superuser'] = user.is_superuser
             
             return Response({
                 'refresh': str(refresh_token),

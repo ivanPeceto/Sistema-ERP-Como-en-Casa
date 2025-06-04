@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'apps.productos',
+    'apps.categorias',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
@@ -51,7 +52,7 @@ REST_FRAMEWORK = {
     )
 }
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=4),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     "ALGORITHM": "HS256",
     'SIGNING_KEY': 'clave_secreta_123',
