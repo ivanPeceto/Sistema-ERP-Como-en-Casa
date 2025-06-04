@@ -5,13 +5,6 @@ from rest_framework.permissions import IsAuthenticated
 from .serializer import LogInSerializer, SignUpSerializer, UsuarioSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
-from .jwt_serializer import CustomTokenObtainPairSerializer
-
-
-class CustomTokenObtainPairView(TokenObtainPairView):
-    ##Necesitamos crear un tokemobtainpair custom porque usamos el email como user_field
-    ##y el metodo del que heredamos por defecto usa el nombre del usuario como user_field
-    serializer_class = CustomTokenObtainPairSerializer
 
 
 class UserLoginView(APIView):
