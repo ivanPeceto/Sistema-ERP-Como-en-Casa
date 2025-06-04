@@ -6,3 +6,4 @@ class PedidoProductos(models.Model):
     cantidad_producto = models.DecimalField(db_column= 'cantidad_producto', max_digits=6, decimal_places=2)
     nombre_producto = models.CharField(max_length=100, db_column='nombre_producto')
     precio_unitario = models.DecimalField(db_column= 'precio_unitario', max_digits=10, decimal_places=2)
+    
