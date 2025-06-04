@@ -1,6 +1,7 @@
 from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+from utils.permissions import IsSuperUser
 from rest_framework.response import Response
 from rest_framework import status
 from apps.pedidos.models import Pedido
@@ -43,7 +44,7 @@ class CrearPedidoView(APIView):
 
 ##Añadir busqueda por ID directo como en el metodo editar
 class EliminarPedidoView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsSuperUser]
 
     def post(self, request):
         fecha = request.query_params.get('fecha')
