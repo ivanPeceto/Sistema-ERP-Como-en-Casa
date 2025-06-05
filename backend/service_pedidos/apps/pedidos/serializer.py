@@ -127,16 +127,34 @@ class PedidoSerializer(serializers.ModelSerializer):
 
         return instance
 
-    #chequear la posibilidad de sacar esto
-    #o explicarlo bien
+
     def get_productos_detalle(self, pedido):
-        ##Busca en la tabla pedidoProductos todas las filas donde
-        ##id_pedido sea el mismo que en el argumento pedido
+        """!
+        @brief Obtiene y serializa los detalles de los productos asociados a un pedido.
+        @details
+            Este método es llamado por el campo 'productos_detalle' (SerializerMethodField).
+            Busca en la tabla PedidoProductos todos los ítems que pertenecen al pedido
+            dado (filtrando por id_pedido).
+            Luego, serializa esta lista de ítems utilizando PedidoProductosSerializer.
+        @param pedido: La instancia del Pedido para la cual se obtienen los productos.
+        @return productoslist: Una lista de diccionarios, donde cada diccionario es la representación
+                      serializada de un PedidoProductos.
+        """
         productos = PedidoProductos.objects.filter(id_pedido=pedido.id)
-        json = PedidoProductosSerializer(productos, many=True).data
-        return json
+        productoslist = PedidoProductosSerializer(productos, many=True).data
+        return productoslist
 
     def get_total(self, pedido):
+        """!
+        @brief Calcula el monto total de un pedido sumando los subtotales de sus productos.
+        @details
+            Este método es llamado por el campo 'total' (SerializerMethodField).
+            Obtiene todos los PedidoProductos asociados al pedido.
+            Para cada uno, obtiene su subtotal y los suma.
+            Redondea el total a dos decimales.
+        @param pedido: La instancia del Pedido para la cual se calcula el total.
+        @return float: El monto total del pedido.
+        """
         productos = PedidoProductos.objects.filter(id_pedido=pedido.id)
         total = 0.0
 
