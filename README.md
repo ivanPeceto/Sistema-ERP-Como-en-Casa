@@ -30,6 +30,8 @@ Microservicio Productos:
 
 ![Diagrama de Productos](graficos/productos.jpg)
 
+![Diagrama de Categorias](graficos/categorias.jpg)
+
 Microservicio Pedidos.
 
 ![Diagrama de Pedidos](graficos/pedidos.jpg)
