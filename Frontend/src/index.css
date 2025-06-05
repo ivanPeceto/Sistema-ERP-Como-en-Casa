@@ -1,3 +1,9 @@
+/**
+ * @archivo: index.css
+ * @descripcion: Estilos globales base para la aplicación, incluyendo importación de fuentes
+ * y reseteo de estilos para html, body y el elemento raíz.
+ **/
+
 @import url('../public/assets/fonts/fonts.css');
 
 html,

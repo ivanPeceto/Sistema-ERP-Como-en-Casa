@@ -1,0 +1,289 @@
+/**
+ * @archivo: crearPedidoPage.module.css
+ * @descricion: Estilos para la página de creación de pedidos. Define la estructura
+ * de dos paneles principales: selección de productos (con pestañas de categorías)
+ * y el resumen del pedido actual, además de estilos para la cabecera y controles.
+ **/
+.pageContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  flex-grow: 1;
+  padding: 0;
+  box-sizing: border-box;
+  background-color: #f0f4f8;
+}
+
+.headerSection {
+  padding: 15px 20px;
+  background-color: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.headerSection h1 {
+  text-align: center;
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 1.8rem;
+}
+
+.clienteSelector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+.clienteSelector label {
+  font-weight: 500;
+}
+.clienteSelector input {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  min-width: 250px;
+}
+
+.mainGrid {
+  display: flex;
+  flex-grow: 1;
+  gap: 20px;
+  padding: 20px;
+  overflow: hidden;
+}
+
+.productSelectionPanel {
+  flex: 1;
+  min-width: 300px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.productSelectionPanel h2,
+.currentOrderPanel h2 {
+  font-size: 1.3rem;
+  color: #fff;
+  background-color: #34495e;
+  padding: 12px 15px;
+  margin: 0;
+  text-align: center;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.categoryTabs {
+  display: flex;
+  background-color: #ecf0f1;
+  padding: 5px;
+  overflow-x: auto;
+}
+
+.categoryTab {
+  padding: 10px 15px;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #7f8c8d;
+  border-bottom: 3px solid transparent;
+  transition: color 0.2s, border-bottom-color 0.2s;
+  white-space: nowrap;
+}
+.categoryTab:hover {
+  color: #34495e;
+}
+.categoryTab.activeTab {
+  color: #2c3e50;
+  border-bottom-color: #3498db;
+}
+
+.productList {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.productItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.productItem:last-child {
+  border-bottom: none;
+}
+
+.productInfo strong {
+  display: block;
+  font-size: 1rem;
+  color: #333;
+}
+.productInfo span {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.addButtonSmall {
+  padding: 6px 12px;
+  background-color: #2ecc71;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.addButtonSmall:hover {
+  background-color: #27ae60;
+}
+
+.currentOrderPanel {
+  flex: 1.5;
+  min-width: 350px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.orderItemsList {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.emptyOrderText {
+  text-align: center;
+  padding: 20px;
+  color: #777;
+  font-style: italic;
+}
+
+.orderItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 10px;
+  border-bottom: 1px solid #f0f0f0;
+  gap: 10px;
+}
+.orderItem:last-child {
+  border-bottom: none;
+}
+
+.orderItemInfo {
+  flex-grow: 1;
+}
+.orderItemInfo strong {
+  display: block;
+}
+.orderItemInfo span {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.orderItemControls {
+  display: flex;
+  align-items: center;
+}
+
+.quantityButton {
+  background-color: #ecf0f1;
+  border: 1px solid #bdc3c7;
+  color: #2c3e50;
+  width: 30px;
+  height: 30px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.quantityButton:hover {
+  background-color: #dadedf;
+}
+
+.quantityInput {
+  width: 40px;
+  text-align: center;
+  margin: 0 5px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  -moz-appearance: textfield;
+}
+.quantityInput::-webkit-outer-spin-button,
+.quantityInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+
+.orderItemSubtotal {
+  min-width: 80px;
+  text-align: right;
+  font-weight: 500;
+}
+
+.deleteItemButton {
+  background-color: transparent;
+  border: none;
+  color: #e74c3c;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0 5px;
+}
+.deleteItemButton:hover {
+  color: #c0392b;
+}
+
+.orderSummary {
+  padding: 15px;
+  border-top: 1px solid #e0e0e0;
+  background-color: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.totalDisplay strong {
+  font-size: 1.4rem;
+  color: #333;
+}
+
+.confirmOrderButton {
+  padding: 12px 25px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.confirmOrderButton:hover {
+  background-color: #2980b9;
+}
+
+@media (max-width: 900px) {
+  .mainGrid {
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .productSelectionPanel,
+  .currentOrderPanel {
+    flex: none;
+    min-height: 300px;
+  }
+}

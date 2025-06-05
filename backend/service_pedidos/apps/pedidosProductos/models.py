@@ -20,3 +20,4 @@ class PedidoProductos(models.Model):
 
     class Meta:
         db_table = 'pedidoProductos'
+
