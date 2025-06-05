@@ -1,6 +1,14 @@
 from django.db import models
 
 class Producto(models.Model):
+    """!
+    @brief Modelo para representar un producto.
+    @details
+        Este modelo hereda de models.Model de Django, proporcionando la base
+        para la interacción con la base de datos a través del ORM de Django.
+        Cada instancia de esta clase representa un producto.
+    """
+    
     id = models.AutoField(primary_key=True, db_column='id_producto')
     nombre = models.CharField(max_length=100, db_column='nombre_producto')
     descripcion = models.TextField(db_column='descripcion_producto')

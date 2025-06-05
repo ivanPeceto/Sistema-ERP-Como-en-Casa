@@ -3,6 +3,14 @@ from apps.pedidos.models import Pedido
 from apps.pedidosProductos.models import PedidoProductos
 
 class PedidoProductosSerializer(serializers.ModelSerializer):
+    """!
+    @brief Serializador para el modelo PedidoProductos (ítems de un pedido).
+    @details
+        Este serializador convierte instancias del modelo PedidoProductos a JSON.
+        Calcula dinámicamente el subtotal para cada producto del pedido.
+        Es utilizado tanto para la entrada de datos de productos al crear/actualizar
+        un pedido como para mostrar los mismos.
+    """
     subtotal = serializers.SerializerMethodField()
 
     class Meta:
@@ -15,6 +23,16 @@ class PedidoProductosSerializer(serializers.ModelSerializer):
                   'subtotal']
         
     def get_subtotal(self, producto):
+        """!
+        @brief Calcula el subtotal para un ítem del pedido.
+        @details
+            Multiplica el precio_unitario del PedidoProductos por su cantidad_producto.
+        @param producto_pedido: La instancia del modelo PedidoProductos
+                                para la cual se calcula el subtotal.
+        @return float | None: El subtotal calculado como un flotante, o None si el
+                              precio unitario no está definido.
+        """
+
         precio = producto.precio_unitario
 
         if precio is not None:
@@ -23,9 +41,15 @@ class PedidoProductosSerializer(serializers.ModelSerializer):
             return None
 
 class PedidoSerializer(serializers.ModelSerializer):
-    ##Llama automaticamente a get_productos() y get_total()cada vez que se instancie pedidoSerializer
-    ##Hay que realizarlo ya que la columna productos por defecto no existe en
-    ##la tabla de pedidos
+    """!
+    @brief Serializador para el modelo Pedido.
+    @details
+        Gestiona la serialización/deserialización de objetos Pedido.
+        Maneja de forma anidada los productos asociados al pedido PedidoProductos:
+        - Para la entrada, acepta una lista de productos a través del campo 'productos'.
+        - Para la salida, muestra la lista de productos a través del campo 'productos_detalle' y calcula el 'total' del pedido.
+    """
+
     productos = PedidoProductosSerializer(many=True, write_only=True)
     productos_detalle = serializers.SerializerMethodField(read_only=True)
     total = serializers.SerializerMethodField()
@@ -47,7 +71,13 @@ class PedidoSerializer(serializers.ModelSerializer):
         }
     
     def create(self, validated_data):
-        #Añadir try except aca
+        """!
+        @brief Crea una instancia de Pedido y sus PedidoProductos asociados.
+        @details
+            Sobrescribe el método create base para manejar la creación anidada.
+        @param validated_data (dict): Datos validados por el serializador.
+        @return Pedido: La instancia del 'Pedido' creado.
+        """        
         productos = validated_data.pop('productos', [])
         pedido = Pedido.objects.create(**validated_data)
         for producto in productos:
@@ -62,6 +92,20 @@ class PedidoSerializer(serializers.ModelSerializer):
     
 
     def update(self, instance, validated_data):
+        """!
+        @brief Actualiza una instancia de `Pedido` y sus `PedidoProductos` asociados.
+        @details
+            Sobrescribe el método `update` base.
+            Extrae los datos de los productos. Actualiza los campos del `Pedido` (`instance`).
+            Luego, elimina todos los `PedidoProductos` existentes asociados a esta instancia
+            de pedido y crea nuevos `PedidoProductos` basados en los datos de `productos`
+            proporcionados en la solicitud. Este enfoque (borrar y recrear) es una
+            estrategia común para manejar actualizaciones de colecciones anidadas.
+        @param instance (Pedido): La instancia original del `Pedido` a actualizar.
+        @param validated_data (dict): Datos validados por el serializador para la actualización.
+        @return Pedido: La instancia del `Pedido` actualizada.
+        """
+        
         productos = validated_data.pop('productos', [])
 
         for attr, value in validated_data.items():
@@ -83,16 +127,34 @@ class PedidoSerializer(serializers.ModelSerializer):
 
         return instance
 
-    #chequear la posibilidad de sacar esto
-    #o explicarlo bien
+
     def get_productos_detalle(self, pedido):
-        ##Busca en la tabla pedidoProductos todas las filas donde
-        ##id_pedido sea el mismo que en el argumento pedido
+        """!
+        @brief Obtiene y serializa los detalles de los productos asociados a un pedido.
+        @details
+            Este método es llamado por el campo 'productos_detalle' (SerializerMethodField).
+            Busca en la tabla PedidoProductos todos los ítems que pertenecen al pedido
+            dado (filtrando por id_pedido).
+            Luego, serializa esta lista de ítems utilizando PedidoProductosSerializer.
+        @param pedido: La instancia del Pedido para la cual se obtienen los productos.
+        @return productoslist: Una lista de diccionarios, donde cada diccionario es la representación
+                      serializada de un PedidoProductos.
+        """
         productos = PedidoProductos.objects.filter(id_pedido=pedido.id)
-        json = PedidoProductosSerializer(productos, many=True).data
-        return json
+        productoslist = PedidoProductosSerializer(productos, many=True).data
+        return productoslist
 
     def get_total(self, pedido):
+        """!
+        @brief Calcula el monto total de un pedido sumando los subtotales de sus productos.
+        @details
+            Este método es llamado por el campo 'total' (SerializerMethodField).
+            Obtiene todos los PedidoProductos asociados al pedido.
+            Para cada uno, obtiene su subtotal y los suma.
+            Redondea el total a dos decimales.
+        @param pedido: La instancia del Pedido para la cual se calcula el total.
+        @return float: El monto total del pedido.
+        """
         productos = PedidoProductos.objects.filter(id_pedido=pedido.id)
         total = 0.0
 
