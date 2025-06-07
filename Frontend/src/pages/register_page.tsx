@@ -17,7 +17,7 @@ const RegisterPage: React.FC = () => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault(); 
 
-    // -------        -------        -------        -------        -------        -------
+
 
     // Primero, nos aseguramos de que las contraseñas que ingresó el usuario coincidan.
     if (password !== confirmPassword) {
@@ -30,7 +30,7 @@ const RegisterPage: React.FC = () => {
     // Esto es solo para que este organizado
   };
 
-  // -------        -------        -------        -------        -------        -------
+
 
   // Componente para el ícono que acompaña a nuestro logo en el formulario.
   const LogoIcon = () => (
@@ -39,7 +39,7 @@ const RegisterPage: React.FC = () => {
     </svg>
   );
 
-  // -------        -------        -------        -------        -------        -------
+
 
   return (
     // Este es el contenedor principal de nuestra página de registro.
@@ -51,7 +51,6 @@ const RegisterPage: React.FC = () => {
         </div>
         <h2 className={styles.title}>REGISTER</h2>
 
-        // -------        -------        -------        -------        -------        -------
 
         {/* Este es el formulario donde el usuario introduce sus datos para crear la cuenta. */}
         <form onSubmit={handleSubmit}>
@@ -100,7 +99,7 @@ const RegisterPage: React.FC = () => {
             />
           </div>
 
-          // -------        -------        -------        -------        -------        -------
+
 
           {/* Este botón envía los datos del formulario para intentar el registro. */}
           <button type="submit" className={styles.submitButton}>
@@ -108,7 +107,7 @@ const RegisterPage: React.FC = () => {
           </button>
         </form>
 
-        // -------        -------        -------        -------        -------        -------
+
 
         {/* Enlace para que el usuario pueda volver a la página de login si ya tiene una cuenta. */}
         <Link to="/login" className={styles.switchFormLink}>
