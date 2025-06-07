@@ -16,10 +16,10 @@ services:
       - usuarios_data:/var/lib/mysql
 
   usuarios:
-    build: ./service_usuarios
+    build: ./backend/service_usuarios
     container_name: usuarios
     volumes:
-      - ./service_usuarios:/app
+      - ./backend/service_usuarios:/app
     ports:
       - "8001:8001"
     depends_on:
@@ -39,10 +39,10 @@ services:
       - clientes_data:/var/lib/mysql
 
   clientes:
-    build: ./service_clientes
+    build: ./backend/service_clientes
     container_name: clientes
     volumes:
-      - ./service_clientes:/app
+      - ./backend/service_clientes:/app
     ports:
       - "8002:8002"
     depends_on:
@@ -62,15 +62,15 @@ services:
       - productos_data:/var/lib/mysql
 
   productos:
-    build: ./service_productos
+    build: ./backend/service_productos
     container_name: productos
     volumes:
-      - ./service_productos:/app
+      - ./backend/service_productos:/app
     ports:
       - "8003:8003"
     depends_on:
       - db_productos
-
+    
   db_pedidos:
     image: mysql:8.0
     container_name: db_pedidos
@@ -85,10 +85,10 @@ services:
       - pedidos_data:/var/lib/mysql
 
   pedidos:
-    build: ./service_pedidos
+    build: ./backend/service_pedidos
     container_name: pedidos
     volumes:
-      - ./service_pedidos:/app
+      - ./backend/service_pedidos:/app
     ports:
       - "8004:8004"
     depends_on:
