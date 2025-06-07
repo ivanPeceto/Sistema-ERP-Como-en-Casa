@@ -12,6 +12,7 @@ import RegisterPage from '../pages/register_page';
 import CrearPedidoPage from '../pages/ArmarPedidosPage';
 import GestionProductosPage from '../pages/GestionProductosPage';
 import GestionClientesPage from '../pages/GestionClientesPage';
+import GestionPedidosPage from '../pages/GestionPedidosPage';
 import MainLayout from '../Layouts/MainLayout';
 
 /**
@@ -44,6 +45,10 @@ const router = createBrowserRouter([
           {
             path: 'clientes',
             element: <GestionClientesPage />,
+          },
+          {
+            path: 'pedidos', 
+            element: <GestionPedidosPage />,
           },
         ],
       },

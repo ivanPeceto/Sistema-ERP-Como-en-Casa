@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom'; 
 import styles from '../styles/login.module.css'; 
 
-// -------        -------        -------        -------        -------        -------
+
 
 const LoginPage: React.FC = () => {
   // Acá guardariamos los datos que el usuario ingresa en los campos de usuario y contraseña.
@@ -20,7 +20,7 @@ const LoginPage: React.FC = () => {
     // Cuando el backend este listo, acá se manejara la autenticación real y la redirección.
   };
 
-  // -------        -------        -------        -------        -------        -------
+
 
   // Componente simple para mostrar un ícono que seria del logo.
   const LogoIcon = () => (
@@ -29,22 +29,18 @@ const LoginPage: React.FC = () => {
     </svg>
   );
 
-  // -------        -------        -------        -------        -------        -------
 
   return (
     // Contenedor principal de la página de login
     <div className={styles.authPageContainer}>
       <div className={styles.formContainer}>
 
-        // -------        -------        -------        -------        -------        -------
 
         {/* El área del logo en la parte superior del formulario. */}
         <div className={styles.formLogo}>
           <LogoIcon />
         </div>
         <h2 className={styles.title}>LOG IN</h2>
-
-        // -------        -------        -------        -------        -------        -------
 
         {/* formulario */}
         <form onSubmit={handleSubmit}>
@@ -71,7 +67,6 @@ const LoginPage: React.FC = () => {
             />
           </div>
 
-          // -------        -------        -------        -------        -------        -------
 
           {/* Contenedor para la opción "Recordarme" y "Olvidé mi contraseña". */}
           <div className={styles.optionsContainer}>
@@ -84,7 +79,6 @@ const LoginPage: React.FC = () => {
               Recordarme
             </label>
 
-            // -------        -------        -------        -------        -------        -------
 
             {/* Enlace para la función de recuperación de contraseña */}
             <Link to="/forgot-password" className={styles.forgotPasswordLink}>
@@ -92,7 +86,7 @@ const LoginPage: React.FC = () => {
             </Link>
           </div>
 
-          // -------        -------        -------        -------        -------        -------
+  
 
           {/* Botón para iniciar sesión. */}
           <button type="submit" className={styles.submitButton}>
@@ -100,7 +94,7 @@ const LoginPage: React.FC = () => {
           </button>
         </form>
 
-        // -------        -------        -------        -------        -------        -------
+
 
         {/* Enlace para ir a la página de registro si el usuario no tiene una cuenta. */}
         <Link to="/register" className={styles.switchFormLink}>
@@ -111,6 +105,6 @@ const LoginPage: React.FC = () => {
   );
 };
 
-// -------        -------        -------        -------        -------        -------
+
 
 export default LoginPage; // Exportamos esta página para que pueda ser usada por el router.

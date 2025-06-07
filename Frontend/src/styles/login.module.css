@@ -28,7 +28,7 @@
   .formLogo {
     width: 70px;
     height: 70px;
-    background-color: #fc4700;
+    background-color: #1a202c;
     border-radius: 50%;
     margin: 0 auto 1.5rem auto;
     display: flex;
@@ -75,8 +75,8 @@
   }
 
   .inputField:focus {
-    border-color: #fc4700;
-    box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25);
+    border-color: #0000001a;
+    box-shadow: 0 0 0 0.2rem #1a202c;
     outline: none;
   }
 
@@ -96,11 +96,11 @@
 
   .checkboxContainer input[type="checkbox"] {
     margin-right: 0.5rem;
-    accent-color: #fc4700;
+    accent-color: #1a202c;
   }
 
   .forgotPasswordLink {
-    color: #fc4700;
+    color: #1a202c;
     text-decoration: none;
   }
 
@@ -111,7 +111,7 @@
   .submitButton {
     width: 100%;
     padding: 0.9rem 1.5rem;
-    background-color: #fc4700;
+    background-color: #1a202c;
     color: white;
     border: none;
     border-radius: 8px;
@@ -122,7 +122,7 @@
   }
 
   .submitButton:hover {
-    background-color: #eb0901;
+    background-color: #1a202c;
   }
 
   .switchFormLink {
