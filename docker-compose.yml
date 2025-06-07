@@ -1,7 +1,6 @@
-version: '3.8'
-
 services:
 
+  # --- BACKEND --- #
   db_usuarios:
     image: mysql:8.0
     container_name: db_usuarios
@@ -94,6 +93,28 @@ services:
     depends_on:
       - db_pedidos
 
+  # --- FRONTEND --- #
+  frontend:
+    container_name: frontend
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    volumes:
+      - ./Frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    environment:
+      # variables de entorno
+      - VITE_API_USUARIOS_URL=http://localhost:8001
+      - VITE_API_CLIENTES_URL=http://localhost:8002
+      - VITE_API_PRODUCTOS_URL=http://localhost:8003
+      - VITE_API_PEDIDOS_URL=http://localhost:8004
+    depends_on:
+      - usuarios
+      - clientes
+      - productos
+      - pedidos
 
 volumes:
   usuarios_data:
