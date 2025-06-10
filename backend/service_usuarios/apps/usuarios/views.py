@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializer import LogInSerializer, SignUpSerializer, UsuarioSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError
 
 
 class UserLoginView(APIView):
@@ -112,3 +113,43 @@ class UserSignUpView(APIView):
                 'user': UsuarioSerializer(user).data,
             },status=status.HTTP_200_OK)
         return Response(signupserializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserTokenRefreshView(APIView):
+    """!
+    @brief Vista para refrescar un token de acceso utilizando un refresh token.
+    @details
+        Esta vista recibe un refresh token válido y devuelve un nuevo access token 
+        con información adicional del usuario (email, nombre, is_superuser) directamente en su payload.
+    """
+    def post(self, request):
+        """!
+        @brief Maneja las solicitudes POST para generar un nuevo access token.
+        @details
+            Espera un cuerpo de solicitud JSON con la forma: {"refresh": "token_string"}.
+            Valida el refresh token proporcionado y genera un nuevo access token.
+            Transfiere los claims personalizados (email, nombre, is_superuser) del
+            refresh token al nuevo access token.
+        @param request: El objeto de la solicitud HTTP.
+        @return:
+                - Exito: Respuesta HTTP 200 OK con el nuevo access token.
+                - Falla: Respuesta HTTP 400 BAD REQUEST.
+        """
+        refresh_token_str = request.data.get('refresh')
+
+        if not refresh_token_str:
+            return Response({'detail': 'El refresh token no fue proporcionado.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            refresh_token = RefreshToken(refresh_token_str)
+
+            access_token = refresh_token.access_token
+
+            access_token['email'] = refresh_token.get('email')
+            access_token['nombre'] = refresh_token.get('nombre')
+            access_token['is_superuser'] = refresh_token.get('is_superuser', False)
+
+            return Response({'access': str(access_token),}, status=status.HTTP_200_OK)
+
+        except TokenError:
+            return Response({'detail': 'El refresh token es inválido o ha expirado.'}, status=status.HTTP_400_BAD_REQUEST)
