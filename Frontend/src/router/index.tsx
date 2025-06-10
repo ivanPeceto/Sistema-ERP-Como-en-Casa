@@ -14,7 +14,7 @@ import GestionProductosPage from '../pages/GestionProductosPage';
 import GestionClientesPage from '../pages/GestionClientesPage';
 import GestionPedidosPage from '../pages/GestionPedidosPage';
 import MainLayout from '../Layouts/MainLayout';
-
+import ProtectedRoute from './protected_route'; 
 /**
  * Configuración del enrutador de la aplicación.
  *
@@ -31,8 +31,11 @@ const router = createBrowserRouter([
     element: <App />, // Componente raíz que puede incluir contexto global o configuraciones iniciales.
     children: [
       {
-        path: '/',
-        element: <MainLayout />, // Layout principal para las secciones internas de la aplicación.
+        path: '/gestion',
+        element:
+        <ProtectedRoute>
+          <MainLayout />
+        </ProtectedRoute>,
         children: [
           {
             index: true, // Define `CrearPedidoPage` como el componente para la ruta padre (`/`).
