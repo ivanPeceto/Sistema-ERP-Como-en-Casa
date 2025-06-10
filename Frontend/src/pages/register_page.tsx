@@ -1,61 +1,76 @@
-// Esta página se encarga del registro de nuevos usuarios en nuestra aplicación.
-// Permite a los usuarios crear una cuenta con sus datos.
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // Para el enlace a la página de login.
-import styles from '../styles/login.module.css'; // Nuestros estilos compartidos para formularios de autenticación.
+/**
+ * @file register_page.tsx
+ * @brief Componente de React para la página de registro de nuevos usuarios.
+ * @details
+ * Este componente renderiza un formulario que permite a un nuevo usuario registrarse
+ * en la aplicación proporcionando su nombre, email y una contraseña.
+ * Utiliza el AuthContext para manejar la lógica de registro y el estado de autenticación.
+ */
 
-// -------        -------        -------        -------        -------        -------
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom'; 
+import styles from '../styles/login.module.css'; 
+import { useAuth } from '../context/auth_context';
 
 const RegisterPage: React.FC = () => {
-  // Aca gestionamos el estado de los campos del formulario: nombre de usuario, email, contraseña y confirmación.
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const { register } = useAuth();
 
-  // Esta función se activa cuando el usuario intenta registrarse.
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  /**
+   * @brief Maneja el envío del formulario de registro.
+   * @details
+   * Esta función se ejecuta cuando el usuario envía el formulario.
+   * Realiza una validación de cliente para asegurar que las contraseñas coincidan.
+   * Llama a la función `register` del AuthContext para comunicarse con el backend.
+   * En caso de éxito, redirige al usuario al panel principal.
+   * En caso de error, muestra un mensaje al usuario.
+   * @param {FormEvent<HTMLFormElement>} event El evento del formulario.
+   */
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault(); 
+    setError(null);
 
-
-
-    // Primero, nos aseguramos de que las contraseñas que ingresó el usuario coincidan.
     if (password !== confirmPassword) {
       alert("¡Las contraseñas no coinciden! Por favor, verificá.");
       return;
     }
 
-    console.log('Intento de registro:', { username, email, password });
-    // Cuando el backend esté listo, vamos a manejar la respuesta del registro y la redirección.
-    // Esto es solo para que este organizado
+    try{
+      await register(username, email, password);
+      navigate('/gestion');
+
+    } catch (err: any){
+      console.error('Error de registro: ', err);
+      if (err.response && err.response.data && err.response.data.email) {
+        setError('Este correo electrónico ya está en uso.');
+      } else {
+        setError('Ocurrió un error durante el registro. Intente de nuevo.');
+      }
+    }
   };
 
-
-
-  // Componente para el ícono que acompaña a nuestro logo en el formulario.
   const LogoIcon = () => (
     <svg viewBox="0 0 24 24" fill="currentColor" height="1em" width="1em">
       <path d="M12.375 3h-.75L3 12.375v-.75L12.375 3zm0 0L21 12.375v-.75L12.375 3zm0 0L3 20.999l9.375-9.374-9.375-9.375zM12.375 3l9.375 9.375-9.375 9.374 9.375-9.374z" />
     </svg>
   );
 
-
-
   return (
-    // Este es el contenedor principal de nuestra página de registro.
     <div className={styles.authPageContainer}>
       <div className={styles.formContainer}>
-        {/* Aquí mostramos el ícono del logo. */}
         <div className={styles.formLogo}>
           <LogoIcon />
         </div>
-        <h2 className={styles.title}>REGISTER</h2>
+        <h2 className={styles.title}>REGISTRARSE</h2>
 
-
-        {/* Este es el formulario donde el usuario introduce sus datos para crear la cuenta. */}
         <form onSubmit={handleSubmit}>
           <div className={styles.formGroup}>
-            <label htmlFor="username">Username</label>
+            <label htmlFor="username">Usuario</label>
             <input
               type="text"
               id="username"
@@ -77,7 +92,7 @@ const RegisterPage: React.FC = () => {
             />
           </div>
           <div className={styles.formGroup}>
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">Contraseña</label>
             <input
               type="password"
               id="password"
@@ -88,7 +103,7 @@ const RegisterPage: React.FC = () => {
             />
           </div>
           <div className={styles.formGroup}>
-            <label htmlFor="confirmPassword">Confirm Password</label>
+            <label htmlFor="confirmPassword">Confirmar Contraseña</label>
             <input
               type="password"
               id="confirmPassword"
@@ -99,17 +114,14 @@ const RegisterPage: React.FC = () => {
             />
           </div>
 
+          {error && <p className={styles.errorMessage}>{error}</p>}
 
-
-          {/* Este botón envía los datos del formulario para intentar el registro. */}
           <button type="submit" className={styles.submitButton}>
             Register
           </button>
         </form>
 
 
-
-        {/* Enlace para que el usuario pueda volver a la página de login si ya tiene una cuenta. */}
         <Link to="/login" className={styles.switchFormLink}>
           ¿Ya tienes una cuenta? Inicia sesión
         </Link>
