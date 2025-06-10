@@ -1,28 +1,43 @@
 // Esta página es para que los usuarios puedan iniciar sesión en la aplicación.
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; 
+import { Link, useNavigate } from 'react-router-dom'; 
 import styles from '../styles/login.module.css'; 
+import { login } from '../services/auth_service'
 
 
 
 const LoginPage: React.FC = () => {
   // Acá guardariamos los datos que el usuario ingresa en los campos de usuario y contraseña.
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false); 
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
-  // Esta función se ejecuta cuando el usuario hace click en "Login".
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    // Evitamos que la página se recargue por defecto.
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault(); 
-    console.log('Intento de login:', { username, password, rememberMe });
-    // Cuando el backend este listo, acá se manejara la autenticación real y la redirección.
-  };
+    setError(null);
+  
 
+  if (!email || !password) {
+    setError('Por favor, complete ambos campos.');
+    return;
+  }
 
+  try {
+    await login(email, password);
+  
+    navigate('/gestion');
+  } catch (err:any){
+    console.error('Error de inicio de sersión: ', err);
+    if (err.response && err.response.data){
+      setError('Credenciales invállidas. Por favor, intente de nuevo.')
+    } else {
+      setError('Ocurrió un error al intentar iniciar sesión.');
+    }
+  }
+};
 
-  // Componente simple para mostrar un ícono que seria del logo.
   const LogoIcon = () => (
     <svg viewBox="0 0 24 24" fill="currentColor" height="1em" width="1em">
       <path d="M12.375 3h-.75L3 12.375v-.75L12.375 3zm0 0L21 12.375v-.75L12.375 3zm0 0L3 20.999l9.375-9.374-9.375-9.375zM12.375 3l9.375 9.375-9.375 9.374 9.375-9.374z" />
@@ -45,18 +60,18 @@ const LoginPage: React.FC = () => {
         {/* formulario */}
         <form onSubmit={handleSubmit}>
           <div className={styles.formGroup}>
-            <label htmlFor="username">Username</label>
+            <label htmlFor="email">Email</label>
             <input
-              type="text"
-              id="username"
+              type="email"
+              id="email"
               className={styles.inputField}
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
           <div className={styles.formGroup}>
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">Contraseña</label>
             <input
               type="password"
               id="password"
@@ -67,34 +82,11 @@ const LoginPage: React.FC = () => {
             />
           </div>
 
-
-          {/* Contenedor para la opción "Recordarme" y "Olvidé mi contraseña". */}
-          <div className={styles.optionsContainer}>
-            <label className={styles.checkboxContainer}>
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-              />
-              Recordarme
-            </label>
-
-
-            {/* Enlace para la función de recuperación de contraseña */}
-            <Link to="/forgot-password" className={styles.forgotPasswordLink}>
-              Olvidaste la contraseña?
-            </Link>
-          </div>
-
-  
-
           {/* Botón para iniciar sesión. */}
           <button type="submit" className={styles.submitButton}>
             Login
           </button>
         </form>
-
-
 
         {/* Enlace para ir a la página de registro si el usuario no tiene una cuenta. */}
         <Link to="/register" className={styles.switchFormLink}>

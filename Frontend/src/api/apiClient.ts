@@ -10,7 +10,7 @@
  */
 
 import axios from 'axios';
-import { getAccessToken, getRefreshToken } from '../services/authService';
+import { getAccessToken, getRefreshToken } from '../services/auth_service';
 
 /**
  * @brief URL base para el microservicio de autenticación y usuarios.
@@ -31,7 +31,7 @@ const baseURL = import.meta.env.VITE_API_USUARIOS_URL;
  * para realizar las llamadas a la API.
  */
 const apiClient = axios.create({
-  baseURL: `${baseURL}/api`,
+  baseURL: `${baseURL}`,
 });
 
 /**
@@ -101,7 +101,7 @@ apiClient.interceptors.response.use(
       try {
         // Intenta obtener un nuevo access token usando el refresh token.
         // Se usa axios.post directamente aquí para evitar un bucle con el interceptor.
-        const response = await axios.post(`${baseURL}/api/auth/token/refresh/`, {
+        const response = await axios.post(`${baseURL}/refresh_token/`, {
           refresh: refreshToken,
         });
 
