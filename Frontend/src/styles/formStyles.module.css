@@ -1,0 +1,149 @@
+/*
+ * @archivo: formStyles.module.css
+ * @descripcion: Estilos compartidos para formularios profesionales y modernos
+ */
+
+/* Contenedor principal del formulario */
+.formContainer {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Secciones del formulario */
+.formSection {
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.formSection:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.formSectionTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 1rem;
+}
+
+/* Campos de entrada */
+.formField {
+  margin-bottom: 0.75rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.formLabel {
+  display: inline-block;
+  margin-bottom: 0;
+  font-weight: 500;
+  color: #4a5568;
+  min-width: 120px;
+  text-align: right;
+}
+
+.formInput,
+.formTextarea {
+  flex: 1;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  transition: border-color 0.2s ease;
+}
+
+.formInput:focus,
+.formTextarea:focus {
+  outline: none;
+  border-color: #4299e1;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+}
+
+.formTextarea {
+  min-height: 60px;
+  resize: vertical;
+  flex: 1;
+}
+
+/* Botones */
+.formButtons {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.primaryButton,
+.secondaryButton {
+  padding: 0.375rem 1rem;
+  font-size: 0.875rem;
+  min-width: 100px;
+}
+
+.primaryButton {
+  background-color: #4299e1;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.primaryButton:hover {
+  background-color: #3168b3;
+}
+
+.secondaryButton {
+  background-color: #cbd5e0;
+  color: #2d3748;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.secondaryButton:hover {
+  background-color: #a0aec0;
+}
+
+/* Mensajes de error */
+.formError {
+  color: #e53e3e;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* Campos requeridos */
+.requiredLabel:after {
+  content: '*';
+  color: #e53e3e;
+  margin-left: 0.25rem;
+}
+
+/* Selects */
+.formSelect {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  transition: border-color 0.2s ease;
+}
+
+.formSelect:focus {
+  outline: none;
+  border-color: #4299e1;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+}
