@@ -38,26 +38,37 @@ const router = createBrowserRouter([
         </ProtectedRoute>,
         children: [
           {
-            index: true, // Define `CrearPedidoPage` como el componente para la ruta padre (`/`).
-            element: <CrearPedidoPage />,
+            index: true,
+            element:
+            <ProtectedRoute>
+              <CrearPedidoPage />
+            </ProtectedRoute>,
           },
           {
             path: 'productos',
-            element: <GestionProductosPage />,
+            element: 
+            <ProtectedRoute>
+              <GestionProductosPage />
+            </ProtectedRoute>,
           },
           {
             path: 'clientes',
-            element: <GestionClientesPage />,
+            element: 
+            <ProtectedRoute>
+              <GestionClientesPage />
+            </ProtectedRoute>,
           },
           {
             path: 'pedidos', 
-            element: <GestionPedidosPage />,
+            element: 
+            <ProtectedRoute>
+             <GestionPedidosPage />
+            </ProtectedRoute>,
           },
         ],
       },
     ],
   },
-  // Rutas que no utilizan el MainLayout (login - registro).
   {
     path: '/login',
     element: <LoginPage />,

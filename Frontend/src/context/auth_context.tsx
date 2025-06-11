@@ -8,7 +8,7 @@
  * Esto evita pasar props a través de múltiples niveles (prop drilling).
  */
 import React, { createContext, useState, useContext, useEffect, type ReactNode } from 'react';
-import { login as apiLogin, logout as apiLogout, getCurrentUser, type AuthResponse } from '../services/auth_service';
+import { login as apiLogin, logout as apiLogout, register as apiRegister, getCurrentUser, type AuthResponse } from '../services/auth_service';
 
 // Tipado para los datos del usuario
 interface User {
@@ -25,6 +25,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<AuthResponse>;
   logout: () => void;
+  register: (email: string, password: string, username: string) => Promise<AuthResponse>;
 }
 
 // Creamos el contexto con un valor inicial por defecto.
@@ -46,7 +47,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
     } catch (error) {
       console.error("Error al cargar datos de sesión", error);
-      apiLogout(); // Limpia en caso de datos corruptos
+      apiLogout(); 
     } finally {
       setIsLoading(false);
     }
@@ -59,11 +60,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return response;
   };
 
+  const register = async (email: string, password: string, username: string) => {
+    const response = await apiRegister(email, password, username);
+    setUser(response.user);
+    setIsAuthenticated(true);
+    return response;
+  };
+
   const logout = () => {
     apiLogout();
     setUser(null);
     setIsAuthenticated(false);
-    // Redirigir a la página de login
     window.location.href = '/login';
   };
 
@@ -73,6 +80,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     isLoading,
     login,
     logout,
+    register,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

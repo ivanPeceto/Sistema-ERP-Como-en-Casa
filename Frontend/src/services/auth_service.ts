@@ -34,6 +34,21 @@ export const login = async (email: string, password: string): Promise<AuthRespon
   return response.data;
 };
 
+export const register = async (email: string, password: string, nombre: string): Promise<AuthResponse> => {
+  const response = await apiClient.post<AuthResponse>('/signup/', {
+    email,
+    password,
+    nombre,
+  });
+  if (response.data.access && response.data.refresh){
+    localStorage.setItem('accessToken', response.data.access);
+    localStorage.setItem('refreshToken', response.data.refresh);
+    localStorage.setItem('user', JSON.stringify(response.data.user));
+  }
+
+  return response.data;
+}
+
 /**
  * Realiza el logout eliminando los datos de la sesión.
  */
@@ -41,7 +56,6 @@ export const logout = () => {
   localStorage.removeItem('accessToken');
   localStorage.removeItem('refreshToken');
   localStorage.removeItem('user');
-  // Aquí podrías añadir una llamada a una API de 'blacklist' de tokens si la implementas
 };
 
 /**
