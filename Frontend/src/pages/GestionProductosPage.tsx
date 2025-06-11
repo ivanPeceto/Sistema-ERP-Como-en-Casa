@@ -6,10 +6,12 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
+
 import type { ChangeEvent, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from '../styles/gestionProductosPage.module.css';
 import formStyles from '../styles/formStyles.module.css';
+
 
 /**
  * Importaciones de servicios y tipos necesarios para la gestión de productos y categorías.
@@ -55,6 +57,7 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
     categoria_id: null,
   });
 
+
   /**
    * Funciones para obtener datos del backend
    */
@@ -85,6 +88,7 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
   /**
    * Efectos del componente
    */
+
   useEffect(() => {
     // Cargar datos iniciales al montar el componente
     fetchProductos();
@@ -102,12 +106,15 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
   }, [searchTerm, productos]);
 
 
+
   /**
    * Manejadores de eventos del formulario
    */
+
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
+
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = event.target;
@@ -131,6 +138,7 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
   /**
    * Abre el modal de formulario con los datos del producto seleccionado o en modo nuevo
    */
+
   const openModal = useCallback((producto: Producto | null = null) => {
     if (producto) {
       // Cargar datos del producto existente
@@ -160,13 +168,16 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
     setIsModalOpen(true);
   }, [categorias]);
 
+
   /**
    * Cierra el modal de formulario
    */
+
   const closeModal = useCallback(() => {
     setIsModalOpen(false);
     setEditingProducto(null);
   }, []);
+
 
   /**
    * Maneja el envío del formulario de producto
@@ -197,6 +208,7 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
       console.error('Error al guardar producto:', error);
       const errorMessage = error.response?.data?.detail || JSON.stringify(error.response?.data) || 'Ocurrió un error al guardar.';
       alert(errorMessage);
+
     }
   };
 
@@ -219,6 +231,7 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
   /**
    * Renderizado del componente
    */
+
   return (
     <div className={styles.pageContainer}>
       <h1>PRODUCTOS</h1>
@@ -253,6 +266,7 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
           filteredProductos.map((producto) => (
             <div 
               key={producto.id} 
+
               className={`${styles.listItem} ${!producto.disponible ? styles.itemNoDisponible : ''}`}
             >
               <div className={styles.itemInfo}>
