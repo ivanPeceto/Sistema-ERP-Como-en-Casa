@@ -76,6 +76,7 @@ export const getAccessToken = (): string | null => {
   return localStorage.getItem('accessToken');
 };
 
+
 /**
  * Obtiene el token de refresh actual.
  * @returns Token de refresh o null si no existe
