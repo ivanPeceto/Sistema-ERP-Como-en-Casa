@@ -22,7 +22,7 @@ const GestionClientesPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [editingCliente, setEditingCliente] = useState<Cliente | null>(null);
-  const [formData, setFormData] = useState<Omit<Cliente, 'id'>>({ // Omit 'id' para el formulario de creación/edición
+  const [formData, setFormData] = useState<Omit<Cliente, 'id'>>({
     nombre: '',
     email: '',
     telefono: '',
