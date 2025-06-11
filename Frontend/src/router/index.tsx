@@ -5,7 +5,7 @@
  * distinguiendo entre rutas que utilizan el layout principal y rutas de pantalla completa
  * como login o registro.
  **/
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import App from '../App';
 import LoginPage from '../pages/login_page';
 import RegisterPage from '../pages/register_page';
@@ -31,39 +31,36 @@ const router = createBrowserRouter([
     element: <App />, // Componente raíz que puede incluir contexto global o configuraciones iniciales.
     children: [
       {
-        path: '/gestion',
-        element:
-        <ProtectedRoute>
-          <MainLayout />
-        </ProtectedRoute>,
+        index: true, 
+        element: <Navigate to="/login" replace />,
+      },
+      {
+        path: 'gestion',
+        element: (
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        ),
         children: [
           {
             index: true,
             element:
-            <ProtectedRoute>
-              <CrearPedidoPage />
-            </ProtectedRoute>,
+              <CrearPedidoPage />,
           },
           {
             path: 'productos',
             element: 
-            <ProtectedRoute>
-              <GestionProductosPage />
-            </ProtectedRoute>,
+              <GestionProductosPage />,
           },
           {
             path: 'clientes',
             element: 
-            <ProtectedRoute>
-              <GestionClientesPage />
-            </ProtectedRoute>,
+              <GestionClientesPage />,
           },
           {
             path: 'pedidos', 
             element: 
-            <ProtectedRoute>
-             <GestionPedidosPage />
-            </ProtectedRoute>,
+              <GestionPedidosPage />,
           },
         ],
       },
