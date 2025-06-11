@@ -7,8 +7,9 @@
  * relacionadas (login, logout) a cualquier componente que lo necesite.
  * Esto evita pasar props a través de múltiples niveles (prop drilling).
  */
-import React, { createContext, useState, useContext, useEffect, type ReactNode } from 'react';
-import { login as apiLogin, logout as apiLogout, register as apiRegister, getCurrentUser, type AuthResponse } from '../services/auth_service';
+
+import { createContext, useState, useContext, useEffect, type ReactNode } from 'react';
+import { login as apiLogin, logout as apiLogout, getCurrentUser, type AuthResponse } from '../services/auth_service';
 
 // Tipado para los datos del usuario
 interface User {
