@@ -34,7 +34,7 @@ Microservicio Productos:
 
 Microservicio Pedidos.
 
-![Diagrama de Pedidos](graficos/pedidos.jpg)
+![Diagrama de Pedidos](graficos/pedidosnew.jpg)
 
 
 
