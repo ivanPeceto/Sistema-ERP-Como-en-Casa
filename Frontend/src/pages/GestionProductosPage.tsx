@@ -1,190 +1,288 @@
-/**
- * @archivo: GestionProductosPage.tsx
- * @descripcion: Página para la administración de productos.
+/*
+ * @file GestionProductosPage.tsx
+ * @description Página principal para la gestión de productos.
+ * Permite listar, crear, editar y eliminar productos del sistema.
+ * Utiliza un modal para el formulario de productos y tiene funcionalidad de búsqueda.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+
 import type { ChangeEvent, FormEvent } from 'react';
-import styles from '../styles/gestionClientesPage.module.css';
+import { useNavigate } from 'react-router-dom';
+import styles from '../styles/gestionProductosPage.module.css';
+import formStyles from '../styles/formStyles.module.css';
 
+
+/**
+ * Importaciones de servicios y tipos necesarios para la gestión de productos y categorías.
+ */
 import {
-  listarProductos,
-  crearProducto,
-  actualizarProducto,
-  eliminarProducto,
-  cambiarDisponibilidad,
-} from '../services/producto_service.ts';
+  getProductos,
+  createProducto,
+  updateProducto,
+  deleteProducto,
+  type Producto,
+  type ProductoInput,
+} from '../services/product_service';
+import { getCategorias, type Categoria } from '../services/category_service';
 
-import type { Producto } from '../services/producto_service.ts';
+interface GestionProductosPageProps {}
 
-const GestionProductosPage: React.FC = () => {
+const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
+  const navigate = useNavigate();
+
+  /**
+   * Estados del componente:
+   * - productos: Lista completa de productos
+   * - filteredProductos: Lista filtrada de productos para búsqueda
+   * - categorias: Lista de categorías disponibles
+   * - searchTerm: Término de búsqueda actual
+   * - isModalOpen: Estado del modal de formulario
+   * - editingProducto: Producto actualmente en edición (null si es nuevo)
+   * - formData: Datos del formulario actual
+   */
   const [productos, setProductos] = useState<Producto[]>([]);
   const [filteredProductos, setFilteredProductos] = useState<Producto[]>([]);
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [editingProducto, setEditingProducto] = useState<Producto | null>(null);
-  const [formData, setFormData] = useState<Partial<Producto>>({
+  const [formData, setFormData] = useState<ProductoInput>({
     nombre: '',
     descripcion: '',
     precio_unitario: 0,
     precio_por_bulto: 0,
+    stock: 0,
     disponible: true,
+    categoria_id: null,
   });
 
-  useEffect(() => {
-    fetchProductos();
+
+  /**
+   * Funciones para obtener datos del backend
+   */
+  const fetchProductos = useCallback(async () => {
+    try {
+      const data = await getProductos();
+      setProductos(data);
+      setFilteredProductos(data);
+    } catch (error) {
+      console.error('Error al cargar productos:', error);
+      alert('Error al cargar productos. Revisa que el backend esté funcionando.');
+    }
   }, []);
 
+  const fetchCategorias = useCallback(async () => {
+    try {
+      const data = await getCategorias();
+      setCategorias(data);
+      // Establecer la primera categoría como valor por defecto si existe
+      if (data.length > 0) {
+        setFormData(prev => ({ ...prev, categoria_id: data[0].id }));
+      }
+    } catch (error) {
+      console.error('Error al cargar categorías:', error);
+    }
+  }, []);
+
+  /**
+   * Efectos del componente
+   */
+
   useEffect(() => {
-    const results = productos.filter(producto =>
-      producto.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      producto.descripcion.toLowerCase().includes(searchTerm.toLowerCase())
+    // Cargar datos iniciales al montar el componente
+    fetchProductos();
+    fetchCategorias();
+  }, [fetchProductos, fetchCategorias]);
+
+  useEffect(() => {
+    // Búsqueda en tiempo real por nombre o descripción
+    const lowercasedValue = searchTerm.toLowerCase();
+    const results = productos.filter(p =>
+      p.nombre.toLowerCase().includes(lowercasedValue) ||
+      p.descripcion.toLowerCase().includes(lowercasedValue)
     );
     setFilteredProductos(results);
   }, [searchTerm, productos]);
 
-  const fetchProductos = async () => {
-    try {
-      const data = await listarProductos();
-      setProductos(data);
-    } catch (error) {
-      console.error('Error al cargar productos:', error);
-      alert('Error al cargar productos. Intente nuevamente.');
-    }
-  };
 
-  const handleCrearProducto = async (productoData: Partial<Producto>) => {
-    try {
-      const nuevoProducto = await crearProducto(productoData);
-      setProductos(prev => [...prev, nuevoProducto]);
-    } catch (error) {
-      console.error('Error al crear producto:', error);
-      alert('Error al crear producto. Intente nuevamente.');
-    }
-  };
 
-  const handleActualizarProducto = async (id: number, productoData: Partial<Producto>) => {
-    try {
-      await actualizarProducto(id, productoData);
-      await fetchProductos();
-    } catch (error) {
-      console.error('Error al actualizar producto:', error);
-      alert('Error al actualizar producto. Intente nuevamente.');
-    }
-  };
-
-  const handleEliminarProducto = async (id: number) => {
-    try {
-      await eliminarProducto(id);
-      setProductos(prev => prev.filter(p => p.id !== id));
-    } catch (error) {
-      console.error('Error al eliminar producto:', error);
-      alert('Error al eliminar producto. Intente nuevamente.');
-    }
-  };
-
-  const handleToggleDisponibilidad = async (producto: Producto) => {
-    try {
-      await cambiarDisponibilidad(producto);
-      await fetchProductos();
-    } catch (error) {
-      console.error('Error al cambiar disponibilidad:', error);
-      alert('Error al cambiar disponibilidad. Intente nuevamente.');
-    }
-  };
+  /**
+   * Manejadores de eventos del formulario
+   */
 
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
 
-  const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = event.target;
-    const checked = (event.target as HTMLInputElement).checked;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : type === 'number' ? parseFloat(value) || 0 : value,
-    }));
+
+    // Manejo especializado para diferentes tipos de campos
+    if (type === 'checkbox') {
+      const target = event.target as HTMLInputElement;
+      setFormData(prev => ({ ...prev, [name]: target.checked }));
+    } else if (name === 'precio_unitario' || name === 'precio_por_bulto' || name === 'stock') {
+      // Convertir a número con fallback a 0 si no es válido
+      setFormData(prev => ({ ...prev, [name]: parseFloat(value) || 0 }));
+    } else if (name === 'categoria_id') {
+      // Manejar selección de categoría
+      setFormData(prev => ({ ...prev, [name]: value ? parseInt(value) : null }));
+    } else {
+      // Manejar campos de texto
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
+
+  /**
+   * Abre el modal de formulario con los datos del producto seleccionado o en modo nuevo
+   */
 
   const openModal = useCallback((producto: Producto | null = null) => {
     if (producto) {
+      // Cargar datos del producto existente
       setEditingProducto(producto);
-      setFormData({ ...producto });
+      setFormData({
+        nombre: producto.nombre,
+        descripcion: producto.descripcion,
+        precio_unitario: +producto.precio_unitario,
+        precio_por_bulto: +producto.precio_por_bulto,
+        stock: +producto.stock,
+        disponible: producto.disponible,
+        categoria_id: producto.categoria?.id ?? null,
+      });
     } else {
+      // Inicializar formulario en modo nuevo
       setEditingProducto(null);
-      setFormData({ nombre: '', descripcion: '', precio_unitario: 0, precio_por_bulto: 0, disponible: true });
+      setFormData({
+        nombre: '',
+        descripcion: '',
+        precio_unitario: 0,
+        precio_por_bulto: 0,
+        stock: 0,
+        disponible: true,
+        categoria_id: categorias.length > 0 ? categorias[0].id : null,
+      });
     }
     setIsModalOpen(true);
-  }, []);
+  }, [categorias]);
+
+
+  /**
+   * Cierra el modal de formulario
+   */
 
   const closeModal = useCallback(() => {
     setIsModalOpen(false);
     setEditingProducto(null);
   }, []);
 
+
+  /**
+   * Maneja el envío del formulario de producto
+   */
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (editingProducto) {
-      await handleActualizarProducto(editingProducto.id, formData);
-    } else {
-      await handleCrearProducto(formData);
+
+    // Validación de categoría
+    if (!formData.categoria_id) {
+      alert('Por favor, seleccione una categoría para el producto.');
+      return;
     }
-    closeModal();
+
+    try {
+      // Operación CRUD según el modo (editar/crear)
+      if (editingProducto) {
+        await updateProducto(editingProducto.id, formData);
+        alert('Producto actualizado exitosamente.');
+      } else {
+        await createProducto(formData);
+        alert('Producto creado exitosamente.');
+      }
+
+      // Actualizar lista y cerrar modal
+      fetchProductos();
+      closeModal();
+    } catch (error: any) {
+      console.error('Error al guardar producto:', error);
+      const errorMessage = error.response?.data?.detail || JSON.stringify(error.response?.data) || 'Ocurrió un error al guardar.';
+      alert(errorMessage);
+
+    }
   };
 
+  /**
+   * Maneja la eliminación de un producto
+   */
   const handleDelete = async (productoId: number) => {
-    if (window.confirm('¿Está seguro de que desea eliminar este producto?')) {
-      await handleEliminarProducto(productoId);
+    if (window.confirm('¿Estás seguro de que querés eliminar este producto?')) {
+      try {
+        await deleteProducto(productoId);
+        alert('Producto eliminado.');
+        fetchProductos();
+      } catch (error: any) {
+        console.error('Error al eliminar producto:', error);
+        alert(error.response?.data?.detail || 'Error al eliminar.');
+      }
     }
   };
+
+  /**
+   * Renderizado del componente
+   */
 
   return (
     <div className={styles.pageContainer}>
-      <h1>Gestión de Productos</h1>
+      <h1>PRODUCTOS</h1>
+      
+      {/* Barra de herramientas con búsqueda y botones */}
       <div className={styles.toolbar}>
         <div className={styles.searchBarContainer}>
           <input
             type="text"
-            placeholder="Buscar productos..."
+            placeholder="Buscar por nombre o descripción..."
             value={searchTerm}
             onChange={handleSearchChange}
             className={styles.searchInput}
           />
         </div>
-        <button onClick={() => openModal()} className={styles.addButton}>
-          Nuevo Producto
-        </button>
+        <div className={styles.toolbarButtons}>
+          <button 
+            onClick={() => navigate('/gestion/categorias')} 
+            className={`${styles.addButton} ${styles.secondaryButton}`}
+          >
+            Gestionar Categorías
+          </button>
+          <button onClick={() => openModal()} className={styles.addButton}>
+            Nuevo Producto
+          </button>
+        </div>
       </div>
 
+      {/* Lista de productos filtrada */}
       <div className={styles.listContainer}>
         {filteredProductos.length > 0 ? (
-          filteredProductos.map(producto => (
-            <div
-              key={producto.id}
+          filteredProductos.map((producto) => (
+            <div 
+              key={producto.id} 
+
               className={`${styles.listItem} ${!producto.disponible ? styles.itemNoDisponible : ''}`}
             >
               <div className={styles.itemInfo}>
                 <strong>{producto.nombre}</strong>
-                <span>
-                  ${producto.precio_unitario.toFixed(2)} - {producto.disponible ? 'Disponible' : 'No Disponible'}
-                </span>
-                <small>{producto.descripcion}</small>
+                <span>Precio: ${(+producto.precio_unitario).toFixed(2)}</span>
+                <span>Stock: {producto.stock}</span>
+                {producto.categoria && <small>Categoría: {producto.categoria.nombre}</small>}
               </div>
               <div className={styles.itemActions}>
-                <button onClick={() => handleToggleDisponibilidad(producto)} className={styles.toggleButton}>
-                  {producto.disponible ? 'Deshabilitar' : 'Habilitar'}
-                </button>
-                <button onClick={() => openModal(producto)} className={styles.editButton}>
-                  Editar
-                </button>
-                <button onClick={() => handleDelete(producto.id)} className={styles.deleteButton}>
-                  Eliminar
-                </button>
+                <button onClick={() => openModal(producto)} className={styles.editButton}>Editar</button>
+                <button onClick={() => handleDelete(producto.id)} className={styles.deleteButton}>Eliminar</button>
               </div>
             </div>
           ))
         ) : (
-          <p>No se encontraron productos.</p>
+          <p className={styles.noResults}>No se encontraron productos.</p>
         )}
       </div>
 
@@ -192,66 +290,117 @@ const GestionProductosPage: React.FC = () => {
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
             <h2>{editingProducto ? 'Editar Producto' : 'Nuevo Producto'}</h2>
-            <form onSubmit={handleSubmit}>
-              <div className={styles.formGroup}>
-                <label htmlFor="nombre">Nombre:</label>
-                <input
-                  type="text"
-                  id="nombre"
-                  name="nombre"
-                  value={formData.nombre || ''}
-                  onChange={handleInputChange}
-                  required
-                />
+            <form onSubmit={handleSubmit} className={formStyles.formContainer}>
+              <div className={formStyles.formSection}>
+                <h3 className={formStyles.formSectionTitle}>Información Básica</h3>
+                <div className={formStyles.formField}>
+                  <label className={`${formStyles.formLabel} ${formStyles.requiredLabel}`} htmlFor="nombre">Nombre</label>
+                  <input
+                    type="text"
+                    id="nombre"
+                    name="nombre"
+                    value={formData.nombre}
+                    onChange={handleInputChange}
+                    required
+                    className={formStyles.formInput}
+                  />
+                </div>
+                <div className={formStyles.formField}>
+                  <label className={formStyles.formLabel} htmlFor="descripcion">Descripción</label>
+                  <textarea
+                    id="descripcion"
+                    name="descripcion"
+                    value={formData.descripcion}
+                    onChange={handleInputChange}
+                    className={formStyles.formTextarea}
+                  />
+                </div>
               </div>
-              <div className={styles.formGroup}>
-                <label htmlFor="descripcion">Descripción:</label>
-                <textarea
-                  id="descripcion"
-                  name="descripcion"
-                  value={formData.descripcion || ''}
-                  onChange={handleInputChange}
-                />
+              <div className={formStyles.formSection}>
+                <h3 className={formStyles.formSectionTitle}>Precios y Stock</h3>
+                <div className={formStyles.formField}>
+                  <label className={`${formStyles.formLabel} ${formStyles.requiredLabel}`} htmlFor="precio_unitario">Precio Unitario</label>
+                  <input
+                    type="number"
+                    id="precio_unitario"
+                    name="precio_unitario"
+                    value={formData.precio_unitario}
+                    onChange={handleInputChange}
+                    step="0.01"
+                    required
+                    className={formStyles.formInput}
+                  />
+                </div>
+                <div className={formStyles.formField}>
+                  <label className={`${formStyles.formLabel} ${formStyles.requiredLabel}`} htmlFor="precio_por_bulto">Precio por Bulto</label>
+                  <input
+                    type="number"
+                    id="precio_por_bulto"
+                    name="precio_por_bulto"
+                    value={formData.precio_por_bulto}
+                    onChange={handleInputChange}
+                    step="0.01"
+                    required
+                    className={formStyles.formInput}
+                  />
+                </div>
+                <div className={formStyles.formField}>
+                  <label className={`${formStyles.formLabel} ${formStyles.requiredLabel}`} htmlFor="stock">Stock</label>
+                  <input
+                    type="number"
+                    id="stock"
+                    name="stock"
+                    value={formData.stock}
+                    onChange={handleInputChange}
+                    required
+                    className={formStyles.formInput}
+                  />
+                </div>
               </div>
-              <div className={styles.formGroup}>
-                <label htmlFor="precio_unitario">Precio Unitario:</label>
-                <input
-                  type="number"
-                  id="precio_unitario"
-                  name="precio_unitario"
-                  value={formData.precio_unitario || 0}
-                  onChange={handleInputChange}
-                  step="0.01"
-                  required
-                />
+              <div className={formStyles.formSection}>
+                <h3 className={formStyles.formSectionTitle}>Estado y Categoría</h3>
+                <div className={formStyles.formField}>
+                  <label className={formStyles.formLabel} htmlFor="disponible">Disponible</label>
+                  <input
+                    type="checkbox"
+                    id="disponible"
+                    name="disponible"
+                    checked={formData.disponible}
+                    onChange={handleInputChange}
+                    className={formStyles.formInput}
+                  />
+                </div>
+                <div className={formStyles.formField}>
+                  <label className={formStyles.formLabel} htmlFor="categoria_id">Categoría</label>
+                  <select
+                    id="categoria_id"
+                    name="categoria_id"
+                    value={formData.categoria_id || ''}
+                    onChange={handleInputChange}
+                    className={formStyles.formSelect}
+                  >
+                    <option value="">Seleccionar categoría</option>
+                    {categorias.map((categoria) => (
+                      <option key={categoria.id} value={categoria.id}>
+                        {categoria.nombre}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
-              <div className={styles.formGroup}>
-                <label htmlFor="precio_por_bulto">Precio por Bulto (opcional):</label>
-                <input
-                  type="number"
-                  id="precio_por_bulto"
-                  name="precio_por_bulto"
-                  value={formData.precio_por_bulto || 0}
-                  onChange={handleInputChange}
-                  step="0.01"
-                />
-              </div>
-              <div className={styles.formGroupCheckbox}>
-                <input
-                  type="checkbox"
-                  id="disponible"
-                  name="disponible"
-                  checked={formData.disponible ?? true}
-                  onChange={handleInputChange}
-                />
-                <label htmlFor="disponible">Disponible</label>
-              </div>
-              <div className={styles.modalActions}>
-                <button type="submit" className={styles.saveButton}>
-                  Guardar
-                </button>
-                <button type="button" onClick={closeModal} className={styles.cancelButton}>
+              <div className={formStyles.formButtons}>
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  className={formStyles.secondaryButton}
+                >
                   Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className={formStyles.primaryButton}
+                >
+                  {editingProducto ? 'Actualizar' : 'Crear'}
                 </button>
               </div>
             </form>

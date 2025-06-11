@@ -13,6 +13,7 @@ import CrearPedidoPage from '../pages/ArmarPedidosPage';
 import GestionProductosPage from '../pages/GestionProductosPage';
 import GestionClientesPage from '../pages/GestionClientesPage';
 import GestionPedidosPage from '../pages/GestionPedidosPage';
+import GestionCategoriasPage from '../pages/GestionCategoriasPage';
 import MainLayout from '../Layouts/MainLayout';
 import ProtectedRoute from './protected_route'; 
 /**
@@ -28,7 +29,7 @@ import ProtectedRoute from './protected_route';
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <App />, // Componente raíz que puede incluir contexto global o configuraciones iniciales.
+    element: <App />,
     children: [
       {
         index: true, 
@@ -43,9 +44,15 @@ const router = createBrowserRouter([
         ),
         children: [
           {
+<<<<<<< HEAD
             index: true,
             element:
               <CrearPedidoPage />,
+=======
+
+            index: true, 
+            element: <CrearPedidoPage />,
+>>>>>>> main
           },
           {
             path: 'productos',
@@ -61,6 +68,10 @@ const router = createBrowserRouter([
             path: 'pedidos', 
             element: 
               <GestionPedidosPage />,
+          },
+          {
+            path: 'categorias',
+            element: <GestionCategoriasPage />,
           },
         ],
       },

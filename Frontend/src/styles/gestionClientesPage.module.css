@@ -1,8 +1,6 @@
 /**
  * @archivo: gestionClientesPage.module.css
- * @descripcion: Estilos para la página de gestión de clientes, incluyendo
- * la barra de herramientas (búsqueda, botones), listado de clientes,
- * y el modal para agregar/editar clientes.
+ * @descripcion: Estilos específicos para la página de gestión de clientes
  **/
 .pageContainer {
   display: flex;
@@ -49,21 +47,52 @@
 .saveButton,
 .cancelButton,
 .toggleButton {
-  padding: 10px 15px;
+  padding: 8px 16px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.9rem;
-  transition: background-color 0.2s ease;
-  white-space: nowrap;
+  font-weight: 500;
+  transition: background-color 0.2s;
 }
 
-.addButton {
-  background-color: #28a745;
+.addButton,
+.saveButton {
+  background-color: #48bb78;
   color: white;
 }
-.addButton:hover {
-  background-color: #218838;
+
+.addButton:hover,
+.saveButton:hover {
+  background-color: #38a169;
+}
+
+.editButton {
+  background-color: #4299e1;
+  color: white;
+}
+
+.editButton:hover {
+  background-color: #3168b3;
+}
+
+.deleteButton {
+  background-color: #ef5350;
+  color: white;
+}
+
+.deleteButton:hover {
+  background-color: #e53e3e;
+}
+
+.cancelButton,
+.toggleButton {
+  background-color: #cbd5e0;
+  color: #333;
+}
+
+.cancelButton:hover,
+.toggleButton:hover {
+  background-color: #a0aec0;
 }
 
 .listContainer {
@@ -91,7 +120,6 @@
 .itemNoDisponible strong {
   text-decoration: line-through;
 }
-
 
 .itemInfo {
   display: flex;
@@ -141,6 +169,12 @@
   background-color: #138496;
 }
 
+.noResults {
+  text-align: center;
+  padding: 20px;
+  color: #a0aec0;
+}
+
 .modalOverlay {
   position: fixed;
   top: 0;
@@ -161,6 +195,7 @@
   box-shadow: 0 5px 15px rgba(0,0,0,0.2);
   width: 100%;
   max-width: 500px;
+  border: 1px solid #ddd;
 }
 
 .modalContent h2 {
@@ -173,16 +208,17 @@
   margin-bottom: 15px;
 }
 .formGroup label {
-  display: block;
+  color: #333;
   margin-bottom: 5px;
   font-weight: bold;
+  color: #a0aec0;
 }
 .formGroup input[type="text"],
-.formGroup input[type="number"],
+.formGroup input,
 .formGroup textarea {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
+  background-color: white;
+  color: #333;
+  border: 1px solid #ddd;
   border-radius: 4px;
   box-sizing: border-box;
   font-size: 1rem;
