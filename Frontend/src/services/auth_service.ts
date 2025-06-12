@@ -4,12 +4,11 @@
  */
 
 import createAuthApiClient from '../api/apiClient'; // CAMBIO: Importamos la fábrica
-import type { User, AuthResponse } from '../types/models.ts'; // Tipos centralizados
+import type { User, AuthResponse } from '../types/models.ts'; 
 
 // CAMBIO: Definimos la URL base específica para este servicio
 const USERS_API_BASE_URL = import.meta.env.VITE_API_USUARIOS_URL;
 
-// CAMBIO: Creamos una instancia de API exclusiva para este servicio
 const apiClient = createAuthApiClient(USERS_API_BASE_URL);
 
 /**
