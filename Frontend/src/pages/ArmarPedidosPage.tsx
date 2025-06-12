@@ -17,11 +17,11 @@ const CrearPedidoPage: React.FC = () => {
   const [productos, setProductos] = useState<Producto[]>([]);
 
   // --- Estados para la UI y el formulario ---
-  const [clienteBusqueda, setClienteBusqueda] = useState('');
   const [clienteSeleccionado, setClienteSeleccionado] = useState<Cliente | null>(null);
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<string>('');
   const [pedidoItems, setPedidoItems] = useState<PedidoItem[]>([]);
-  
+  const [clienteSearchTerm, setClienteSearchTerm] = useState(''); // Nuevo estado para el término de búsqueda de clientes
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -53,12 +53,18 @@ const CrearPedidoPage: React.FC = () => {
   // --- Lógica de filtrado y cálculos (Memorizada para optimización) ---
 
   const clientesFiltrados = useMemo(() => {
-    if (!clienteBusqueda) return [];
-    return clientes.filter(c => c.nombre.toLowerCase().includes(clienteBusqueda.toLowerCase()));
-  }, [clienteBusqueda, clientes]);
+    if (!clienteSearchTerm) {
+      return clientes; // Si no hay término de búsqueda, muestra todos los clientes
+    }
+    return clientes.filter(c => 
+      c.nombre.toLowerCase().includes(clienteSearchTerm.toLowerCase()) ||
+      c.telefono.includes(clienteSearchTerm) ||
+      c.direccion.toLowerCase().includes(clienteSearchTerm.toLowerCase())
+    );
+  }, [clienteSearchTerm, clientes]);
 
-  const categoriasUnicas = useMemo(() => 
-    [...new Set(productos.map(p => p.categoria?.nombre || 'Sin Categoría'))], 
+  const categoriasUnicas = useMemo(() =>
+    [...new Set(productos.map(p => p.categoria?.nombre || 'Sin Categoría'))],
   [productos]);
 
   const productosFiltradosPorCategoria = useMemo(() => {
@@ -109,7 +115,7 @@ const CrearPedidoPage: React.FC = () => {
   
   const handleSeleccionarCliente = (cliente: Cliente) => {
     setClienteSeleccionado(cliente);
-    setClienteBusqueda(cliente.nombre);
+    setClienteSearchTerm(cliente.nombre); // Actualiza el campo de búsqueda con el nombre del cliente
   }
 
   const handleConfirmarPedido = async () => {
@@ -147,7 +153,7 @@ const CrearPedidoPage: React.FC = () => {
       
       setPedidoItems([]);
       setClienteSeleccionado(null);
-      setClienteBusqueda('');
+      setClienteSearchTerm('');
 
     } catch (err) {
       console.error("Error al confirmar el pedido:", err);
@@ -163,31 +169,43 @@ const CrearPedidoPage: React.FC = () => {
     <div className={styles.pageContainer}>
       <div className={styles.headerSection}>
         <h1>Armar Nuevo Pedido</h1>
-        <div className={styles.clienteSelectorContainer}> {/* 1. Añadimos un contenedor padre */}
-          <div className={styles.clienteSelector}>
-            <label htmlFor="cliente">Cliente: </label>
-            <input
-              type="text"
-              id="cliente"
-              value={clienteBusqueda}
-              onChange={(e) => setClienteBusqueda(e.target.value)}
-              placeholder="Buscar nombre del cliente..."
-            />
-          </div>
-          
-          {/* 2. Movemos el desplegable para que sea hermano del input, pero dentro del contenedor padre */}
-          {clienteBusqueda && clientesFiltrados.length > 0 && (
-            <div className={styles.clienteDropdown}>
-              {clientesFiltrados.map(cliente => (
-                <div key={cliente.id} onClick={() => handleSeleccionarCliente(cliente)} className={styles.clienteDropdownItem}>
-                  {cliente.nombre}
-                </div>
-              ))}
+        {clienteSeleccionado && (
+            <div className={styles.clienteSeleccionadoInline}>
+                Pedido para: <strong>{clienteSeleccionado.nombre}</strong>
             </div>
-          )}
-        </div>
+        )}
       </div>
       <div className={styles.mainGrid}>
+        {/* Nuevo panel de Selección de Clientes */}
+        <div className={styles.clientSelectionPanel}>
+          <h2>Seleccionar Cliente</h2>
+          <div className={styles.clientSearch}>
+            <input
+              type="text"
+              placeholder="Buscar cliente..."
+              value={clienteSearchTerm}
+              onChange={(e) => setClienteSearchTerm(e.target.value)}
+            />
+          </div>
+          <div className={styles.clientList}>
+            {clientesFiltrados.length > 0 ? (
+              clientesFiltrados.map(cliente => (
+                <div
+                  key={cliente.id}
+                  className={`${styles.clientItem} ${clienteSeleccionado?.id === cliente.id ? styles.selectedClient : ''}`}
+                  onClick={() => handleSeleccionarCliente(cliente)}
+                >
+                  <strong>{cliente.nombre}</strong>
+                  <span>{cliente.telefono}</span>
+                  <small>{cliente.direccion}</small>
+                </div>
+              ))
+            ) : (
+              <p>No se encontraron clientes.</p>
+            )}
+          </div>
+        </div>
+
         <div className={styles.productSelectionPanel}>
           <h2>Seleccionar Productos</h2>
           <div className={styles.categoryTabs}>
