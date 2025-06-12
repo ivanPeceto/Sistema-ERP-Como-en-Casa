@@ -5,7 +5,7 @@
  * distinguiendo entre rutas que utilizan el layout principal y rutas de pantalla completa
  * como login o registro.
  **/
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import App from '../App';
 import LoginPage from '../pages/login_page';
 import RegisterPage from '../pages/register_page';
@@ -32,28 +32,35 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       {
+        index: true, 
+        element: <Navigate to="/login" replace />,
+      },
+      {
         path: '/gestion',
-        element:
-        <ProtectedRoute>
-          <MainLayout />
-        </ProtectedRoute>,
+        element: (
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        ),
         children: [
           {
-
             index: true, 
             element: <CrearPedidoPage />,
           },
           {
             path: 'productos',
-            element: <GestionProductosPage />,
+            element: 
+              <GestionProductosPage />,
           },
           {
             path: 'clientes',
-            element: <GestionClientesPage />,
+            element: 
+              <GestionClientesPage />,
           },
           {
             path: 'pedidos', 
-            element: <GestionPedidosPage />,
+            element: 
+              <GestionPedidosPage />,
           },
           {
             path: 'categorias',
@@ -63,7 +70,6 @@ const router = createBrowserRouter([
       },
     ],
   },
-  // Rutas que no utilizan el MainLayout (login - registro).
   {
     path: '/login',
     element: <LoginPage />,

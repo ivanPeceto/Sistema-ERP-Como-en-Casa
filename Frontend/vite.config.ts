@@ -10,9 +10,6 @@ export default defineConfig(({ mode }) => {
       port: 5174, 
       host: true, 
     },
-    define: {
-      'process.env': { ...env } 
-    },
     build: {
       outDir: 'dist',
     },
