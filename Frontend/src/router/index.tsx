@@ -36,7 +36,7 @@ const router = createBrowserRouter([
         element: <Navigate to="/login" replace />,
       },
       {
-        path: 'gestion',
+        path: '/gestion',
         element: (
           <ProtectedRoute>
             <MainLayout />
@@ -44,15 +44,8 @@ const router = createBrowserRouter([
         ),
         children: [
           {
-<<<<<<< HEAD
-            index: true,
-            element:
-              <CrearPedidoPage />,
-=======
-
             index: true, 
             element: <CrearPedidoPage />,
->>>>>>> main
           },
           {
             path: 'productos',

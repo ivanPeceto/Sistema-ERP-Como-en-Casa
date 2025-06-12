@@ -1,204 +1,197 @@
 /**
- * @file ArmarPedidosPage.tsx
+ * @file CrearPedidoPage.tsx
  * @description Página para la creación y armado de nuevos pedidos. Permite seleccionar
  * productos por categoría, ajustar cantidades y confirmar el pedido.
  */
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import type { ChangeEvent } from 'react';
 import styles from '../styles/crearPedidoPage.module.css';
+import { getClientes, type Cliente } from '../services/client_service';
+import { getProductos, type Producto } from '../services/product_service';
+import { createPedido, getPedidosByDate, type PedidoInput } from '../services/pedido_service';
+import type { PedidoItem } from '../types/models.d.ts';
 
-/**
- * @typedef CategoriaProducto
- * @description Tipo para las categorías de productos.
- */
-type CategoriaProducto = 'Pizzas' | 'Empanadas' | 'Hamburguesas' | 'Bebidas';
-
-/**
- * @interface Producto
- * @description Define la estructura base de un producto.
- */
-interface Producto {
-  id: number;
-  nombre: string;
-  categoria: CategoriaProducto;
-  precio: number;
-  descripcion?: string;
-  disponible?: boolean; // Indica si el producto está disponible para la venta.
-}
-
-/**
- * @interface PedidoItem
- * @extends Producto
- * @description Representa un ítem dentro de un pedido, extendiendo Producto con cantidad y subtotal.
- */
-interface PedidoItem extends Producto {
-  cantidad: number;
-  subtotal: number;
-  notas?: string; // Notas adicionales para el ítem del pedido.
-}
-
-// Definición de categorías de productos disponibles.
-const CATEGORIAS: CategoriaProducto[] = ['Pizzas', 'Empanadas', 'Hamburguesas', 'Bebidas'];
-
-// Datos de ejemplo iniciales. Serán reemplazados por datos del backend.
-const mockProductosDisponibles: Producto[] = [
-  { id: 101, nombre: 'Pizza Muzzarella Grande', categoria: 'Pizzas', precio: 1500, disponible: true },
-  { id: 102, nombre: 'Pizza Napolitana Especial', categoria: 'Pizzas', precio: 1700, disponible: true },
-  { id: 103, nombre: 'Pizza Fugazzeta Rellena', categoria: 'Pizzas', precio: 1800, disponible: false },
-  { id: 201, nombre: 'Empanada Carne Suave (unidad)', categoria: 'Empanadas', precio: 280, disponible: true },
-  { id: 202, nombre: 'Empanada Jamón y Queso (unidad)', categoria: 'Empanadas', precio: 280, disponible: true },
-  { id: 203, nombre: 'Docena Empanadas Surtidas', categoria: 'Empanadas', precio: 3000, disponible: true },
-  { id: 301, nombre: 'Hamburguesa Clásica con Papas', categoria: 'Hamburguesas', precio: 1200, disponible: true },
-  { id: 302, nombre: 'Hamburguesa Doble Cheddar y Bacon', categoria: 'Hamburguesas', precio: 1600, disponible: true },
-  { id: 401, nombre: 'Gaseosa Coca-Cola 1.5L', categoria: 'Bebidas', precio: 750, disponible: true },
-  { id: 402, nombre: 'Agua Mineral Sin Gas 1.5L', categoria: 'Bebidas', precio: 450, disponible: true },
-  { id: 403, nombre: 'Cerveza Brahma Litro Retornable', categoria: 'Bebidas', precio: 800, disponible: true },
-];
-
-/**
- * Componente funcional para la página de creación de pedidos.
- * @returns {JSX.Element} La interfaz de usuario para armar un nuevo pedido.
- */
 const CrearPedidoPage: React.FC = () => {
-  const [productosDisponibles, setProductosDisponibles] = useState<Producto[]>([]);
-  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<CategoriaProducto>(CATEGORIAS[0]);
+  // --- Estados para datos externos ---
+  const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [productos, setProductos] = useState<Producto[]>([]);
+
+  // --- Estados para la UI y el formulario ---
+  const [clienteBusqueda, setClienteBusqueda] = useState('');
+  const [clienteSeleccionado, setClienteSeleccionado] = useState<Cliente | null>(null);
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<string>('');
   const [pedidoItems, setPedidoItems] = useState<PedidoItem[]>([]);
-  const [clienteSeleccionado, setClienteSeleccionado] = useState<string>(''); // Puede ser un ID o nombre de cliente.
+  
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Efecto para cargar y filtrar productos disponibles (simulado).
-  useEffect(() => {
-    // TODO: Implementar llamada al backend para obtener productosDisponibles.
-    // async function fetchProductos() {
-    //   try {
-    //     // const response = await apiClient.get('/productos?disponible=true');
-    //     // setProductosDisponibles(response.data);
-    //   } catch (error) { console.error("Error al cargar productos:", error); }
-    // }
-    // fetchProductos();
-    setProductosDisponibles(mockProductosDisponibles.filter(p => p.disponible !== false));
-  }, []);
-
-  // Memoriza los productos filtrados por la categoría seleccionada.
-  const productosFiltradosPorCategoria = useMemo(() => {
-    return productosDisponibles.filter(p => p.categoria === categoriaSeleccionada);
-  }, [productosDisponibles, categoriaSeleccionada]);
-
-  /**
-   * Agrega un producto al pedido o incrementa su cantidad si ya existe.
-   * @param {Producto} producto - El producto a agregar.
-   * @param {number} [cantidad=1] - La cantidad a agregar.
-   */
-  const agregarProductoAlPedido = useCallback((producto: Producto, cantidad: number = 1) => {
-    setPedidoItems(prevItems => {
-      const itemExistente = prevItems.find(item => item.id === producto.id);
-      if (itemExistente) {
-        return prevItems.map(item =>
-          item.id === producto.id
-            ? { ...item, cantidad: item.cantidad + cantidad, subtotal: (item.cantidad + cantidad) * item.precio }
-            : item
-        );
-      } else {
-        return [...prevItems, { ...producto, cantidad, subtotal: producto.precio * cantidad }];
+  // --- Lógica de carga de datos ---
+  const fetchInitialData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const [clientesData, productosData] = await Promise.all([getClientes(), getProductos()]);
+      setClientes(clientesData);
+      setProductos(productosData);
+      if (productosData.length > 0) {
+        const categoriasUnicas = [...new Set(productosData.map(p => p.categoria?.nombre || 'Sin Categoría'))];
+        if (categoriasUnicas.length > 0) {
+            setCategoriaSeleccionada(categoriasUnicas[0]);
+        }
       }
-    });
+    } catch (err) {
+      setError('Error al cargar datos iniciales. Verifique el estado de los servicios.');
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  /**
-   * Actualiza la cantidad de un ítem en el pedido. Si la cantidad es 0 o menor, elimina el ítem.
-   * @param {number} productoId - ID del producto a actualizar.
-   * @param {number} nuevaCantidad - Nueva cantidad del producto.
-   */
-  const actualizarCantidadItem = useCallback((productoId: number, nuevaCantidad: number) => {
-    if (nuevaCantidad <= 0) {
+  useEffect(() => {
+    fetchInitialData();
+  }, [fetchInitialData]);
+
+  // --- Lógica de filtrado y cálculos (Memorizada para optimización) ---
+
+  const clientesFiltrados = useMemo(() => {
+    if (!clienteBusqueda) return [];
+    return clientes.filter(c => c.nombre.toLowerCase().includes(clienteBusqueda.toLowerCase()));
+  }, [clienteBusqueda, clientes]);
+
+  const categoriasUnicas = useMemo(() => 
+    [...new Set(productos.map(p => p.categoria?.nombre || 'Sin Categoría'))], 
+  [productos]);
+
+  const productosFiltradosPorCategoria = useMemo(() => {
+    if (!categoriaSeleccionada) return [];
+    return productos.filter(p => (p.categoria?.nombre || 'Sin Categoría') === categoriaSeleccionada && p.disponible);
+  }, [categoriaSeleccionada, productos]);
+
+  const totalPedido = useMemo(() => {
+    return pedidoItems.reduce((total, item) => total + (item.subtotal || 0), 0);
+  }, [pedidoItems]);
+
+  // --- Manejadores de eventos ---
+
+  const eliminarItemDelPedido = useCallback((productoId: number) => {
+    setPedidoItems(prevItems => prevItems.filter(item => item.id !== productoId));
+  }, []);
+
+  const actualizarCantidadItem = useCallback((productoId: number, cantidad: number) => {
+    if (cantidad < 1) {
       eliminarItemDelPedido(productoId);
       return;
     }
     setPedidoItems(prevItems =>
       prevItems.map(item =>
         item.id === productoId
-          ? { ...item, cantidad: nuevaCantidad, subtotal: nuevaCantidad * item.precio }
+          ? { ...item, cantidad, subtotal: cantidad * item.precio_unitario }
           : item
       )
     );
+  }, [eliminarItemDelPedido]);
+
+  const agregarProductoAlPedido = useCallback((producto: Producto) => {
+    setPedidoItems(prevItems => {
+      const existingItem = prevItems.find(item => item.id === producto.id);
+      if (existingItem) {
+        // Si el ítem ya existe, actualiza su cantidad y subtotal.
+        return prevItems.map(item =>
+          item.id === producto.id
+            ? { ...item, cantidad: item.cantidad + 1, subtotal: (item.cantidad + 1) * item.precio_unitario }
+            : item
+        );
+      } else {
+        // Si es un ítem nuevo, lo añade a la lista.
+        return [...prevItems, { ...producto, cantidad: 1, subtotal: producto.precio_unitario, precio: producto.precio_unitario }];
+      }
+    });
   }, []);
+  
+  const handleSeleccionarCliente = (cliente: Cliente) => {
+    setClienteSeleccionado(cliente);
+    setClienteBusqueda(cliente.nombre);
+  }
 
-  /**
-   * Elimina un ítem del pedido.
-   * @param {number} productoId - ID del producto a eliminar.
-   */
-  const eliminarItemDelPedido = useCallback((productoId: number) => {
-    setPedidoItems(prevItems => prevItems.filter(item => item.id !== productoId));
-  }, []);
-
-  // Memoriza el cálculo del total del pedido.
-  const totalPedido = useMemo(() => {
-    return pedidoItems.reduce((total, item) => total + item.subtotal, 0);
-  }, [pedidoItems]);
-
-  /**
-   * Maneja la confirmación del pedido. Prepara los datos y (eventualmente) los envía al backend.
-   */
   const handleConfirmarPedido = async () => {
-    if (pedidoItems.length === 0) {
-      alert("El pedido está vacío. Agregue productos antes de confirmar.");
+    if (!clienteSeleccionado) {
+      alert('Por favor, seleccione un cliente de la lista.');
       return;
     }
-    // TODO: Validar clienteSeleccionado si es un campo requerido.
+    if (pedidoItems.length === 0) {
+      alert('El pedido está vacío.');
+      return;
+    }
 
-    const pedidoParaEnviar = {
-      cliente: clienteSeleccionado, // Podría ser un ID o nombre. Ajustar según backend.
-      fecha_pedido: new Date().toISOString().split('T')[0], // Fecha actual en formato YYYY-MM-DD.
-      items: pedidoItems.map(item => ({
-        id_producto: item.id,
-        cantidad: item.cantidad, // Nombre original 'cantidad_producto'
-        // Opcional: enviar nombre y precio si el backend no los busca por ID.
-        // nombre_producto: item.nombre,
-        // precio_unitario_al_momento_pedido: item.precio,
-      })),
-      total_calculado: totalPedido, // El backend podría recalcular por seguridad.
-      estado_pedido: 'pendiente', // Estado inicial del pedido.
-      // Otros campos como: para_hora_estimada, notas_generales_pedido, etc.
-    };
+    try {
+      const hoy = new Date().toISOString().split('T')[0];
+      const pedidosDeHoy = await getPedidosByDate(hoy);
+      const nuevoNumeroPedido = pedidosDeHoy.length + 1;
 
-    console.log("Enviando pedido al backend:", pedidoParaEnviar);
-    // TODO: Implementar llamada al backend para crear el pedido.
-    // try {
-    //   // const response = await apiClient.post('/pedidos/crear', pedidoParaEnviar);
-    //   // console.log('Pedido creado:', response.data);
-    //   alert('Pedido confirmado exitosamente (simulación)');
-    //   setPedidoItems([]); // Limpiar pedido actual.
-    //   setClienteSeleccionado(''); // Limpiar cliente.
-    // } catch (error) {
-    //   console.error('Error al confirmar pedido:', error);
-    //   alert('Error al confirmar el pedido. Intente nuevamente.');
-    // }
-    alert('Pedido confirmado exitosamente (simulación)');
-    setPedidoItems([]);
-    setClienteSeleccionado('');
+      const pedidoData: PedidoInput = {
+        numero_pedido: nuevoNumeroPedido,
+        fecha_pedido: hoy,
+        id_cliente: clienteSeleccionado.id,
+        para_hora: null,
+        entregado: false,
+        pagado: false,
+        productos: pedidoItems.map(item => ({
+          id_producto: item.id,
+          nombre_producto: item.nombre,
+          cantidad_producto: item.cantidad,
+          precio_unitario: item.precio_unitario,
+        })),
+      };
+      
+      await createPedido(pedidoData);
+      alert(`Pedido #${nuevoNumeroPedido} creado para ${clienteSeleccionado.nombre}.`);
+      
+      setPedidoItems([]);
+      setClienteSeleccionado(null);
+      setClienteBusqueda('');
+
+    } catch (err) {
+      console.error("Error al confirmar el pedido:", err);
+      alert("Ocurrió un error al confirmar el pedido.");
+    }
   };
 
+  if (isLoading) return <div>Cargando...</div>;
+  if (error) return <div className={styles.error}>{error}</div>;
 
+  // --- Renderizado del Componente ---
   return (
     <div className={styles.pageContainer}>
       <div className={styles.headerSection}>
         <h1>Armar Nuevo Pedido</h1>
-        <div className={styles.clienteSelector}>
-          <label htmlFor="cliente">Cliente: </label>
-          <input
-            type="text"
-            id="cliente"
-            value={clienteSeleccionado}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setClienteSeleccionado(e.target.value)}
-            placeholder="Nombre o ID del cliente"
-          />
+        <div className={styles.clienteSelectorContainer}> {/* 1. Añadimos un contenedor padre */}
+          <div className={styles.clienteSelector}>
+            <label htmlFor="cliente">Cliente: </label>
+            <input
+              type="text"
+              id="cliente"
+              value={clienteBusqueda}
+              onChange={(e) => setClienteBusqueda(e.target.value)}
+              placeholder="Buscar nombre del cliente..."
+            />
+          </div>
+          
+          {/* 2. Movemos el desplegable para que sea hermano del input, pero dentro del contenedor padre */}
+          {clienteBusqueda && clientesFiltrados.length > 0 && (
+            <div className={styles.clienteDropdown}>
+              {clientesFiltrados.map(cliente => (
+                <div key={cliente.id} onClick={() => handleSeleccionarCliente(cliente)} className={styles.clienteDropdownItem}>
+                  {cliente.nombre}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
-
       <div className={styles.mainGrid}>
         <div className={styles.productSelectionPanel}>
           <h2>Seleccionar Productos</h2>
           <div className={styles.categoryTabs}>
-            {CATEGORIAS.map(cat => (
+            {(categoriasUnicas || []).map(cat => (
               <button
                 key={cat}
                 className={`${styles.categoryTab} ${categoriaSeleccionada === cat ? styles.activeTab : ''}`}
@@ -214,7 +207,7 @@ const CrearPedidoPage: React.FC = () => {
                 <div key={producto.id} className={styles.productItem}>
                   <div className={styles.productInfo}>
                     <strong>{producto.nombre}</strong>
-                    <span>${producto.precio.toFixed(2)}</span>
+                    <span>${(producto.precio_unitario || 0)}</span>
                   </div>
                   <button
                     onClick={() => agregarProductoAlPedido(producto)}
@@ -240,7 +233,7 @@ const CrearPedidoPage: React.FC = () => {
                 <div key={item.id} className={styles.orderItem}>
                   <div className={styles.orderItemInfo}>
                     <strong>{item.nombre}</strong>
-                    <span>${item.precio.toFixed(2)} c/u</span>
+                    <span>${(item.precio_unitario || 0)} c/u</span>
                   </div>
                   <div className={styles.orderItemControls}>
                     <button onClick={() => actualizarCantidadItem(item.id, item.cantidad - 1)} className={styles.quantityButton}>-</button>
@@ -253,7 +246,7 @@ const CrearPedidoPage: React.FC = () => {
                     />
                     <button onClick={() => actualizarCantidadItem(item.id, item.cantidad + 1)} className={styles.quantityButton}>+</button>
                   </div>
-                  <span className={styles.orderItemSubtotal}>${item.subtotal.toFixed(2)}</span>
+                  <span className={styles.orderItemSubtotal}>${(item.subtotal || 0)}</span>
                   <button onClick={() => eliminarItemDelPedido(item.id)} className={styles.deleteItemButton}>×</button>
                 </div>
               ))
@@ -262,9 +255,9 @@ const CrearPedidoPage: React.FC = () => {
           {pedidoItems.length > 0 && (
             <div className={styles.orderSummary}>
               <div className={styles.totalDisplay}>
-                <strong>TOTAL: ${totalPedido.toFixed(2)}</strong>
+                <strong>TOTAL: ${totalPedido}</strong>
               </div>
-              <button onClick={handleConfirmarPedido} className={styles.confirmOrderButton}>
+              <button onClick={handleConfirmarPedido} className={styles.confirmOrderButton} disabled={!clienteSeleccionado}>
                 Confirmar Pedido
               </button>
             </div>

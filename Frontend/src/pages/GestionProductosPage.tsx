@@ -21,11 +21,9 @@ import {
   createProducto,
   updateProducto,
   deleteProducto,
-  type Producto,
-  type ProductoInput,
 } from '../services/product_service';
 import { getCategorias, type Categoria } from '../services/category_service';
-
+import {type Producto, type ProductoInput} from '../types/models'
 interface GestionProductosPageProps {}
 
 const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
