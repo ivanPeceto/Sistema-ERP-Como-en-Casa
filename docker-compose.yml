@@ -6,9 +6,9 @@ services:
     container_name: db_usuarios
     restart: always
     environment:
-      MYSQL_DATABASE: usuarios_db
-      MYSQL_PASSWORD: rootpassword
-      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: ${USUARIOS_DB_NAME}
+      MYSQL_PASSWORD: ${USUARIOS_DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${USUARIOS_DB_PASSWORD}
     ports:
       - "3307:3306"
     volumes:
@@ -17,6 +17,8 @@ services:
   usuarios:
     build: ./backend/service_usuarios
     container_name: usuarios
+    env_file:
+      - ./.env 
     volumes:
       - ./backend/service_usuarios:/app
     ports:
@@ -29,9 +31,9 @@ services:
     container_name: db_clientes
     restart: always
     environment:
-      MYSQL_DATABASE: clientes_db
-      MYSQL_PASSWORD: rootpassword
-      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: ${CLIENTES_DB_NAME}
+      MYSQL_PASSWORD: ${CLIENTES_DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${CLIENTES_DB_PASSWORD}
     ports:
       - "3308:3306"
     volumes:
@@ -40,6 +42,8 @@ services:
   clientes:
     build: ./backend/service_clientes
     container_name: clientes
+    env_file:
+      - ./.env 
     volumes:
       - ./backend/service_clientes:/app
     ports:
@@ -52,9 +56,9 @@ services:
     container_name: db_productos
     restart: always
     environment:
-      MYSQL_DATABASE: productos_db
-      MYSQL_PASSWORD: rootpassword
-      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: ${PRODUCTOS_DB_NAME}
+      MYSQL_PASSWORD: ${PRODUCTOS_DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${PRODUCTOS_DB_PASSWORD}
     ports:
       - "3309:3306"
     volumes:
@@ -63,6 +67,8 @@ services:
   productos:
     build: ./backend/service_productos
     container_name: productos
+    env_file:
+      - ./.env 
     volumes:
       - ./backend/service_productos:/app
     ports:
@@ -75,9 +81,9 @@ services:
     container_name: db_pedidos
     restart: always
     environment:
-      MYSQL_DATABASE: pedidos_db
-      MYSQL_PASSWORD: rootpassword
-      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: ${PEDIDOS_DB_NAME}
+      MYSQL_PASSWORD: ${PEDIDOS_DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${PEDIDOS_DB_PASSWORD}
     ports:
       - "3310:3306"
     volumes:
@@ -86,6 +92,8 @@ services:
   pedidos:
     build: ./backend/service_pedidos
     container_name: pedidos
+    env_file:
+      - ./.env 
     volumes:
       - ./backend/service_pedidos:/app
     ports:

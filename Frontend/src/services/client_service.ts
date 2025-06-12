@@ -6,7 +6,6 @@
 import createAuthApiClient from '../api/apiClient';
 import type { Cliente } from '../types/models.ts';
 
-// URL base del microservicio de clientes
 const CLIENTES_API_BASE_URL = import.meta.env.VITE_API_CLIENTES_URL;
 const apiClient = createAuthApiClient(CLIENTES_API_BASE_URL);
 

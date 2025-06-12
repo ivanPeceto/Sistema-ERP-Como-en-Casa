@@ -1,5 +1,7 @@
 from pathlib import Path
 from datetime import timedelta
+from decouple import config 
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -9,10 +11,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-4es^g=i9ya&d%1=y3@dqi0j(_ty=(5a(2^#uf#s4l@+=y8@wzz'
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = config('DJANGO_SECRET_KEY', default='unsafe-default-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = []
 
@@ -62,8 +65,9 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=4),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    "ALGORITHM": "HS256",
-    'SIGNING_KEY': 'clave_secreta_123',
+    'AUTH_HEADER_TYPES': ('Bearer'),
+    'ALGORITHM': "HS256",
+    'SIGNING_KEY': config('JWT_SIGNING_KEY'),
 }
 
 ROOT_URLCONF = 'products.urls'
@@ -93,14 +97,13 @@ WSGI_APPLICATION = 'products.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'productos_db',
-        'USER': 'root',
-        'PASSWORD': 'rootpassword',
-        'HOST': 'db_productos',  
-        'PORT': '3306',
+        'NAME': config('PRODUCTOS_DB_NAME'),
+        'USER': config('PRODUCTOS_DB_USER'),
+        'PASSWORD': config('PRODUCTOS_DB_PASSWORD'),
+        'HOST': config('PRODUCTOS_DB_HOST'),
+        'PORT': config('PRODUCTOS_DB_PORT', cast=int),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
