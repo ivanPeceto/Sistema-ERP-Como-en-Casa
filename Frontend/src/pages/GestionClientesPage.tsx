@@ -1,7 +1,11 @@
-/*
+/**
  * @file GestionClientesPage.tsx
- * @description Página de gestión de clientes que permite crear, editar, eliminar y buscar clientes.
- * Utiliza el servicio de clientes para comunicarse con el backend y maneja la interfaz de usuario.
+ * @brief Página de gestión de clientes que permite crear, editar, eliminar y buscar clientes.
+ * @details
+ * Este componente de React proporciona una interfaz de usuario completa para las operaciones
+ * CRUD sobre la entidad de Clientes. Se comunica con el `client_service` 
+ * para interactuar con el backend y maneja toda la lógica de
+ * la interfaz, incluyendo un modal para la edición y creación de clientes.
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -12,24 +16,15 @@ import {
   getClientes,
   createCliente,
   updateCliente,
-  deleteCliente,
-  type Cliente
+  deleteCliente
 } from '../services/client_service';
+import { type Cliente } from '../types/models';
 
 /**
- * Componente principal de gestión de clientes.
- * Proporciona una interfaz para administrar clientes con operaciones CRUD.
+ * @brief Componente principal para la página de gestión de clientes.
+ * @returns {React.ReactElement} El JSX que renderiza la página completa.
  */
 const GestionClientesPage: React.FC = () => {
-  /**
-   * Estados del componente:
-   * - clientes: Lista completa de clientes del backend
-   * - filteredClientes: Lista filtrada de clientes para búsqueda
-   * - searchTerm: Término de búsqueda ingresado por el usuario
-   * - isModalOpen: Estado del modal de edición/creación
-   * - editingCliente: Cliente actualmente en edición (null si es nuevo)
-   * - formData: Datos del formulario (sin ID)
-   */
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [filteredClientes, setFilteredClientes] = useState<Cliente[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -42,9 +37,9 @@ const GestionClientesPage: React.FC = () => {
   });
 
   /**
-   * Función para cargar la lista de clientes desde el backend.
-   * @returns Promesa que resuelve cuando la carga es exitosa
-   * @throws Error si la carga falla
+   * @brief Carga la lista de clientes desde el backend usando el servicio.
+   * @details Se envuelve en `useCallback` para la optimización de rendimiento.
+   * Muestra una alerta en caso de error en la comunicación con la API.
    */
   const fetchClientes = useCallback(async () => {
     try {
@@ -57,17 +52,14 @@ const GestionClientesPage: React.FC = () => {
     }
   }, []);
 
-  /**
-   * Efecto para cargar clientes al montar el componente.
-   * Utiliza useCallback para evitar recreación innecesaria.
-   */
   useEffect(() => {
     fetchClientes();
   }, [fetchClientes]);
 
   /**
-   * Efecto para filtrar clientes en frontend según el término de búsqueda.
-   * Realiza búsqueda por nombre, teléfono y dirección.
+   * @brief Efecto para filtrar los clientes en el lado del cliente.
+   * @details Se ejecuta cada vez que el `searchTerm` o la lista de `clientes` cambia,
+   * actualizando la lista `filteredClientes` que se muestra en la UI.
    */
   useEffect(() => {
     const lowercasedSearchTerm = searchTerm.toLowerCase();
@@ -80,16 +72,16 @@ const GestionClientesPage: React.FC = () => {
   }, [searchTerm, clientes]);
 
   /**
-   * Maneja cambios en el campo de búsqueda.
-   * @param event Evento de cambio del input
+   * @brief Actualiza el estado del término de búsqueda.
+   * @param {ChangeEvent<HTMLInputElement>} event El evento del input de búsqueda.
    */
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
 
   /**
-   * Maneja cambios en los campos del formulario.
-   * @param event Evento de cambio del input o textarea
+   * @brief Actualiza el estado del formulario del modal cuando el usuario escribe.
+   * @param {ChangeEvent<HTMLInputElement | HTMLTextAreaElement>} event El evento del campo del formulario.
    */
   const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
@@ -97,8 +89,8 @@ const GestionClientesPage: React.FC = () => {
   };
 
   /**
-   * Abre el modal de edición/creación de cliente.
-   * @param cliente Cliente a editar (null para nuevo cliente)
+   * @brief Abre el modal y configura el formulario para crear o editar un cliente.
+   * @param {Cliente | null} cliente El cliente a editar, o `null` para crear uno nuevo.
    */
   const openModal = useCallback((cliente: Cliente | null = null) => {
     if (cliente) {
@@ -116,7 +108,7 @@ const GestionClientesPage: React.FC = () => {
   }, []);
 
   /**
-   * Cierra el modal y resetea el formulario.
+   * @brief Cierra el modal y resetea los estados del formulario.
    */
   const closeModal = useCallback(() => {
     setIsModalOpen(false);
@@ -125,8 +117,8 @@ const GestionClientesPage: React.FC = () => {
   }, []);
 
   /**
-   * Maneja el envío del formulario (creación/edición).
-   * @param event Evento de envío del formulario
+   * @brief Maneja el envío del formulario, llamando al servicio para crear o actualizar un cliente.
+   * @param {FormEvent<HTMLFormElement>} event El evento de envío del formulario.
    */
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -151,8 +143,8 @@ const GestionClientesPage: React.FC = () => {
   };
 
   /**
-   * Maneja la eliminación de un cliente.
-   * @param clienteId ID del cliente a eliminar
+   * @brief Maneja la eliminación de un cliente, con un diálogo de confirmación.
+   * @param {number} clienteId El ID del cliente a eliminar.
    */
   const handleDelete = async (clienteId: number) => {
     if (window.confirm('¿Está seguro de que desea eliminar este cliente? Esta acción es irreversible.')) {
@@ -173,7 +165,6 @@ const GestionClientesPage: React.FC = () => {
 
   return (
     <div className={styles.pageContainer}>
-      {/* Encabezado y barra de herramientas */}
       <h1>Gestión de clientes</h1>
       <div className={styles.toolbar}>
         <div className={styles.searchBarContainer}>
@@ -190,7 +181,6 @@ const GestionClientesPage: React.FC = () => {
         </button>
       </div>
 
-      {/* Lista de clientes */}
       <div className={styles.listContainer}>
         {filteredClientes.length > 0 ? (
           filteredClientes.map(cliente => (
@@ -211,7 +201,6 @@ const GestionClientesPage: React.FC = () => {
         )}
       </div>
 
-      {/* Modal de edición/creación */}
       {isModalOpen && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
