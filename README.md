@@ -21,7 +21,7 @@ La arquitectura se basa en un backend de microservicios y un frontend desacoplad
 
 A continuación, se detallan las tecnologías, frameworks y librerías clave utilizadas en el desarrollo del proyecto.
 
-###Backend (Python)
+### Backend (Python)
 
 El backend se construyó utilizando el ecosistema de Django, aprovechando su robustez y rapidez para el desarrollo de APIs.
 
@@ -36,7 +36,7 @@ El backend se construyó utilizando el ecosistema de Django, aprovechando su rob
 **Comunicación**:
     django-cors-headers: Para gestionar las políticas de Cross-Origin Resource Sharing (CORS), permitiendo que el frontend se comunique de forma segura con los microservicios del backend.
 
-###Frontend (TypeScript)
+### Frontend (TypeScript)
 
 El frontend es una aplicación construida con las siguientes tecnologías:
 
@@ -48,7 +48,7 @@ El frontend es una aplicación construida con las siguientes tecnologías:
 **Enrutamiento**:
     React Router DOM: Para gestionar la navegación y las rutas del lado del cliente en esta SPA.
 
-###Infraestructura
+### Infraestructura
 
 **Containerización**: Docker y Docker Compose para definir, construir y ejecutar todo el entorno multi-contenedor de la aplicación de manera aislada y reproducible.
 **Control de Versiones**: Git y GitHub para el seguimiento de cambios y la colaboración en equipo.
@@ -59,21 +59,21 @@ El frontend es una aplicación construida con las siguientes tecnologías:
 
 A continuación se presenta un bosquejo del diagrama de arquitectura que representa la estructura general de la aplicación, separando claramente el frontend del backend y mostrando los flujos principales entre las distintas funcionalidades:
 
-###Microservicio Usuarios:
+### Microservicio Usuarios:
 
 ![Diagrama de Usuarios](graficos/usuariosnew.jpg)
 
-###Microservicio Clientes:
+### Microservicio Clientes:
 
 ![Diagrama de Clientes](graficos/clientes.jpg)
 
-###Microservicio Productos:
+### Microservicio Productos:
 
 ![Diagrama de Productos](graficos/productos.jpg)
 
 ![Diagrama de Categorias](graficos/categorias.jpg)
 
-###Microservicio Pedidos.
+### Microservicio Pedidos.
 
 ![Diagrama de Pedidos](graficos/pedidosnew.jpg)
 
