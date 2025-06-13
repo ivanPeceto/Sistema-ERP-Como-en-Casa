@@ -36,47 +36,49 @@ const Sidebar: React.FC = () => {
   const accountItem: MenuItem = { path: '/profile', label: 'Perfil', icon: <svg className={styles.icon} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> }; //
 
   return (
-    <div className={`${styles.sidebarContainer} ${styles.expanded} ${styles.darkTheme}`}> {/* */}
-      <NavLink to="/" className={styles.logoLink}> {/* */}
-        <svg className={`${styles.logoIcon} ${styles.fillLight}`} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"> {/* */}
+    <div className={`${styles.sidebarContainer} ${styles.expanded} ${styles.darkTheme}`}>
+      {/* Changed NavLink to a div to prevent redirection */}
+      <div className={styles.logoLink}>
+        <svg className={`${styles.logoIcon} ${styles.fillLight}`} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
           <path d="M11 17a1 1 0 001.447.894l4-2A1 1 0 0017 15V9.236a1 1 0 00-1.447-.894l-4 2a1 1 0 00-.553.894V17zM15.211 6.276a1 1 0 000-1.788l-4.764-2.382a1 1 0 00-.894 0L4.789 4.488a1 1 0 000 1.788l4.764 2.382a1 1 0 00.894 0l4.764-2.382zM4.447 8.342A1 1 0 003 9.236V15a1 1 0 00.553.894l4 2A1 1 0 009 17v-5.764a1 1 0 00-.553-.894l-4-2z" />
         </svg>
-        <span className={styles.logoText}>GESTOR DE PEDIDOS</span> {/* */}
-      </NavLink>
+        <span className={styles.logoText}>GESTOR DE PEDIDOS</span>
+      </div>
 
-      <div className={`${styles.menuSection} ${styles.topSection}`}> {/* */}
+      <div className={`${styles.menuSection} ${styles.topSection}`}>
         {menuItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
+            end={item.path === '/gestion'} // Add 'end' prop for exact match for '/gestion'
             className={({ isActive }) =>
-              `${styles.menuItem} ${styles.expandedItem} ${isActive ? styles.activeDark : ''}` //
+              `${styles.menuItem} ${styles.expandedItem} ${isActive ? styles.activeDark : ''}`
             }
           >
             {item.icon}
-            <span className={styles.menuItemText}>{item.label}</span> {/* */}
+            <span className={styles.menuItemText}>{item.label}</span>
           </NavLink>
         ))}
       </div>
 
-      <div className={`${styles.menuSection} ${styles.bottomSection}`}> {/* */}
+      <div className={`${styles.menuSection} ${styles.bottomSection}`}>
         {bottomMenuItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
             className={({ isActive }) =>
-              `${styles.menuItem} ${styles.expandedItem} ${isActive ? styles.activeDark : ''}` //
+              `${styles.menuItem} ${styles.expandedItem} ${isActive ? styles.activeDark : ''}`
             }
           >
             {item.icon}
-            {item.hasNotification && <span className={styles.notificationDot}></span>} {/* */}
-            <span className={styles.menuItemText}>{item.label}</span> {/* */}
+            {item.hasNotification && <span className={styles.notificationDot}></span>}
+            <span className={styles.menuItemText}>{item.label}</span>
           </NavLink>
         ))}
       </div>
-      <NavLink to={accountItem.path} className={`${styles.accountLink} ${styles.expandedAccountLink}`}> {/* */}
+      <NavLink to={accountItem.path} className={`${styles.accountLink} ${styles.expandedAccountLink}`}>
         {accountItem.icon}
-        <span className={styles.accountText}>{accountItem.label}</span> {/* */}
+        <span className={styles.accountText}>{accountItem.label}</span>
       </NavLink>
     </div>
   );

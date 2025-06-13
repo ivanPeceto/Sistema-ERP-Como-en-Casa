@@ -174,7 +174,7 @@ const GestionClientesPage: React.FC = () => {
   return (
     <div className={styles.pageContainer}>
       {/* Encabezado y barra de herramientas */}
-      <h1>CLIENTES</h1>
+      <h1>Gestión de clientes</h1>
       <div className={styles.toolbar}>
         <div className={styles.searchBarContainer}>
           <input
