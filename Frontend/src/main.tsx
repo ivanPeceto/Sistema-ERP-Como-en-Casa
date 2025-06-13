@@ -1,9 +1,3 @@
-/**
- * @archivo: main.tsx
- * @descripcion: Punto de entrada principal de la aplicación React.
- * Inicializa y monta la aplicación en el DOM.
- **/
-
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';

@@ -1,10 +1,11 @@
 /**
- * @archivo: index.tsx
- * @descripcion: Define la configuración de enrutamiento principal para la aplicación.
- * Utiliza `react-router-dom` para mapear URLs a los componentes correspondientes,
- * distinguiendo entre rutas que utilizan el layout principal y rutas de pantalla completa
- * como login o registro.
- **/
+ * @file router/index.tsx
+ * @brief Define la configuración de enrutamiento principal para la aplicación.
+ * @details
+ * Este archivo utiliza la función `createBrowserRouter` de `react-router-dom` para
+ * crear y configurar todas las rutas de la Single-Page Application (SPA).
+ */
+
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import App from '../App';
 import LoginPage from '../pages/login_page';
@@ -16,16 +17,7 @@ import GestionPedidosPage from '../pages/GestionPedidosPage';
 import GestionCategoriasPage from '../pages/GestionCategoriasPage';
 import MainLayout from '../Layouts/MainLayout';
 import ProtectedRoute from './protected_route'; 
-/**
- * Configuración del enrutador de la aplicación.
- *
- * Define las rutas principales:
- * - Rutas anidadas bajo `/` que utilizan `MainLayout` para la estructura visual común (sidebar).
- * - La ruta raíz (`/`) renderiza `CrearPedidoPage` por defecto.
- * - Rutas específicas como `/productos` y `/clientes` renderizan sus respectivas páginas de gestión.
- * - Rutas de nivel superior como `/login` y `/register` que renderizan componentes de página completa
- * sin el `MainLayout`.
- */
+
 const router = createBrowserRouter([
   {
     path: '/',
