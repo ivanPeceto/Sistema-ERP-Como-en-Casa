@@ -1,5 +1,6 @@
 from pathlib import Path
 from datetime import timedelta
+from decouple import config 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -9,10 +10,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-27m)hl*kb_#-2&jba2w9(1o7b7@-yrcm@l4)$8q!8$#vg3+b7^'
+SECRET_KEY = config('DJANGO_SECRET_KEY', default='unsafe-default-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = []
 
@@ -43,7 +44,7 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'AUTH_HEADER_TYPES': ('Bearer'),
     'ALGORITHM': "HS256",
-    'SIGNING_KEY': 'clave_secreta_123',
+    'SIGNING_KEY': config('JWT_SIGNING_KEY'),
 }
 
 MIDDLEWARE = [
@@ -84,11 +85,11 @@ WSGI_APPLICATION = 'users.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'usuarios_db',
-        'USER': 'root',
-        'PASSWORD': 'rootpassword',
-        'HOST': 'db_usuarios',
-        'PORT': '3306',
+        'NAME': config('USUARIOS_DB_NAME'),
+        'USER': config('USUARIOS_DB_USER'),
+        'PASSWORD': config('USUARIOS_DB_PASSWORD'),
+        'HOST': config('USUARIOS_DB_HOST'),
+        'PORT': config('USUARIOS_DB_PORT', cast=int),
     }
 }
 

@@ -1,11 +1,14 @@
 from pathlib import Path
 from datetime import timedelta
+from decouple import config 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-clientes-123456789'
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = config('DJANGO_SECRET_KEY', default='unsafe-default-key')
 
-DEBUG = True
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = []
 
@@ -39,9 +42,8 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'AUTH_HEADER_TYPES': ('Bearer'),
     'ALGORITHM': "HS256",
-    'SIGNING_KEY': 'clave_secreta_123',
+    'SIGNING_KEY': config('JWT_SIGNING_KEY'),
 }
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -78,13 +80,14 @@ WSGI_APPLICATION = 'clients.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'clientes_db',
-        'USER': 'root',
-        'PASSWORD': 'rootpassword',
-        'HOST': 'db_clientes',
-        'PORT': '3306',
+        'NAME': config('CLIENTES_DB_NAME'),
+        'USER': config('CLIENTES_DB_USER'),
+        'PASSWORD': config('CLIENTES_DB_PASSWORD'),
+        'HOST': config('CLIENTES_DB_HOST'),
+        'PORT': config('CLIENTES_DB_PORT', cast=int),
     }
 }
+
 
 
 # Config regional

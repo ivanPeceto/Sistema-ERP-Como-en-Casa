@@ -130,6 +130,4 @@ const RegisterPage: React.FC = () => {
   );
 };
 
-// -------        -------        -------        -------        -------        -------
-
-export default RegisterPage; // Exportamos esta página para que nuestro sistema de rutas la pueda usar.
+export default RegisterPage;

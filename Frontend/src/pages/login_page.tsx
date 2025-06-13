@@ -1,4 +1,12 @@
-// Esta página es para que los usuarios puedan iniciar sesión en la aplicación.
+/**
+ * @file login_page.tsx
+ * @brief Componente de React que renderiza la página de inicio de sesión.
+ * @details
+ * Esta página proporciona la interfaz para que los usuarios se autentiquen en la aplicación.
+ * Contiene un formulario para ingresar email y contraseña, maneja el estado de dichos
+ * campos, y se comunica con el `auth_service` para validar las credenciales
+ * contra el backend.
+ */
 
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom'; 
@@ -6,9 +14,11 @@ import styles from '../styles/login.module.css';
 import { login } from '../services/auth_service'
 
 
-
+/**
+ * @brief Componente funcional para la página de inicio de sesión.
+ * @returns {React.ReactElement} El JSX que renderiza la página de login.
+ */
 const LoginPage: React.FC = () => {
-  // Acá guardariamos los datos que el usuario ingresa en los campos de usuario y contraseña.
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -19,24 +29,24 @@ const LoginPage: React.FC = () => {
     setError(null);
   
 
-  if (!email || !password) {
-    setError('Por favor, complete ambos campos.');
-    return;
-  }
-
-  try {
-    await login(email, password);
-    navigate('/gestion');
-
-  } catch (err:any){
-    console.error('Error de inicio de sersión: ', err);
-    if (err.response && err.response.data){
-      setError('Credenciales invállidas. Por favor, intente de nuevo.')
-    } else {
-      setError('Ocurrió un error al intentar iniciar sesión.');
+    if (!email || !password) {
+      setError('Por favor, complete ambos campos.');
+      return;
     }
-  }
-};
+
+    try {
+      await login(email, password);
+      navigate('/gestion');
+
+    } catch (err:any){
+      console.error('Error de inicio de sersión: ', err);
+      if (err.response && err.response.data){
+        setError('Credenciales invállidas. Por favor, intente de nuevo.')
+      } else {
+        setError('Ocurrió un error al intentar iniciar sesión.');
+      }
+    }
+  };
 
   const LogoIcon = () => (
     <svg viewBox="0 0 24 24" fill="currentColor" height="1em" width="1em">
@@ -79,6 +89,8 @@ const LoginPage: React.FC = () => {
             />
           </div>
 
+          {error && <p className={styles.errorMessage}>{error}</p>}
+
           <button type="submit" className={styles.submitButton}>
             Login
           </button>
@@ -92,6 +104,4 @@ const LoginPage: React.FC = () => {
   );
 };
 
-
-
-export default LoginPage; // Exportamos esta página para que pueda ser usada por el router.
+export default LoginPage; 

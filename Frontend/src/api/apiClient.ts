@@ -1,16 +1,30 @@
-// Frontend/src/api/apiClient.ts
+/**
+ * @file apiClient.ts
+ * @brief Archivo que exporta una función factoría para crear clientes HTTP (Axios) con autenticación JWT.
+ * @details
+ * Este módulo es el núcleo de la comunicación con el backend. En lugar de exportar una única
+ * instancia de Axios, exporta una función `createAuthApiClient`. Esta función es una "fábrica"
+ * que genera instancias de Axios pre-configuradas para un microservicio específico,
+ * equipadas con interceptores para manejar la autenticación JWT de forma automática.
+ */
 
 import axios from 'axios';
 import { getAccessToken, getRefreshToken, setTokens, removeTokens, type RefreshTokenResponse } from '../services/auth_service';
-// import { jwtDecode } from 'jwt-decode';
 
 /**
- * @brief Crea una instancia de Axios configurada con interceptores para JWT.
+/**
+ * @brief Crea y configura una instancia de Axios con interceptores para manejar la autenticación JWT.
  * @details
- * Esta función factoría permite crear instancias de Axios para cada microservicio,
- * asegurando que todas las peticiones lleven el token de acceso y manejen el refresh automáticamente.
- * @param baseURL La URL base del microservicio al que esta instancia se conectará.
- * @returns Una instancia de Axios con interceptores de autenticación.
+ * Esta función factoría toma una URL base y devuelve una instancia de Axios.
+ * Dicha instancia tiene dos interceptores configurados:
+ *    1.Interceptor de Petición (Request): Se ejecuta antes de cada petición para inyectar
+ * automáticamente el 'access token' en la cabecera 'Authorization'.
+ *    2.Interceptor de Respuesta (Response): Se ejecuta al recibir una respuesta. Si detecta
+ * un error 401 (Unauthorized), intenta renovar el 'access token' usando el 'refresh token'
+ * y reintenta la petición original de forma transparente.
+ * 
+ * @param {string} baseURL La URL base del microservicio al que esta instancia se conectará.
+ * @returns {import('axios').AxiosInstance} Una instancia de Axios configurada y lista para usar.
  */
 const createAuthApiClient = (baseURL: string) => { 
   const instance = axios.create({
@@ -20,7 +34,6 @@ const createAuthApiClient = (baseURL: string) => {
     },
   });
 
-  // Interceptor de Petición (Request Interceptor)
   instance.interceptors.request.use(
     (config) => {
       const token = getAccessToken();
@@ -33,7 +46,6 @@ const createAuthApiClient = (baseURL: string) => {
     (error) => Promise.reject(error)
   );
 
-  // Interceptor de Respuesta (Response Interceptor)
   instance.interceptors.response.use(
     (response) => response,
     async (error) => {
@@ -74,8 +86,7 @@ const createAuthApiClient = (baseURL: string) => {
     }
   );
 
-  return instance; // Devuelve la instancia de Axios configurada
+  return instance; 
 };
 
-// ¡Esta es la exportación correcta de la FUNCIÓN factoría!
 export default createAuthApiClient;

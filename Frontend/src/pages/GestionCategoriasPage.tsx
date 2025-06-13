@@ -1,8 +1,13 @@
-/*
+/**
  * @file GestionCategoriasPage.tsx
- * @description Página de gestión de categorías que permite crear, editar, eliminar y listar categorías.
- * Utiliza el servicio de categorías para comunicarse con el backend y maneja la interfaz de usuario.
+ * @brief Página de gestión de categorías que permite crear, editar, eliminar y listar categorías.
+ * @details
+ * Este componente de React implementa una interfaz de usuario completa para las operaciones
+ * CRUD sobre la entidad de Categorías. Se comunica con el `category_service` para
+ * interactuar con el backend y maneja toda la lógica de la interfaz, incluyendo
+ * un modal para la edición y creación de categorías.
  */
+
 
 import React, { useState, useEffect, useCallback } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
@@ -13,23 +18,17 @@ import {
   getCategorias,
   createCategoria,
   updateCategoria,
-  deleteCategoria,
-  type Categoria
+  deleteCategoria
 } from '../services/category_service';
+import type { Categoria } from '../types/models';
 
 /**
- * Componente principal de gestión de categorías.
- * Proporciona una interfaz para administrar categorías con operaciones CRUD.
+ * @brief Componente principal de gestión de categorías.
+ * @details Proporciona una interfaz para administrar categorías con operaciones CRUD.
+ * @returns {React.ReactElement} El JSX que renderiza la página completa.
  */
 const GestionCategoriasPage: React.FC = () => {
   const navigate = useNavigate();
-  /**
-   * Estados del componente:
-   * - categorias: Lista completa de categorías del backend
-   * - isModalOpen: Estado del modal de edición/creación
-   * - editingCategoria: Categoría actualmente en edición (null si es nueva)
-   * - formData: Datos del formulario (sin ID)
-   */
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [editingCategoria, setEditingCategoria] = useState<Categoria | null>(null);
@@ -39,9 +38,9 @@ const GestionCategoriasPage: React.FC = () => {
   });
 
   /**
-   * Función para cargar la lista de categorías desde el backend.
-   * @returns Promesa que resuelve cuando la carga es exitosa
-   * @throws Error si la carga falla
+   * @brief Carga la lista de categorías desde el backend usando el servicio.
+   * @details Se envuelve en `useCallback` para optimizar y evitar que la función se
+   * recree en cada renderizado. Muestra una alerta en caso de error.
    */
   const fetchCategorias = useCallback(async () => {
     try {
@@ -53,17 +52,13 @@ const GestionCategoriasPage: React.FC = () => {
     }
   }, []);
 
-  /**
-   * Efecto para cargar categorías al montar el componente.
-   * Utiliza useCallback para evitar recreación innecesaria.
-   */
   useEffect(() => {
     fetchCategorias();
   }, [fetchCategorias]);
 
   /**
-   * Maneja cambios en los campos del formulario.
-   * @param event Evento de cambio del input o textarea
+   * @brief Maneja los cambios en los campos del formulario del modal.
+   * @param {ChangeEvent<HTMLInputElement | HTMLTextAreaElement>} event El evento del campo del formulario.
    */
   const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
@@ -71,8 +66,8 @@ const GestionCategoriasPage: React.FC = () => {
   };
 
   /**
-   * Abre el modal de edición/creación de categoría.
-   * @param categoria Categoría a editar (null para nueva categoría)
+   * @brief Abre el modal y configura el formulario para crear o editar una categoría.
+   * @param {Categoria | null} categoria La categoría a editar, o `null` para crear una nueva.
    */
   const openModal = useCallback((categoria: Categoria | null = null) => {
     if (categoria) {
@@ -85,9 +80,6 @@ const GestionCategoriasPage: React.FC = () => {
     setIsModalOpen(true);
   }, []);
 
-  /**
-   * Cierra el modal y resetea el formulario.
-   */
   const closeModal = useCallback(() => {
     setIsModalOpen(false);
     setEditingCategoria(null);
@@ -95,8 +87,8 @@ const GestionCategoriasPage: React.FC = () => {
   }, []);
 
   /**
-   * Maneja el envío del formulario (creación/edición).
-   * @param event Evento de envío del formulario
+   * @brief Maneja el envío del formulario, llamando al servicio de crear o actualizar.
+   * @param {FormEvent<HTMLFormElement>} event El evento de envío del formulario.
    */
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -117,8 +109,8 @@ const GestionCategoriasPage: React.FC = () => {
   };
 
   /**
-   * Maneja la eliminación de una categoría.
-   * @param categoriaId ID de la categoría a eliminar
+   * @brief Maneja la eliminación de una categoría, con un diálogo de confirmación.
+   * @param {number} categoriaId El ID de la categoría a eliminar.
    */
   const handleDelete = async (categoriaId: number) => {
     if (window.confirm('¿Seguro que querés eliminar esta categoría?')) {
@@ -135,7 +127,6 @@ const GestionCategoriasPage: React.FC = () => {
 
   return (
     <div className={styles.pageContainer}>
-      {/* Encabezado y barra de herramientas */}
       <h1>Gestion de Categorias</h1>
       <div className={styles.toolbar}>
         <button 
@@ -149,7 +140,6 @@ const GestionCategoriasPage: React.FC = () => {
         </button>
       </div>
 
-      {/* Lista de categorías */}
       <div className={styles.listContainer}>
         {categorias.length > 0 ? (
           categorias.map(cat => (
@@ -169,7 +159,6 @@ const GestionCategoriasPage: React.FC = () => {
         )}
       </div>
 
-      {/* Modal de edición/creación */}
       {isModalOpen && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>

@@ -1,31 +1,36 @@
 /**
  * @file CrearPedidoPage.tsx
- * @description Página para la creación y armado de nuevos pedidos. Permite seleccionar
- * productos por categoría, ajustar cantidades y confirmar el pedido.
+ * @brief Página para la creación y armado de nuevos pedidos.
+ * @details
+ * Este es el componente central para la operatoria diaria. Permite a los usuarios
+ * armar un nuevo pedido de forma interactiva. Orquesta la información de los servicios
+ * de clientes y productos para construir un objeto de pedido que finalmente se envía
+ * al servicio de pedidos. La interfaz está dividida en tres paneles principales:
+ * selección de cliente, selección de productos por categoría y el resumen del pedido actual.
  */
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import type { ChangeEvent } from 'react';
 import styles from '../styles/crearPedidoPage.module.css';
-import { getClientes, type Cliente } from '../services/client_service';
-import { getProductos, type Producto } from '../services/product_service';
-import { createPedido, getPedidosByDate, type PedidoInput } from '../services/pedido_service';
-import type { PedidoItem } from '../types/models.d.ts';
+import { getClientes } from '../services/client_service';
+import { getProductos } from '../services/product_service';
+import { createPedido, getPedidosByDate } from '../services/pedido_service';
+import type { PedidoItem, PedidoInput, Producto, Cliente } from '../types/models.d.ts';
 
 const CrearPedidoPage: React.FC = () => {
-  // --- Estados para datos externos ---
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [productos, setProductos] = useState<Producto[]>([]);
 
-  // --- Estados para la UI y el formulario ---
   const [clienteSeleccionado, setClienteSeleccionado] = useState<Cliente | null>(null);
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<string>('');
   const [pedidoItems, setPedidoItems] = useState<PedidoItem[]>([]);
-  const [clienteSearchTerm, setClienteSearchTerm] = useState(''); // Nuevo estado para el término de búsqueda de clientes
+  const [clienteSearchTerm, setClienteSearchTerm] = useState(''); 
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // --- Lógica de carga de datos ---
+    /**
+   * @brief Carga los datos iniciales de clientes y productos en paralelo.
+   */
   const fetchInitialData = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -50,11 +55,10 @@ const CrearPedidoPage: React.FC = () => {
     fetchInitialData();
   }, [fetchInitialData]);
 
-  // --- Lógica de filtrado y cálculos (Memorizada para optimización) ---
-
+  /** @brief Filtra la lista de clientes basándose en el término de búsqueda. */
   const clientesFiltrados = useMemo(() => {
     if (!clienteSearchTerm) {
-      return clientes; // Si no hay término de búsqueda, muestra todos los clientes
+      return clientes; 
     }
     return clientes.filter(c => 
       c.nombre.toLowerCase().includes(clienteSearchTerm.toLowerCase()) ||
@@ -62,26 +66,29 @@ const CrearPedidoPage: React.FC = () => {
       c.direccion.toLowerCase().includes(clienteSearchTerm.toLowerCase())
     );
   }, [clienteSearchTerm, clientes]);
-
+  
+  /** @brief Extrae una lista de nombres de categorías únicas a partir de los productos. */
   const categoriasUnicas = useMemo(() =>
     [...new Set(productos.map(p => p.categoria?.nombre || 'Sin Categoría'))],
   [productos]);
 
+  /** @brief Filtra los productos que se muestran basándose en la categoría seleccionada. */
   const productosFiltradosPorCategoria = useMemo(() => {
     if (!categoriaSeleccionada) return [];
     return productos.filter(p => (p.categoria?.nombre || 'Sin Categoría') === categoriaSeleccionada && p.disponible);
   }, [categoriaSeleccionada, productos]);
 
+  /** @brief Calcula el total del pedido actual cada vez que la lista de ítems cambia. */
   const totalPedido = useMemo(() => {
     return pedidoItems.reduce((total, item) => total + (item.subtotal || 0), 0);
   }, [pedidoItems]);
 
-  // --- Manejadores de eventos ---
-
+  /** @brief Elimina un ítem del pedido actual. */
   const eliminarItemDelPedido = useCallback((productoId: number) => {
     setPedidoItems(prevItems => prevItems.filter(item => item.id !== productoId));
   }, []);
 
+  /** @brief Actualiza la cantidad de un ítem en el pedido. Si la cantidad es < 1, lo elimina. */
   const actualizarCantidadItem = useCallback((productoId: number, cantidad: number) => {
     if (cantidad < 1) {
       eliminarItemDelPedido(productoId);
@@ -96,18 +103,17 @@ const CrearPedidoPage: React.FC = () => {
     );
   }, [eliminarItemDelPedido]);
 
+  /** @brief Añade un producto al pedido o incrementa su cantidad si ya existe. */
   const agregarProductoAlPedido = useCallback((producto: Producto) => {
     setPedidoItems(prevItems => {
       const existingItem = prevItems.find(item => item.id === producto.id);
       if (existingItem) {
-        // Si el ítem ya existe, actualiza su cantidad y subtotal.
         return prevItems.map(item =>
           item.id === producto.id
             ? { ...item, cantidad: item.cantidad + 1, subtotal: (item.cantidad + 1) * item.precio_unitario }
             : item
         );
       } else {
-        // Si es un ítem nuevo, lo añade a la lista.
         return [...prevItems, { ...producto, cantidad: 1, subtotal: producto.precio_unitario, precio: producto.precio_unitario }];
       }
     });
@@ -115,9 +121,14 @@ const CrearPedidoPage: React.FC = () => {
   
   const handleSeleccionarCliente = (cliente: Cliente) => {
     setClienteSeleccionado(cliente);
-    setClienteSearchTerm(cliente.nombre); // Actualiza el campo de búsqueda con el nombre del cliente
+    setClienteSearchTerm(cliente.nombre);
   }
 
+  /**
+   * @brief Maneja la confirmación final y envío del pedido al backend.
+   * @details Valida que haya un cliente y productos, calcula el número de pedido secuencial
+   * para el día, construye el payload y llama al servicio `createPedido`.
+   */
   const handleConfirmarPedido = async () => {
     if (!clienteSeleccionado) {
       alert('Por favor, seleccione un cliente de la lista.');
@@ -164,7 +175,6 @@ const CrearPedidoPage: React.FC = () => {
   if (isLoading) return <div>Cargando...</div>;
   if (error) return <div className={styles.error}>{error}</div>;
 
-  // --- Renderizado del Componente ---
   return (
     <div className={styles.pageContainer}>
       <div className={styles.headerSection}>
@@ -176,7 +186,6 @@ const CrearPedidoPage: React.FC = () => {
         )}
       </div>
       <div className={styles.mainGrid}>
-        {/* Nuevo panel de Selección de Clientes */}
         <div className={styles.clientSelectionPanel}>
           <h2>Seleccionar Cliente</h2>
           <div className={styles.clientSearch}>
