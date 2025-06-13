@@ -87,6 +87,13 @@ A continuación se presenta un bosquejo del diagrama de arquitectura que represe
 ![Diagrama de Pedidos](graficos/pedidosnew.jpg)
 
 
+---
+
+## Diagrama de Clases de la App
+
+Exponemos el diagrama de clases de la aplicacion, detallando las diversas instancias que tiene cada microservicio.
+
+![Diagrama de Clases](graficos/DiagramaClasesApp.jpg)
 
 
 ---
