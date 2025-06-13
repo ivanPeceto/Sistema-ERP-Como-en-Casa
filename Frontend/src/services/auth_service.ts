@@ -67,7 +67,6 @@ export const removeTokens = () => {
 
 export const getAccessToken = (): string | null => localStorage.getItem('accessToken');
 export const getRefreshToken = (): string | null => localStorage.getItem('refreshToken');
-
 export const getCurrentUser = (): User | null => {
   const user = localStorage.getItem('user');
   return user ? JSON.parse(user) : null;

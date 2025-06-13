@@ -12,9 +12,9 @@ import {
   getClientes,
   createCliente,
   updateCliente,
-  deleteCliente,
-  type Cliente
+  deleteCliente
 } from '../services/client_service';
+import type { Cliente } from '../types/models';
 
 /**
  * Componente principal de gestión de clientes.
@@ -174,7 +174,7 @@ const GestionClientesPage: React.FC = () => {
   return (
     <div className={styles.pageContainer}>
       {/* Encabezado y barra de herramientas */}
-      <h1>CLIENTES</h1>
+      <h1>GESTION CLIENTES</h1>
       <div className={styles.toolbar}>
         <div className={styles.searchBarContainer}>
           <input

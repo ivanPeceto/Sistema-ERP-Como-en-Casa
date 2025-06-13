@@ -1,0 +1,50 @@
+.pedidoCard {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.pedidoCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.pedidoInfo {
+  flex: 1;
+}
+
+.pedidoInfo h3 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+}
+
+.pedidoInfo p {
+  margin: 0.25rem 0;
+  color: #666;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.editButton {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.editButton:hover {
+  background-color: #357abd;
+}

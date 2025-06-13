@@ -15,17 +15,25 @@
 }
 
 .headerSection {
-  padding: 15px 20px;
+  padding: 20px 20px 15px;
   background-color: #fff;
   border-bottom: 1px solid #e0e0e0;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  text-align: center; 
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .headerSection h1 {
-  margin: 0 0 10px 0; 
-  color: #333;
-  font-size: 1.8rem;
+  margin: 20px 0 25px 0;  /* Añadido 20px de margen superior */
+  color: #2c3e50;
+  font-size: 2rem;
+  font-weight: 600;
+  width: 100%;
+  padding: 0;
+  border: none;
 }
 
 .clienteSeleccionadoInline {
@@ -82,12 +90,45 @@
   border-bottom: 1px solid #eee;
 }
 
+.clientSearch {
+  position: relative;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  gap: 8px;
+}
+
 .clientSearch input {
-  width: 100%;
+  flex-grow: 1;
   padding: 8px 12px;
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 0.9rem;
+}
+
+.clientSearch input.searchDisabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  border-color: #e0e0e0;
+}
+
+.clearButton {
+  padding: 8px 12px;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  transition: background-color 0.2s;
+}
+
+.clearButton:hover {
+  background-color: #e0e0e0;
+}
+
+.clearButton:active {
+  background-color: #d0d0d0;
 }
 
 .clientList {

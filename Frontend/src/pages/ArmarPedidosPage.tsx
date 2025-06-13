@@ -6,10 +6,10 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import type { ChangeEvent } from 'react';
 import styles from '../styles/crearPedidoPage.module.css';
-import { getClientes, type Cliente } from '../services/client_service';
-import { getProductos, type Producto } from '../services/product_service';
-import { createPedido, getPedidosByDate, type PedidoInput } from '../services/pedido_service';
-import type { PedidoItem } from '../types/models.d.ts';
+import { getClientes } from '../services/client_service';
+import { getProductos } from '../services/product_service';
+import { createPedido, getPedidosByDate } from '../services/pedido_service';
+import type { PedidoItem, Cliente, Producto, PedidoInput } from '../types/models.d.ts';
 
 const CrearPedidoPage: React.FC = () => {
   // --- Estados para datos externos ---
@@ -115,16 +115,39 @@ const CrearPedidoPage: React.FC = () => {
   
   const handleSeleccionarCliente = (cliente: Cliente) => {
     setClienteSeleccionado(cliente);
-    setClienteSearchTerm(cliente.nombre); // Actualiza el campo de búsqueda con el nombre del cliente
-  }
+    setClienteSearchTerm(''); // Limpiamos el término de búsqueda al seleccionar un cliente
+  };
+
+  const handleClienteSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setClienteSearchTerm(value);
+    
+    // Si el usuario está borrando o modificando el texto, deseleccionamos el cliente actual
+    if (clienteSeleccionado && value !== clienteSeleccionado.nombre) {
+      setClienteSeleccionado(null);
+    }
+  };
+  
+  const getInputPlaceholder = () => {
+    return clienteSeleccionado ? 'Buscar otro cliente...' : 'Buscar cliente...';
+  };
+  
+  const getInputValue = () => {
+    return clienteSeleccionado ? '' : clienteSearchTerm;
+  };
+  
+  const handleClearSelection = () => {
+    setClienteSeleccionado(null);
+    setClienteSearchTerm('');
+  };
 
   const handleConfirmarPedido = async () => {
     if (!clienteSeleccionado) {
-      alert('Por favor, seleccione un cliente de la lista.');
+      console.error('Por favor, seleccione un cliente de la lista.');
       return;
     }
     if (pedidoItems.length === 0) {
-      alert('El pedido está vacío.');
+      console.error('El pedido está vacío.');
       return;
     }
 
@@ -149,7 +172,7 @@ const CrearPedidoPage: React.FC = () => {
       };
       
       await createPedido(pedidoData);
-      alert(`Pedido #${nuevoNumeroPedido} creado para ${clienteSeleccionado.nombre}.`);
+      console.log(`Pedido #${nuevoNumeroPedido} creado para ${clienteSeleccionado.nombre}.`);
       
       setPedidoItems([]);
       setClienteSeleccionado(null);
@@ -157,7 +180,7 @@ const CrearPedidoPage: React.FC = () => {
 
     } catch (err) {
       console.error("Error al confirmar el pedido:", err);
-      alert("Ocurrió un error al confirmar el pedido.");
+      console.error("Ocurrió un error al confirmar el pedido.");
     }
   };
 
@@ -182,10 +205,21 @@ const CrearPedidoPage: React.FC = () => {
           <div className={styles.clientSearch}>
             <input
               type="text"
-              placeholder="Buscar cliente..."
-              value={clienteSearchTerm}
-              onChange={(e) => setClienteSearchTerm(e.target.value)}
+              placeholder={getInputPlaceholder()}
+              value={getInputValue()}
+              onChange={handleClienteSearchChange}
+              className={clienteSeleccionado ? styles.searchDisabled : ''}
+              disabled={!!clienteSeleccionado}
             />
+            {clienteSeleccionado && (
+              <button 
+                onClick={handleClearSelection}
+                className={styles.clearButton}
+                title="Cambiar cliente"
+              >
+                Cambiar
+              </button>
+            )}
           </div>
           <div className={styles.clientList}>
             {clientesFiltrados.length > 0 ? (

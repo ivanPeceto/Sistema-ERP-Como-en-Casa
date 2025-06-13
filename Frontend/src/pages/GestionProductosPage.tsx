@@ -65,8 +65,8 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
       setProductos(data);
       setFilteredProductos(data);
     } catch (error) {
-      console.error('Error al cargar productos:', error);
-      alert('Error al cargar productos. Revisa que el backend esté funcionando.');
+      setProductos([]);
+      setFilteredProductos([]);
     }
   }, []);
 
@@ -79,7 +79,7 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
         setFormData(prev => ({ ...prev, categoria_id: data[0].id }));
       }
     } catch (error) {
-      console.error('Error al cargar categorías:', error);
+      setCategorias([]);
     }
   }, []);
 
@@ -185,7 +185,7 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
 
     // Validación de categoría
     if (!formData.categoria_id) {
-      alert('Por favor, seleccione una categoría para el producto.');
+      console.error('Por favor, seleccione una categoría para el producto.');
       return;
     }
 
@@ -193,20 +193,13 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
       // Operación CRUD según el modo (editar/crear)
       if (editingProducto) {
         await updateProducto(editingProducto.id, formData);
-        alert('Producto actualizado exitosamente.');
       } else {
         await createProducto(formData);
-        alert('Producto creado exitosamente.');
       }
-
-      // Actualizar lista y cerrar modal
       fetchProductos();
       closeModal();
-    } catch (error: any) {
-      console.error('Error al guardar producto:', error);
-      const errorMessage = error.response?.data?.detail || JSON.stringify(error.response?.data) || 'Ocurrió un error al guardar.';
-      alert(errorMessage);
-
+    } catch (error) {
+      // Silently handle error
     }
   };
 
@@ -214,15 +207,11 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
    * Maneja la eliminación de un producto
    */
   const handleDelete = async (productoId: number) => {
-    if (window.confirm('¿Estás seguro de que querés eliminar este producto?')) {
-      try {
-        await deleteProducto(productoId);
-        alert('Producto eliminado.');
-        fetchProductos();
-      } catch (error: any) {
-        console.error('Error al eliminar producto:', error);
-        alert(error.response?.data?.detail || 'Error al eliminar.');
-      }
+    try {
+      await deleteProducto(productoId);
+      fetchProductos();
+    } catch (error) {
+      // Silently handle error
     }
   };
 
@@ -232,7 +221,7 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
 
   return (
     <div className={styles.pageContainer}>
-      <h1>PRODUCTOS</h1>
+      <h1>GESTION PRODUCTOS</h1>
       
       {/* Barra de herramientas con búsqueda y botones */}
       <div className={styles.toolbar}>

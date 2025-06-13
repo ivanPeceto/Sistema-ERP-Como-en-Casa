@@ -39,6 +39,31 @@
   align-items: center;
 }
 
+/* Fila de controles en línea */
+.formRow {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.formRow .formField {
+  margin-bottom: 0;
+  flex: 0 0 auto;
+}
+
+/* Ajustes para checkboxes en fila */
+.formRow .formCheckbox {
+  margin-right: 0.25rem;
+}
+
+.formRow .formLabel {
+  min-width: auto;
+  margin-right: 0.5rem;
+  white-space: nowrap;
+}
+
 .formLabel {
   display: inline-block;
   margin-bottom: 0;
@@ -57,6 +82,18 @@
   font-size: 0.875rem;
   line-height: 1.25rem;
   transition: border-color 0.2s ease;
+}
+
+/* Estilo específico para input de hora */
+input[type="time"].formInput {
+  max-width: 120px;
+  padding: 0.375rem 0.5rem;
+}
+
+/* Asegurar que el ícono del selector de hora sea visible */
+input[type="time"]::-webkit-calendar-picker-indicator {
+  padding: 0;
+  cursor: pointer;
 }
 
 .formInput:focus,

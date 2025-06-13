@@ -46,6 +46,6 @@ export const deleteProducto = async (id: number): Promise<any> => {
 
 export const cambiarDisponibilidad = async (producto: Producto): Promise<Producto> => {
   const actualizado = { ...producto, disponible: !producto.disponible };
-  const response = await apiClient.put(`/editar/?id=${id}`, actualizado);
-  return response.data;
+  const response = await apiClient.put(`/editar/?id=${producto.id}`, actualizado);
+  return response.data as Producto;
 };

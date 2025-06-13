@@ -4,58 +4,64 @@
  */
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import type { ChangeEvent } from 'react'; 
-import styles from '../styles/gestionPedidosPage.module.css'; 
+import type { ChangeEvent, FormEvent } from 'react';
+import styles from '../styles/gestionPedidosPage.module.css';
+import formStyles from '../styles/formStyles.module.css'; // Importamos estilos de formulario
+import crearPedidoStyles from '../styles/crearPedidoPage.module.css'; // Importamos estilos de CrearPedidoPage para reutilizar
 
 // --- Servicios y Tipos ---
-// Asegúrate de que los nombres de las funciones importadas coincidan con tu servicio
-import { getPedidosByDate, editarPedido, deletePedido } from '../services/pedido_service'; 
+import { getPedidosByDate, editarPedido, deletePedido } from '../services/pedido_service';
 import { getClientes, type Cliente } from '../services/client_service';
-import type { Pedido, PedidoInput } from '../types/models.d.ts';
+import { getProductos, type Producto } from '../services/product_service'; // Importamos getProductos
+import type { Pedido, PedidoInput, PedidoItem } from '../types/models.d.ts';
 
 
 const GestionPedidosPage: React.FC = () => {
   // --- Estados del Componente ---
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [productos, setProductos] = useState<Producto[]>([]); // Nuevo: Estado para productos
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [searchDate, setSearchDate] = useState<string>(new Date().toISOString().split('T')[0]);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false); // Modal para ver detalles
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false); // Nuevo: Modal para editar
   const [viewingPedido, setViewingPedido] = useState<Pedido | null>(null);
+  const [editingPedido, setEditingPedido] = useState<Pedido | null>(null); // Nuevo: Pedido en edición
+  const [editFormData, setEditFormData] = useState<Partial<Pedido>>({}); // Nuevo: Datos del formulario de edición (para hora, entregado, pagado)
+  const [editingPedidoItems, setEditingPedidoItems] = useState<PedidoItem[]>([]); // Nuevo: Productos del pedido en edición
+  const [editCategoriaSeleccionada, setEditCategoriaSeleccionada] = useState<string>(''); // Nuevo: Categoría seleccionada en el modal de edición
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  
+
   // --- Lógica de Carga de Datos ---
-  const fetchPedidos = useCallback(async () => {
+  const fetchInitialData = useCallback(async () => {
     setIsLoading(true);
     try {
-      // Usamos la función del servicio que ahora apunta a /buscar/
-      const data = await getPedidosByDate(searchDate);
-      setPedidos(data);
+      const [pedidosData, clientesData, productosData] = await Promise.all([
+        getPedidosByDate(searchDate),
+        getClientes(),
+        getProductos() // Cargar productos
+      ]);
+      setPedidos(pedidosData);
+      setClientes(clientesData);
+      setProductos(productosData);
+      if (productosData.length > 0) {
+        const categoriasUnicas = [...new Set(productosData.map(p => p.categoria?.nombre || 'Sin Categoría'))];
+        if (categoriasUnicas.length > 0) {
+          setEditCategoriaSeleccionada(categoriasUnicas[0]); // Establecer la primera categoría para la edición
+        }
+      }
     } catch (error) {
-      console.error(`Error al cargar pedidos para la fecha ${searchDate}:`, error);
-      setPedidos([]); 
-      alert('Error al cargar pedidos. Verifique la conexión con el backend.');
+      console.error(`Error al cargar datos iniciales:`, error);
+      setPedidos([]);
+      console.error('Error al cargar datos iniciales:', error);
     } finally {
       setIsLoading(false);
     }
   }, [searchDate]);
 
-  const fetchClientes = useCallback(async () => {
-    try {
-      const data = await getClientes();
-      setClientes(data);
-    } catch (error) {
-      console.error('Error al cargar clientes:', error);
-    }
-  }, []);
-
   useEffect(() => {
-    fetchClientes();
-  }, [fetchClientes]);
-
-  useEffect(() => {
-    fetchPedidos();
-  }, [fetchPedidos]); // Se ejecuta al inicio y cuando fetchPedidos cambia (por cambio de fecha)
+    fetchInitialData();
+  }, [fetchInitialData]);
 
   // --- Lógica de UI (Filtros y Mapeos) ---
   const clienteNombreMap = useMemo(() => {
@@ -73,10 +79,28 @@ const GestionPedidosPage: React.FC = () => {
     });
   }, [searchTerm, pedidos, clienteNombreMap]);
 
+  // Nuevo: Categorías únicas para el modal de edición
+  const editCategoriasUnicas = useMemo(() =>
+    [...new Set(productos.map(p => p.categoria?.nombre || 'Sin Categoría'))],
+    [productos]
+  );
+
+  // Nuevo: Productos filtrados por categoría para el modal de edición
+  const editProductosFiltradosPorCategoria = useMemo(() => {
+    if (!editCategoriaSeleccionada) return [];
+    return productos.filter(p => (p.categoria?.nombre || 'Sin Categoría') === editCategoriaSeleccionada && p.disponible);
+  }, [editCategoriaSeleccionada, productos]);
+
+  // Nuevo: Calcular el total del pedido en edición
+  const totalEditingPedido = useMemo(() => {
+    // Aseguramos que la suma siempre sea un número, usando parseFloat y un valor por defecto de 0
+    return editingPedidoItems.reduce((total, item) => total + (parseFloat(item.cantidad.toString()) * (parseFloat(item.precio_unitario.toString()) || 0)), 0);
+  }, [editingPedidoItems]);
+
   // --- Manejadores de Eventos ---
   const handleSearchTermChange = (event: ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value);
   const handleSearchDateChange = (event: ChangeEvent<HTMLInputElement>) => setSearchDate(event.target.value);
-  
+
   const openViewModal = useCallback((pedido: Pedido) => {
     setViewingPedido(pedido);
     setIsModalOpen(true);
@@ -87,79 +111,189 @@ const GestionPedidosPage: React.FC = () => {
     setViewingPedido(null);
   }, []);
 
+  // Nuevo: Abre el modal de edición
+  const openEditModal = useCallback((pedido: Pedido) => {
+    setEditingPedido(pedido);
+    setEditFormData({
+      para_hora: pedido.para_hora,
+      entregado: pedido.entregado,
+      pagado: pedido.pagado,
+    });
+    // Convertir productos_detalle a PedidoItem para la edición
+    setEditingPedidoItems(pedido.productos_detalle.map(item => ({
+      id: item.id_producto, // Usamos id_producto como id para PedidoItem
+      nombre: item.nombre_producto,
+      cantidad: parseFloat(item.cantidad_producto.toString()) || 0, // Aseguramos que sea número
+      precio_unitario: parseFloat(item.precio_unitario.toString()) || 0, // Aseguramos que sea número
+      subtotal: (parseFloat(item.cantidad_producto.toString()) * (parseFloat(item.precio_unitario.toString()) || 0)) || 0, // Aseguramos que sea número
+    })));
+    setIsEditModalOpen(true);
+  }, []);
+
+  // Nuevo: Cierra el modal de edición
+  const closeEditModal = useCallback(() => {
+    setIsEditModalOpen(false);
+    setEditingPedido(null);
+    setEditFormData({});
+    setEditingPedidoItems([]);
+  }, []);
+
+  // Nuevo: Maneja los cambios en los inputs del formulario de edición (hora, checkboxes)
+  const handleEditInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = event.target;
+    setEditFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
+  };
+
+  // Nuevo: Agregar producto al pedido en edición
+  const addProductToEditingOrder = useCallback((product: Producto) => {
+    setEditingPedidoItems(prevItems => {
+      const existingItem = prevItems.find(item => item.id === product.id);
+      const productPrice = parseFloat(product.precio_unitario.toString()) || 0; // Aseguramos que sea número
+      if (existingItem) {
+        return prevItems.map(item =>
+          item.id === product.id
+            ? { ...item, cantidad: item.cantidad + 1, subtotal: (item.cantidad + 1) * productPrice }
+            : item
+        );
+      } else {
+        return [...prevItems, {
+          id: product.id,
+          nombre: product.nombre,
+          cantidad: 1,
+          precio_unitario: productPrice,
+          subtotal: productPrice
+        }];
+      }
+    });
+  }, []);
+
+  // Nuevo: Eliminar producto del pedido en edición
+  const removeProductFromEditingOrder = useCallback((productId: number) => {
+    setEditingPedidoItems(prevItems => prevItems.filter(item => item.id !== productId));
+  }, []);
+
+  // Nuevo: Actualizar cantidad de producto en el pedido en edición
+  const updateEditingItemQuantity = useCallback((productId: number, quantity: number) => {
+    if (quantity < 1) {
+      removeProductFromEditingOrder(productId);
+      return;
+    }
+    setEditingPedidoItems(prevItems =>
+      prevItems.map(item =>
+        item.id === productId
+          ? { ...item, cantidad: quantity, subtotal: quantity * (parseFloat(item.precio_unitario.toString()) || 0) } // Aseguramos que sea número
+          : item
+      )
+    );
+  }, [removeProductFromEditingOrder]);
 
   /**
    * @brief Prepara el payload completo necesario para la actualización (PUT).
    * @param {Pedido} pedido - El pedido original.
    * @param {Partial<Pedido>} updates - Los campos que se quieren cambiar.
+   * @param {PedidoItem[]} currentItems - Los ítems de producto actuales del pedido.
    * @returns El objeto de datos listo para ser enviado al backend.
    */
-  const prepareUpdatePayload = (pedido: Pedido, updates: Partial<Pedido>) => {
-    // Mapeamos los productos_detalle (lectura) al formato 'productos' (escritura)
-    const productosParaEnviar = pedido.productos_detalle.map(item => ({
-      id_producto: item.id_producto,
-      nombre_producto: item.nombre_producto,
-      cantidad_producto: item.cantidad_producto,
-      precio_unitario: item.precio_unitario,
+  const prepareUpdatePayload = useCallback((pedido: Pedido, updates: Partial<Pedido>, currentItems: PedidoItem[]): PedidoInput => {
+    const productosParaEnviar = currentItems.map(item => ({
+      id_producto: item.id,
+      nombre_producto: item.nombre,
+      cantidad_producto: item.cantidad,
+      precio_unitario: parseFloat(item.precio_unitario.toString()) || 0, // Aseguramos que sea número
     }));
 
     return {
       numero_pedido: pedido.numero_pedido,
       fecha_pedido: pedido.fecha_pedido,
       id_cliente: pedido.id_cliente,
-      para_hora: pedido.para_hora,
-      entregado: pedido.entregado,
-      pagado: pedido.pagado,
-      ...updates, // Aplicamos los cambios específicos (ej. { pagado: true })
-      productos: productosParaEnviar, // Adjuntamos la lista de productos requerida
+      // Usamos el valor del formulario si está definido, de lo contrario, el valor original del pedido
+      para_hora: updates.para_hora !== undefined ? updates.para_hora : pedido.para_hora,
+      entregado: updates.entregado !== undefined ? updates.entregado : pedido.entregado,
+      pagado: updates.pagado !== undefined ? updates.pagado : pedido.pagado,
+      productos: productosParaEnviar,
     };
-  };
+  }, []);
+
+
+  // Nuevo: Maneja el envío del formulario de edición
+  const handleEditSubmit = useCallback(async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!editingPedido) return;
+
+    if (editingPedidoItems.length === 0) {
+      console.error('El pedido no puede estar vacío. Añada al menos un producto.');
+      return;
+    }
+
+    try {
+      const payload = prepareUpdatePayload(editingPedido, editFormData, editingPedidoItems);
+
+      await editarPedido(
+        { fecha: editingPedido.fecha_pedido, numero: editingPedido.numero_pedido },
+        payload
+      );
+      console.log('Pedido actualizado exitosamente');
+      closeEditModal();
+      fetchInitialData(); // Recargar todos los datos para reflejar los cambios
+    } catch (error) {
+      console.error('Error al actualizar pedido:', error);
+    }
+  }, [editingPedido, editFormData, editingPedidoItems, prepareUpdatePayload, closeEditModal, fetchInitialData]);
+
 
   const handleToggleEntregado = useCallback(async (pedido: Pedido) => {
     try {
-      const payload = prepareUpdatePayload(pedido, { entregado: !pedido.entregado });
+      const payload = prepareUpdatePayload(pedido, { entregado: !pedido.entregado }, pedido.productos_detalle.map(item => ({
+        id: item.id_producto,
+        nombre: item.nombre_producto,
+        cantidad: item.cantidad_producto,
+        // Ensure price is a number before passing
+        precio_unitario: parseFloat(item.precio_unitario.toString()) || 0,
+        subtotal: (parseFloat(item.cantidad_producto.toString()) * (parseFloat(item.precio_unitario.toString()) || 0)) || 0,
+      })));
       await editarPedido(
         { fecha: pedido.fecha_pedido, numero: pedido.numero_pedido },
         payload
       );
-      fetchPedidos();
+      fetchInitialData();
     } catch (error) {
       console.error(`Error al cambiar estado 'entregado' para pedido ${pedido.id}:`, error);
-      alert('No se pudo actualizar el estado del pedido.');
     }
-  }, [fetchPedidos]);
+  }, [fetchInitialData, prepareUpdatePayload]);
 
   const handleTogglePagado = useCallback(async (pedido: Pedido) => {
     try {
-      const payload = prepareUpdatePayload(pedido, { pagado: !pedido.pagado });
+      const payload = prepareUpdatePayload(pedido, { pagado: !pedido.pagado }, pedido.productos_detalle.map(item => ({
+        id: item.id_producto,
+        nombre: item.nombre_producto,
+        cantidad: item.cantidad_producto,
+        // Ensure price is a number before passing
+        precio_unitario: parseFloat(item.precio_unitario.toString()) || 0,
+        subtotal: (parseFloat(item.cantidad_producto.toString()) * (parseFloat(item.precio_unitario.toString()) || 0)) || 0,
+      })));
       await editarPedido(
         { fecha: pedido.fecha_pedido, numero: pedido.numero_pedido },
         payload
       );
-      fetchPedidos();
+      fetchInitialData();
     } catch (error) {
       console.error(`Error al cambiar estado 'pagado' para pedido ${pedido.id}:`, error);
-      alert('No se pudo actualizar el estado del pedido.');
     }
-  }, [fetchPedidos]);
+  }, [fetchInitialData, prepareUpdatePayload]);
 
   const handleDeletePedido = useCallback(async (pedido: Pedido) => {
-    if (window.confirm(`¿Confirma que desea eliminar el Pedido #${pedido.numero_pedido}? Esta acción es irreversible.`)) {
-      try {
-        // Se llama a deletePedido pasando solo fecha y número.
-        await deletePedido({ 
-          fecha: pedido.fecha_pedido, 
-          numero: pedido.numero_pedido 
-        });
-        fetchPedidos(); // Recargar la lista
-      } catch (error) {
-        console.error(`Error al eliminar pedido ${pedido.id}:`, error);
-        alert('No se pudo eliminar el pedido.');
-      }
+    try {
+      await deletePedido({ fecha: pedido.fecha_pedido, numero: pedido.numero_pedido });
+      fetchInitialData();
+    } catch (error) {
+      console.error(`Error al eliminar pedido ${pedido.id}:`, error);
     }
-  }, [fetchPedidos]);
+  }, [fetchInitialData]);
 
-  // --- Renderizado del Componente (HTML INTACTO) ---
+  // --- Renderizado del Componente ---
   return (
     <div className={styles.pageContainer}>
       <h1>Gestión de Pedidos</h1>
@@ -192,7 +326,8 @@ const GestionPedidosPage: React.FC = () => {
                 <span>Fecha: {pedido.fecha_pedido}</span>
                 <span>Cliente: {clienteNombreMap.get(pedido.id_cliente) || `ID: ${pedido.id_cliente}`}</span>
                 <span>Hora: {pedido.para_hora || 'N/A'}</span>
-                <strong>Total: ${typeof pedido.total === 'number' ? pedido.total : 'N/A'}</strong>
+                {/* Ensure pedido.total is a number before calling toFixed */}
+                <strong>Total: ${typeof pedido.total === 'number' ? pedido.total.toFixed(2) : 'N/A'}</strong>
               </div>
               <div className={styles.itemActions}>
                 <button
@@ -208,6 +343,8 @@ const GestionPedidosPage: React.FC = () => {
                   {pedido.pagado ? 'Pagado' : 'No Pagado'}
                 </button>
                 <button onClick={() => openViewModal(pedido)} className={styles.viewButton}>Ver Detalles</button>
+                {/* Nuevo botón de Editar */}
+                <button onClick={() => openEditModal(pedido)} className={styles.editButton}>Editar</button>
                 <button onClick={() => handleDeletePedido(pedido)} className={styles.deleteButton}>Eliminar</button>
               </div>
             </div>
@@ -217,6 +354,7 @@ const GestionPedidosPage: React.FC = () => {
         )}
       </div>
 
+      {/* Modal para ver detalles del pedido (existente) */}
       {isModalOpen && viewingPedido && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
@@ -235,11 +373,179 @@ const GestionPedidosPage: React.FC = () => {
                   </li>
                 ))}
               </ul>
-              <p className={styles.modalTotal}><strong>Total del Pedido: ${typeof viewingPedido.total === 'number' ? viewingPedido.total : 'N/A'}</strong></p>
+              <p className={styles.modalTotal}><strong>Total del Pedido: ${typeof viewingPedido.total === 'number' ? viewingPedido.total.toFixed(2) : 'N/A'}</strong></p>
             </div>
             <div className={styles.modalActions}>
               <button type="button" onClick={closeModal} className={styles.cancelButton}>Cerrar</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Nuevo Modal para Editar Pedido */}
+      {isEditModalOpen && editingPedido && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContentWide}> {/* Usamos una clase CSS para un modal más ancho */}
+            <h2>Editar Pedido #{editingPedido.numero_pedido}</h2>
+            <form onSubmit={handleEditSubmit} className={formStyles.formContainer}>
+              <div className={formStyles.formSection}>
+                <h3 className={formStyles.formSectionTitle}>Información del Pedido</h3>
+
+                <p><strong>Cliente:</strong> {clienteNombreMap.get(editingPedido.id_cliente) || `ID: ${editingPedido.id_cliente}`}</p>
+                <p><strong>Fecha:</strong> {editingPedido.fecha_pedido}</p>
+
+                <div className={formStyles.formRow}>
+                  <div className={formStyles.formField}>
+                    <label className={formStyles.formLabel} htmlFor="para_hora">Hora de Entrega</label>
+                    <input
+                      type="time"
+                      id="para_hora"
+                      name="para_hora"
+                      value={editFormData.para_hora || ''}
+                      onChange={handleEditInputChange}
+                      className={formStyles.formInput}
+                    />
+                  </div>
+
+                  <div className={`${formStyles.formField} ${styles.checkboxField}`}>
+                    <input
+                      type="checkbox"
+                      id="entregado"
+                      name="entregado"
+                      checked={editFormData.entregado || false}
+                      onChange={handleEditInputChange}
+                      className={formStyles.formCheckbox}
+                    />
+                    <label htmlFor="entregado" className={formStyles.formLabel}>Entregado</label>
+                  </div>
+
+                  <div className={`${formStyles.formField} ${styles.checkboxField}`}>
+                    <input
+                      type="checkbox"
+                      id="pagado"
+                      name="pagado"
+                      checked={editFormData.pagado || false}
+                      onChange={handleEditInputChange}
+                      className={formStyles.formCheckbox}
+                    />
+                    <label htmlFor="pagado" className={formStyles.formLabel}>Pagado</label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Sección de Productos para Edición */}
+              <div className={styles.editModalProductsSection}>
+                <div className={crearPedidoStyles.productSelectionPanel}> {/* Reutilizamos estilos */}
+                  <h2>Añadir Productos</h2>
+                  <div className={crearPedidoStyles.categoryTabs}>
+                    {(editCategoriasUnicas || []).map(cat => (
+                      <button
+                        key={cat}
+                        className={`${crearPedidoStyles.categoryTab} ${editCategoriaSeleccionada === cat ? crearPedidoStyles.activeTab : ''}`}
+                        onClick={() => setEditCategoriaSeleccionada(cat)}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                  <div className={crearPedidoStyles.productList}>
+                    {editProductosFiltradosPorCategoria.length > 0 ? (
+                      editProductosFiltradosPorCategoria.map(producto => (
+                        <div key={producto.id} className={crearPedidoStyles.productItem}>
+                          <div className={crearPedidoStyles.productInfo}>
+                            <strong>{producto.nombre}</strong>
+                            {/* Ensure price is a number before calling toFixed */}
+                            <span>${(parseFloat(producto.precio_unitario.toString()) || 0).toFixed(2)}</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => addProductToEditingOrder(producto)}
+                            className={crearPedidoStyles.addButtonSmall}
+                          >
+                            Añadir
+                          </button>
+                        </div>
+                      ))
+                    ) : (
+                      <p>No hay productos disponibles en esta categoría.</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className={crearPedidoStyles.currentOrderPanel}> {/* Reutilizamos estilos */}
+                  <h2>Productos del Pedido</h2>
+                  <div className={crearPedidoStyles.orderItemsList}>
+                    {editingPedidoItems.length === 0 ? (
+                      <p className={crearPedidoStyles.emptyOrderText}>No hay productos en el pedido.</p>
+                    ) : (
+                      editingPedidoItems.map(item => (
+                        <div key={item.id} className={crearPedidoStyles.orderItem}>
+                          <div className={crearPedidoStyles.orderItemInfo}>
+                            <strong>{item.nombre}</strong>
+                            {/* Ensure price is a number before calling toFixed */}
+                            <span>${(parseFloat(item.precio_unitario.toString()) || 0).toFixed(2)} c/u</span>
+                          </div>
+                          <div className={crearPedidoStyles.orderItemControls}>
+                            <button
+                              type="button"
+                              onClick={() => updateEditingItemQuantity(item.id, item.cantidad - 1)}
+                              className={crearPedidoStyles.quantityButton}
+                            >
+                              -
+                            </button>
+                            <input
+                              type="number"
+                              min="1"
+                              value={item.cantidad}
+                              onChange={(e: ChangeEvent<HTMLInputElement>) => updateEditingItemQuantity(item.id, parseInt(e.target.value) || 1)}
+                              className={crearPedidoStyles.quantityInput}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => updateEditingItemQuantity(item.id, item.cantidad + 1)}
+                              className={crearPedidoStyles.quantityButton}
+                            >
+                              +
+                            </button>
+                          </div>
+                          {/* Ensure subtotal is a number before calling toFixed */}
+                          <span className={crearPedidoStyles.orderItemSubtotal}>${(parseFloat(item.subtotal.toString()) || 0).toFixed(2)}</span>
+                          <button
+                            type="button"
+                            onClick={() => removeProductFromEditingOrder(item.id)}
+                            className={crearPedidoStyles.deleteItemButton}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  <div className={crearPedidoStyles.orderSummary}>
+                    <div className={crearPedidoStyles.totalDisplay}>
+                      {/* Ensure totalEditingPedido is a number before calling toFixed */}
+                      <strong>TOTAL: ${totalEditingPedido.toFixed(2)}</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className={formStyles.formButtons}>
+                <button
+                  type="button"
+                  onClick={closeEditModal}
+                  className={formStyles.secondaryButton}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className={formStyles.primaryButton}
+                >
+                  Guardar Cambios
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

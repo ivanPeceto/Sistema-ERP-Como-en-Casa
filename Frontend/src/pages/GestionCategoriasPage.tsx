@@ -48,8 +48,7 @@ const GestionCategoriasPage: React.FC = () => {
       const data = await getCategorias();
       setCategorias(data);
     } catch (error) {
-      console.error('Error al cargar categorías:', error);
-      alert('Error al cargar categorías. Revisa la consola.');
+      setCategorias([]);
     }
   }, []);
 
@@ -103,16 +102,13 @@ const GestionCategoriasPage: React.FC = () => {
     try {
       if (editingCategoria) {
         await updateCategoria(editingCategoria.id, formData);
-        alert('Categoría actualizada exitosamente.');
       } else {
         await createCategoria(formData);
-        alert('Categoría creada exitosamente.');
       }
       fetchCategorias();
       closeModal();
-    } catch (error: any) {
-      console.error('Error al guardar categoría:', error);
-      alert(error.response?.data?.detail || 'Error al guardar.');
+    } catch (error) {
+      // Silently handle save error
     }
   };
 
@@ -121,22 +117,18 @@ const GestionCategoriasPage: React.FC = () => {
    * @param categoriaId ID de la categoría a eliminar
    */
   const handleDelete = async (categoriaId: number) => {
-    if (window.confirm('¿Seguro que querés eliminar esta categoría?')) {
-      try {
-        await deleteCategoria(categoriaId);
-        alert('Categoría eliminada.');
-        fetchCategorias();
-      } catch (error: any) {
-        console.error('Error al eliminar categoría:', error);
-        alert(error.response?.data?.detail || 'Error al eliminar.');
-      }
+    try {
+      await deleteCategoria(categoriaId);
+      fetchCategorias();
+    } catch (error) {
+      // Silently handle delete error
     }
   };
 
   return (
     <div className={styles.pageContainer}>
       {/* Encabezado y barra de herramientas */}
-      <h1>CATEGORIAS</h1>
+      <h1>GESTION CATEGORIAS</h1>
       <div className={styles.toolbar}>
         <button 
           onClick={() => navigate('/gestion/productos')} 

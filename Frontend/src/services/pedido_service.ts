@@ -22,7 +22,7 @@ export const createPedido = async (pedidoData: PedidoInput): Promise<any> => {
  */
 export const getPedidosByDate = async (fecha: string): Promise<any[]> => {
   const response = await apiClient.get(`/buscar/?fecha=${fecha}`);
-  return response.data;
+  return response.data as Pedido[];
 };
 
 /**

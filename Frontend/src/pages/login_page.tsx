@@ -18,24 +18,32 @@ const LoginPage: React.FC = () => {
     event.preventDefault(); 
     setError(null);
   
-
-  if (!email || !password) {
-    setError('Por favor, complete ambos campos.');
-    return;
-  }
-
-  try {
-    await login(email, password);
-    navigate('/gestion');
-
-  } catch (err:any){
-    console.error('Error de inicio de sersión: ', err);
-    if (err.response && err.response.data){
-      setError('Credenciales invállidas. Por favor, intente de nuevo.')
-    } else {
-      setError('Ocurrió un error al intentar iniciar sesión.');
+    if (!email || !password) {
+      setError('Por favor, complete ambos campos.');
+      return;
     }
-  }
+
+    try {
+      await login(email, password);
+      navigate('/gestion');
+    } catch (err: any) {
+      console.error('Error de inicio de sesión: ', err);
+      if (err.response) {
+        if (err.response.status === 401) {
+          setError('Credenciales incorrectas. Por favor, verifique su email y contraseña.');
+        } else if (err.response.status === 400) {
+          setError('Formato de email o contraseña inválido.');
+        } else if (err.response.status >= 500) {
+          setError('Error del servidor. Por favor, intente más tarde.');
+        } else {
+          setError('Ocurrió un error al intentar iniciar sesión.');
+        }
+      } else if (err.request) {
+        setError('No se pudo conectar al servidor. Verifique su conexión a internet.');
+      } else {
+        setError('Ocurrió un error inesperado. Por favor, intente nuevamente.');
+      }
+    }
 };
 
   const LogoIcon = () => (
@@ -79,8 +87,13 @@ const LoginPage: React.FC = () => {
             />
           </div>
 
+          {error && (
+            <div className={styles.errorMessage}>
+              {error}
+            </div>
+          )}
           <button type="submit" className={styles.submitButton}>
-            Login
+            Iniciar sesión
           </button>
         </form>
 
