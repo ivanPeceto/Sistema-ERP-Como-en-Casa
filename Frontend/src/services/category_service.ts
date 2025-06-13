@@ -1,48 +1,37 @@
-/*
+/**
  * @file category_service.ts
- * @description Servicio que maneja la comunicación con el backend para operaciones CRUD de categorías.
- * Este servicio proporciona funciones para crear, leer, actualizar y eliminar categorías,
- * compartiendo la misma URL base que el servicio de productos.
+ * @brief Servicio para gestionar las operaciones CRUD de categorías.
+ * @details
+ * Este archivo encapsula toda la comunicación con los endpoints de categorías
+ * del microservicio de productos. Proporciona un conjunto de funciones asíncronas
+ * para crear, leer, actualizar y eliminar categorías, abstrayendo la lógica de las
+ * llamadas API de los componentes de la interfaz de usuario.
  */
 
 import createAuthApiClient from '../api/apiClient';
+import {type Categoria } from '../types/models';
 
 /**
- * URL base del microservicio de productos y categorías. Se obtiene de las variables de entorno.
- * Se comparte la misma URL base con el servicio de productos.
- * Si no está definida, se muestra un mensaje de error en la consola.
+ * @brief URL base del microservicio que gestiona productos y categorías.
+ * @details Se obtiene de las variables de entorno de Vite. Es fundamental que la variable
+ * `VITE_API_PRODUCTOS_URL` esté definida en el archivo `.env` para que el servicio
+ * pueda comunicarse con el backend.
  */
 const PRODUCTOS_API_BASE_URL = import.meta.env.VITE_API_PRODUCTOS_URL;
 
 /**
- * Cliente API configurado con autenticación para interactuar con el microservicio de productos/categorías.
- * Se reutiliza la misma instancia de cliente API que el servicio de productos.
+ * @brief Instancia de cliente API exclusiva para el servicio de productos/categorias.
+ * @details Se crea llamando a la factoría con la URL base de este servicio.
+ * Todas las funciones en este archivo utilizarán esta instancia.
  */
 const apiClient = createAuthApiClient(PRODUCTOS_API_BASE_URL);
 
-/*
- * Interfaces y tipos de datos
- */
 
 /**
- * Define la estructura de una categoría en el sistema.
- * Esta interfaz representa una categoría completa con sus datos básicos.
- * Nota: El campo 'id' es opcional durante la creación de una nueva categoría.
- */
-export interface Categoria {
-  id: number;
-  nombre: string;
-  descripcion: string;
-}
-
-/*
- * Funciones de servicio para operaciones CRUD con categorías
- */
-
-/**
- * Obtiene la lista completa de categorías del backend.
- * @returns Promesa que resuelve a un array de categorías
- * @throws Error si la obtención falla
+ * @brief Obtiene la lista completa de categorías desde el backend.
+ * @details Realiza una petición GET al endpoint `/categoria/listar/`.
+ * @returns {Promise<Categoria[]>} Una promesa que se resuelve con un array de objetos Categoria.
+ * @throws {Error} Relanza el error si la petición a la API falla.
  */
 export const getCategorias = async (): Promise<Categoria[]> => {
   try {
@@ -55,10 +44,12 @@ export const getCategorias = async (): Promise<Categoria[]> => {
 };
 
 /**
- * Crea una nueva categoría en el sistema.
- * @param categoriaData Datos de la categoría a crear (sin ID)
- * @returns Promesa que resuelve a la categoría creada
- * @throws Error si la creación falla
+ * @brief Envía los datos de una nueva categoría al backend para su creación.
+ * @details Realiza una petición POST al endpoint `/categoria/crear/`.
+ * @param {Omit<Categoria, 'id'>} categoriaData Un objeto con los datos de la categoría a crear.
+ * Se utiliza `Omit` para excluir el `id`, ya que es generado por el backend.
+ * @returns {Promise<Categoria>} Una promesa que se resuelve con el objeto de la categoría recién creada (incluyendo su nuevo `id`).
+ * @throws {Error} Relanza el error si la petición a la API falla.
  */
 export const createCategoria = async (categoriaData: Omit<Categoria, 'id'>): Promise<Categoria> => {
   try {
@@ -71,11 +62,13 @@ export const createCategoria = async (categoriaData: Omit<Categoria, 'id'>): Pro
 };
 
 /**
- * Actualiza una categoría existente.
- * @param id ID de la categoría a actualizar
- * @param categoriaData Datos actualizados de la categoría (sin ID)
- * @returns Promesa que resuelve a los datos actualizados
- * @throws Error si la actualización falla
+ * @brief Envía datos actualizados de una categoría existente al backend.
+ * @details Realiza una petición PUT al endpoint `/categoria/editar/`, identificando la
+ * categoría a actualizar mediante un query param `id`.
+ * @param {number} id El ID de la categoría a actualizar.
+ * @param {Omit<Categoria, 'id'>} categoriaData Un objeto con los nuevos datos para la categoría.
+ * @returns {Promise<any>} Una promesa que se resuelve con la respuesta del backend tras la actualización.
+ * @throws {Error} Relanza el error si la petición a la API falla.
  */
 export const updateCategoria = async (id: number, categoriaData: Omit<Categoria, 'id'>): Promise<any> => {
   try {
@@ -89,10 +82,12 @@ export const updateCategoria = async (id: number, categoriaData: Omit<Categoria,
 };
 
 /**
- * Elimina una categoría del sistema.
- * @param id ID de la categoría a eliminar
- * @returns Promesa que resuelve cuando la eliminación es exitosa
- * @throws Error si la eliminación falla
+ * @brief Solicita la eliminación de una categoría existente en el backend.
+ * @details Realiza una petición POST al endpoint `/categoria/eliminar/`, identificando la
+ * categoría a eliminar mediante un query param `id`.
+ * @param {number} id El ID de la categoría a eliminar.
+ * @returns {Promise<any>} Una promesa que se resuelve con la respuesta del backend tras la eliminación.
+ * @throws {Error} Relanza el error si la petición a la API falla.
  */
 export const deleteCategoria = async (id: number): Promise<any> => {
   try {

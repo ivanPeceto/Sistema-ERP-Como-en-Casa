@@ -1,45 +1,57 @@
 /**
  * @file GestionPedidosPage.tsx
- * @description Este componente implementa la interfaz de usuario para la gestión y visualización de pedidos.
+ * @brief Componente para la gestión completa (CRUD) de pedidos.
+ * @details
+ * Este componente implementa la interfaz de usuario para la gestión y visualización de pedidos.
+ * Permite listar pedidos, buscarlos por fecha y texto, y proporciona funcionalidades para:
+ * 1. Ver los detalles de un pedido en un modal.
+ * 2. Editar un pedido completo (hora, estado, productos) en un segundo modal.
+ * 3. Cambiar rápidamente el estado de 'entregado' y 'pagado' desde la lista principal.
+ * 4. Eliminar pedidos.
+ * Orquesta la comunicación con los servicios de pedidos, clientes y productos.
  */
+
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import styles from '../styles/gestionPedidosPage.module.css';
-import formStyles from '../styles/formStyles.module.css'; // Importamos estilos de formulario
-import crearPedidoStyles from '../styles/crearPedidoPage.module.css'; // Importamos estilos de CrearPedidoPage para reutilizar
+import formStyles from '../styles/formStyles.module.css'; 
+import crearPedidoStyles from '../styles/crearPedidoPage.module.css'; 
 
-// --- Servicios y Tipos ---
 import { getPedidosByDate, editarPedido, deletePedido } from '../services/pedido_service';
-import { getClientes, type Cliente } from '../services/client_service';
-import { getProductos, type Producto } from '../services/product_service'; // Importamos getProductos
-import type { Pedido, PedidoInput, PedidoItem } from '../types/models.d.ts';
+import { getClientes } from '../services/client_service';
+import { getProductos } from '../services/product_service'; 
+import type { Pedido, PedidoInput, PedidoItem, Cliente, Producto} from '../types/models.d.ts';
 
-
+/**
+ * @brief Componente funcional para la página de gestión de pedidos.
+ * @returns {React.ReactElement} El JSX que renderiza la página.
+ */
 const GestionPedidosPage: React.FC = () => {
-  // --- Estados del Componente ---
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [clientes, setClientes] = useState<Cliente[]>([]);
-  const [productos, setProductos] = useState<Producto[]>([]); // Nuevo: Estado para productos
+  const [productos, setProductos] = useState<Producto[]>([]); 
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [searchDate, setSearchDate] = useState<string>(new Date().toISOString().split('T')[0]);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false); // Modal para ver detalles
-  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false); // Nuevo: Modal para editar
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false); 
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [viewingPedido, setViewingPedido] = useState<Pedido | null>(null);
-  const [editingPedido, setEditingPedido] = useState<Pedido | null>(null); // Nuevo: Pedido en edición
-  const [editFormData, setEditFormData] = useState<Partial<Pedido>>({}); // Nuevo: Datos del formulario de edición (para hora, entregado, pagado)
-  const [editingPedidoItems, setEditingPedidoItems] = useState<PedidoItem[]>([]); // Nuevo: Productos del pedido en edición
-  const [editCategoriaSeleccionada, setEditCategoriaSeleccionada] = useState<string>(''); // Nuevo: Categoría seleccionada en el modal de edición
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [editingPedido, setEditingPedido] = useState<Pedido | null>(null); 
+  const [editFormData, setEditFormData] = useState<Partial<Pedido>>({}); 
+  const [editingPedidoItems, setEditingPedidoItems] = useState<PedidoItem[]>([]); 
+  const [editCategoriaSeleccionada, setEditCategoriaSeleccionada] = useState<string>(''); 
 
-  // --- Lógica de Carga de Datos ---
+    /**
+   * @brief Carga todos los datos iniciales necesarios para la página.
+   * @details Utiliza `Promise.all` para cargar pedidos, clientes y productos en paralelo, mejorando el rendimiento.
+   */  
   const fetchInitialData = useCallback(async () => {
     setIsLoading(true);
     try {
       const [pedidosData, clientesData, productosData] = await Promise.all([
         getPedidosByDate(searchDate),
         getClientes(),
-        getProductos() // Cargar productos
+        getProductos() 
       ]);
       setPedidos(pedidosData);
       setClientes(clientesData);
@@ -47,7 +59,7 @@ const GestionPedidosPage: React.FC = () => {
       if (productosData.length > 0) {
         const categoriasUnicas = [...new Set(productosData.map(p => p.categoria?.nombre || 'Sin Categoría'))];
         if (categoriasUnicas.length > 0) {
-          setEditCategoriaSeleccionada(categoriasUnicas[0]); // Establecer la primera categoría para la edición
+          setEditCategoriaSeleccionada(categoriasUnicas[0]); 
         }
       }
     } catch (error) {
@@ -65,11 +77,12 @@ const GestionPedidosPage: React.FC = () => {
     fetchInitialData();
   }, [fetchInitialData]);
 
-  // --- Lógica de UI (Filtros y Mapeos) ---
+  /** @brief Crea un mapa de `id` de cliente a `nombre` para evitar búsquedas repetitivas. */
   const clienteNombreMap = useMemo(() => {
     return new Map(clientes.map(cliente => [cliente.id, cliente.nombre]));
   }, [clientes]);
 
+  /** @brief Filtra la lista principal de pedidos basándose en el `searchTerm`. */
   const filteredPedidos = useMemo(() => {
     const lowercasedSearchTerm = searchTerm.toLowerCase();
     return pedidos.filter(pedido => {
@@ -81,25 +94,23 @@ const GestionPedidosPage: React.FC = () => {
     });
   }, [searchTerm, pedidos, clienteNombreMap]);
 
-  // Nuevo: Categorías únicas para el modal de edición
+  /** @brief Obtiene una lista de nombres de categorías únicas para el modal de edición. */  
   const editCategoriasUnicas = useMemo(() =>
     [...new Set(productos.map(p => p.categoria?.nombre || 'Sin Categoría'))],
     [productos]
   );
 
-  // Nuevo: Productos filtrados por categoría para el modal de edición
+  /** @brief Filtra los productos disponibles para añadir en el modal de edición según la categoría seleccionada. */
   const editProductosFiltradosPorCategoria = useMemo(() => {
     if (!editCategoriaSeleccionada) return [];
     return productos.filter(p => (p.categoria?.nombre || 'Sin Categoría') === editCategoriaSeleccionada && p.disponible);
   }, [editCategoriaSeleccionada, productos]);
 
-  // Nuevo: Calcular el total del pedido en edición
+  /** @brief Calcula el total del pedido que se está editando en tiempo real. */  
   const totalEditingPedido = useMemo(() => {
-    // Aseguramos que la suma siempre sea un número, usando parseFloat y un valor por defecto de 0
     return editingPedidoItems.reduce((total, item) => total + (parseFloat(item.cantidad.toString()) * (parseFloat(item.precio_unitario.toString()) || 0)), 0);
   }, [editingPedidoItems]);
 
-  // --- Manejadores de Eventos ---
   const handleSearchTermChange = (event: ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value);
   const handleSearchDateChange = (event: ChangeEvent<HTMLInputElement>) => setSearchDate(event.target.value);
 
@@ -113,7 +124,10 @@ const GestionPedidosPage: React.FC = () => {
     setViewingPedido(null);
   }, []);
 
-  // Nuevo: Abre el modal de edición
+  /**
+   * @brief Abre el modal de "Editar Pedido" y carga los datos del pedido seleccionado en los estados del formulario.
+   * @param {Pedido} pedido El pedido que se va a editar.
+   */
   const openEditModal = useCallback((pedido: Pedido) => {
     setEditingPedido(pedido);
     setEditFormData({
@@ -121,18 +135,17 @@ const GestionPedidosPage: React.FC = () => {
       entregado: pedido.entregado,
       pagado: pedido.pagado,
     });
-    // Convertir productos_detalle a PedidoItem para la edición
     setEditingPedidoItems(pedido.productos_detalle.map(item => ({
-      id: item.id_producto, // Usamos id_producto como id para PedidoItem
+      id: item.id_producto, 
       nombre: item.nombre_producto,
-      cantidad: parseFloat(item.cantidad_producto.toString()) || 0, // Aseguramos que sea número
-      precio_unitario: parseFloat(item.precio_unitario.toString()) || 0, // Aseguramos que sea número
+      cantidad: parseFloat(item.cantidad_producto.toString()) || 0, 
+      precio_unitario: parseFloat(item.precio_unitario.toString()) || 0, 
       subtotal: (parseFloat(item.cantidad_producto.toString()) * (parseFloat(item.precio_unitario.toString()) || 0)) || 0, // Aseguramos que sea número
     })));
     setIsEditModalOpen(true);
   }, []);
 
-  // Nuevo: Cierra el modal de edición
+  /** @brief Cierra el modal de "Editar Pedido" y resetea los estados del formulario. */  
   const closeEditModal = useCallback(() => {
     setIsEditModalOpen(false);
     setEditingPedido(null);
@@ -140,7 +153,7 @@ const GestionPedidosPage: React.FC = () => {
     setEditingPedidoItems([]);
   }, []);
 
-  // Nuevo: Maneja los cambios en los inputs del formulario de edición (hora, checkboxes)
+  /** @brief Maneja los cambios en los inputs del formulario de edición. */  
   const handleEditInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = event.target;
     setEditFormData(prev => ({
@@ -149,7 +162,7 @@ const GestionPedidosPage: React.FC = () => {
     }));
   };
 
-  // Nuevo: Agregar producto al pedido en edición
+  /** @brief Añade un producto a la lista de ítems del pedido en edición. */
   const addProductToEditingOrder = useCallback((product: Producto) => {
     setEditingPedidoItems(prevItems => {
       const existingItem = prevItems.find(item => item.id === product.id);
@@ -172,12 +185,12 @@ const GestionPedidosPage: React.FC = () => {
     });
   }, []);
 
-  // Nuevo: Eliminar producto del pedido en edición
+  /** @brief Elimina un producto de la lista de ítems del pedido en edición. */  
   const removeProductFromEditingOrder = useCallback((productId: number) => {
     setEditingPedidoItems(prevItems => prevItems.filter(item => item.id !== productId));
   }, []);
 
-  // Nuevo: Actualizar cantidad de producto en el pedido en edición
+  /** @brief Actualiza la cantidad de un producto en la lista de ítems del pedido en edición. */
   const updateEditingItemQuantity = useCallback((productId: number, quantity: number) => {
     if (quantity < 1) {
       removeProductFromEditingOrder(productId);
@@ -204,14 +217,13 @@ const GestionPedidosPage: React.FC = () => {
       id_producto: item.id,
       nombre_producto: item.nombre,
       cantidad_producto: item.cantidad,
-      precio_unitario: parseFloat(item.precio_unitario.toString()) || 0, // Aseguramos que sea número
+      precio_unitario: parseFloat(item.precio_unitario.toString()) || 0, 
     }));
 
     return {
       numero_pedido: pedido.numero_pedido,
       fecha_pedido: pedido.fecha_pedido,
       id_cliente: pedido.id_cliente,
-      // Usamos el valor del formulario si está definido, de lo contrario, el valor original del pedido
       para_hora: updates.para_hora !== undefined ? updates.para_hora : pedido.para_hora,
       entregado: updates.entregado !== undefined ? updates.entregado : pedido.entregado,
       pagado: updates.pagado !== undefined ? updates.pagado : pedido.pagado,
@@ -220,7 +232,10 @@ const GestionPedidosPage: React.FC = () => {
   }, []);
 
 
-  // Nuevo: Maneja el envío del formulario de edición
+  /**
+   * @brief Maneja el envío del formulario del modal de edición.
+   * @param {FormEvent<HTMLFormElement>} event El evento de envío del formulario.
+   */
   const handleEditSubmit = useCallback(async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!editingPedido) return;
@@ -246,14 +261,17 @@ const GestionPedidosPage: React.FC = () => {
     }
   }, [editingPedido, editFormData, editingPedidoItems, prepareUpdatePayload, closeEditModal, fetchInitialData]);
 
-
+  /**
+   * @brief Maneja el cambio rápido de estado entregado desde la lista principal.
+   * @param {Pedido} pedido El pedido a modificar.
+   * @param {Partial<Pedido>} update El cambio de estado a aplicar.
+   */
   const handleToggleEntregado = useCallback(async (pedido: Pedido) => {
     try {
       const payload = prepareUpdatePayload(pedido, { entregado: !pedido.entregado }, pedido.productos_detalle.map(item => ({
         id: item.id_producto,
         nombre: item.nombre_producto,
         cantidad: item.cantidad_producto,
-        // Ensure price is a number before passing
         precio_unitario: parseFloat(item.precio_unitario.toString()) || 0,
         subtotal: (parseFloat(item.cantidad_producto.toString()) * (parseFloat(item.precio_unitario.toString()) || 0)) || 0,
       })));
@@ -268,13 +286,17 @@ const GestionPedidosPage: React.FC = () => {
     }
   }, [fetchInitialData, prepareUpdatePayload]);
 
+  /**
+   * @brief Maneja el cambio rápido de estado pagado desde la lista principal.
+   * @param {Pedido} pedido El pedido a modificar.
+   * @param {Partial<Pedido>} update El cambio de estado a aplicar.
+   */
   const handleTogglePagado = useCallback(async (pedido: Pedido) => {
     try {
       const payload = prepareUpdatePayload(pedido, { pagado: !pedido.pagado }, pedido.productos_detalle.map(item => ({
         id: item.id_producto,
         nombre: item.nombre_producto,
         cantidad: item.cantidad_producto,
-        // Ensure price is a number before passing
         precio_unitario: parseFloat(item.precio_unitario.toString()) || 0,
         subtotal: (parseFloat(item.cantidad_producto.toString()) * (parseFloat(item.precio_unitario.toString()) || 0)) || 0,
       })));
@@ -289,6 +311,10 @@ const GestionPedidosPage: React.FC = () => {
     }
   }, [fetchInitialData, prepareUpdatePayload]);
 
+  /**
+   * @brief Maneja la eliminación de un pedido, con confirmación previa.
+   * @param {Pedido} pedido El pedido a eliminar.
+   */
   const handleDeletePedido = useCallback(async (pedido: Pedido) => {
     if (window.confirm(`¿Confirma que desea eliminar el Pedido #${pedido.numero_pedido}? Esta acción es irreversible.`)) {
       try {
@@ -304,7 +330,6 @@ const GestionPedidosPage: React.FC = () => {
     }
   }, [fetchInitialData]);
 
-  // --- Renderizado del Componente ---
   return (
     <div className={styles.pageContainer}>
       <h1>Gestión de Pedidos</h1>
@@ -337,8 +362,7 @@ const GestionPedidosPage: React.FC = () => {
                 <span>Fecha: {pedido.fecha_pedido}</span>
                 <span>Cliente: {clienteNombreMap.get(pedido.id_cliente) || `ID: ${pedido.id_cliente}`}</span>
                 <span>Hora: {pedido.para_hora || 'N/A'}</span>
-                {/* Ensure pedido.total is a number before calling toFixed */}
-                <strong>Total: ${typeof pedido.total === 'number' ? pedido.total.toFixed(2) : 'N/A'}</strong>
+                <strong>Total: ${typeof pedido.total === 'number' ? pedido.total : 'N/A'}</strong>
               </div>
               <div className={styles.itemActions}>
                 <button
@@ -365,7 +389,6 @@ const GestionPedidosPage: React.FC = () => {
         )}
       </div>
 
-      {/* Modal para ver detalles del pedido (existente) */}
       {isModalOpen && viewingPedido && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
@@ -393,10 +416,9 @@ const GestionPedidosPage: React.FC = () => {
         </div>
       )}
 
-      {/* Nuevo Modal para Editar Pedido */}
       {isEditModalOpen && editingPedido && (
         <div className={styles.modalOverlay}>
-          <div className={styles.modalContentWide}> {/* Usamos una clase CSS para un modal más ancho */}
+          <div className={styles.modalContentWide}> 
             <h2>Editar Pedido #{editingPedido.numero_pedido}</h2>
             <form onSubmit={handleEditSubmit} className={formStyles.formContainer}>
               <div className={formStyles.formSection}>
@@ -442,9 +464,8 @@ const GestionPedidosPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Sección de Productos para Edición */}
               <div className={styles.editModalProductsSection}>
-                <div className={crearPedidoStyles.productSelectionPanel}> {/* Reutilizamos estilos */}
+                <div className={crearPedidoStyles.productSelectionPanel}> 
                   <h2>Añadir Productos</h2>
                   <div className={crearPedidoStyles.categoryTabs}>
                     {(editCategoriasUnicas || []).map(cat => (
@@ -463,8 +484,7 @@ const GestionPedidosPage: React.FC = () => {
                         <div key={producto.id} className={crearPedidoStyles.productItem}>
                           <div className={crearPedidoStyles.productInfo}>
                             <strong>{producto.nombre}</strong>
-                            {/* Ensure price is a number before calling toFixed */}
-                            <span>${(parseFloat(producto.precio_unitario.toString()) || 0).toFixed(2)}</span>
+                            <span>${(parseFloat(producto.precio_unitario.toString()) || 0)}</span>
                           </div>
                           <button
                             type="button"
@@ -481,7 +501,7 @@ const GestionPedidosPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className={crearPedidoStyles.currentOrderPanel}> {/* Reutilizamos estilos */}
+                <div className={crearPedidoStyles.currentOrderPanel}> 
                   <h2>Productos del Pedido</h2>
                   <div className={crearPedidoStyles.orderItemsList}>
                     {editingPedidoItems.length === 0 ? (
@@ -491,8 +511,7 @@ const GestionPedidosPage: React.FC = () => {
                         <div key={item.id} className={crearPedidoStyles.orderItem}>
                           <div className={crearPedidoStyles.orderItemInfo}>
                             <strong>{item.nombre}</strong>
-                            {/* Ensure price is a number before calling toFixed */}
-                            <span>${(parseFloat(item.precio_unitario.toString()) || 0).toFixed(2)} c/u</span>
+                            <span>${(parseFloat(item.precio_unitario.toString()) || 0)} c/u</span>
                           </div>
                           <div className={crearPedidoStyles.orderItemControls}>
                             <button
@@ -517,8 +536,7 @@ const GestionPedidosPage: React.FC = () => {
                               +
                             </button>
                           </div>
-                          {/* Ensure subtotal is a number before calling toFixed */}
-                          <span className={crearPedidoStyles.orderItemSubtotal}>${(parseFloat(item.subtotal.toString()) || 0).toFixed(2)}</span>
+                          <span className={crearPedidoStyles.orderItemSubtotal}>${(parseFloat(item.subtotal.toString()) || 0)}</span>
                           <button
                             type="button"
                             onClick={() => removeProductFromEditingOrder(item.id)}
@@ -532,8 +550,7 @@ const GestionPedidosPage: React.FC = () => {
                   </div>
                   <div className={crearPedidoStyles.orderSummary}>
                     <div className={crearPedidoStyles.totalDisplay}>
-                      {/* Ensure totalEditingPedido is a number before calling toFixed */}
-                      <strong>TOTAL: ${totalEditingPedido.toFixed(2)}</strong>
+                      <strong>TOTAL: ${totalEditingPedido}</strong>
                     </div>
                   </div>
                 </div>

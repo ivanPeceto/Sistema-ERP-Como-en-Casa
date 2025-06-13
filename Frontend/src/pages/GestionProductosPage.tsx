@@ -1,9 +1,13 @@
-/*
+/**
  * @file GestionProductosPage.tsx
- * @description Página principal para la gestión de productos.
- * Permite listar, crear, editar y eliminar productos del sistema.
- * Utiliza un modal para el formulario de productos y tiene funcionalidad de búsqueda.
+ * @brief Página principal para la gestión de productos.
+ * @details
+ * Este componente de React implementa una interfaz de usuario completa para las operaciones
+ * CRUD sobre los productos. Se comunica con los servicios `product_service`
+ *  y `category_service` para interactuar con el backend. Incluye
+ * funcionalidades de búsqueda, un modal para la edición y creación, y feedback para el usuario.
  */
+
 
 import React, { useState, useEffect, useCallback } from 'react';
 
@@ -11,34 +15,23 @@ import type { ChangeEvent, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from '../styles/gestionProductosPage.module.css';
 import formStyles from '../styles/formStyles.module.css';
-
-
-/**
- * Importaciones de servicios y tipos necesarios para la gestión de productos y categorías.
- */
 import {
   getProductos,
   createProducto,
   updateProducto,
   deleteProducto,
 } from '../services/product_service';
-import { getCategorias, type Categoria } from '../services/category_service';
-import {type Producto, type ProductoInput} from '../types/models'
+import { getCategorias } from '../services/category_service';
+import {type Producto, type ProductoInput, type Categoria} from '../types/models'
 interface GestionProductosPageProps {}
 
+
+/**
+ * @brief Componente funcional para la página de gestión de productos.
+ * @returns {React.ReactElement} El JSX que renderiza la página completa.
+ */
 const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
   const navigate = useNavigate();
-
-  /**
-   * Estados del componente:
-   * - productos: Lista completa de productos
-   * - filteredProductos: Lista filtrada de productos para búsqueda
-   * - categorias: Lista de categorías disponibles
-   * - searchTerm: Término de búsqueda actual
-   * - isModalOpen: Estado del modal de formulario
-   * - editingProducto: Producto actualmente en edición (null si es nuevo)
-   * - formData: Datos del formulario actual
-   */
   const [productos, setProductos] = useState<Producto[]>([]);
   const [filteredProductos, setFilteredProductos] = useState<Producto[]>([]);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
@@ -57,7 +50,8 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
 
 
   /**
-   * Funciones para obtener datos del backend
+   * @brief Carga la lista de productos desde el servicio y actualiza el estado.
+   * @details Se envuelve en `useCallback` para evitar recrearse en cada render, optimizando el rendimiento.
    */
   const fetchProductos = useCallback(async () => {
     try {
@@ -70,6 +64,10 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
     }
   }, []);
 
+  /**
+   * @brief Carga la lista de categorías desde el servicio.
+   * @details Se utiliza para poblar el `<select>` en el formulario del modal.
+   */
   const fetchCategorias = useCallback(async () => {
     try {
       const data = await getCategorias();
@@ -83,18 +81,13 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
     }
   }, []);
 
-  /**
-   * Efectos del componente
-   */
 
   useEffect(() => {
-    // Cargar datos iniciales al montar el componente
     fetchProductos();
     fetchCategorias();
   }, [fetchProductos, fetchCategorias]);
 
   useEffect(() => {
-    // Búsqueda en tiempo real por nombre o descripción
     const lowercasedValue = searchTerm.toLowerCase();
     const results = productos.filter(p =>
       p.nombre.toLowerCase().includes(lowercasedValue) ||
@@ -106,40 +99,39 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
 
 
   /**
-   * Manejadores de eventos del formulario
+   * @brief Actualiza el estado del término de búsqueda cada vez que el usuario escribe en el input.
+   * @param {ChangeEvent<HTMLInputElement>} event El evento del input de búsqueda.
    */
-
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
 
-
+  /**
+   * @brief Manejador genérico para todos los inputs del formulario del modal.
+   * @details Actualiza el estado `formData` basándose en el `name` del input.
+   * @param {ChangeEvent<...>} event El evento del campo del formulario.
+   */
   const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = event.target;
 
-    // Manejo especializado para diferentes tipos de campos
     if (type === 'checkbox') {
       const target = event.target as HTMLInputElement;
       setFormData(prev => ({ ...prev, [name]: target.checked }));
     } else if (name === 'precio_unitario' || name === 'precio_por_bulto' || name === 'stock') {
-      // Convertir a número con fallback a 0 si no es válido
       setFormData(prev => ({ ...prev, [name]: parseFloat(value) || 0 }));
     } else if (name === 'categoria_id') {
-      // Manejar selección de categoría
       setFormData(prev => ({ ...prev, [name]: value ? parseInt(value) : null }));
     } else {
-      // Manejar campos de texto
       setFormData(prev => ({ ...prev, [name]: value }));
     }
   };
 
   /**
-   * Abre el modal de formulario con los datos del producto seleccionado o en modo nuevo
+   * @brief Abre el modal y configura el formulario para crear o editar un producto.
+   * @param {Producto | null} producto El producto a editar, o `null` para crear uno nuevo.
    */
-
   const openModal = useCallback((producto: Producto | null = null) => {
     if (producto) {
-      // Cargar datos del producto existente
       setEditingProducto(producto);
       setFormData({
         nombre: producto.nombre,
@@ -151,7 +143,6 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
         categoria_id: producto.categoria?.id ?? null,
       });
     } else {
-      // Inicializar formulario en modo nuevo
       setEditingProducto(null);
       setFormData({
         nombre: '',
@@ -168,9 +159,8 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
 
 
   /**
-   * Cierra el modal de formulario
+   * @brief Cierra el modal y resetea el estado de edición.
    */
-
   const closeModal = useCallback(() => {
     setIsModalOpen(false);
     setEditingProducto(null);
@@ -178,19 +168,18 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
 
 
   /**
-   * Maneja el envío del formulario de producto
+   * @brief Maneja el envío del formulario, llamando al servicio de crear o actualizar.
+   * @param {FormEvent<HTMLFormElement>} event El evento de envío del formulario.
    */
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    // Validación de categoría
     if (!formData.categoria_id) {
       alert('Por favor, seleccione una categoría para el producto.');
       return;
     }
 
     try {
-      // Operación CRUD según el modo (editar/crear)
       if (editingProducto) {
         await updateProducto(editingProducto.id, formData);
         alert('Producto actualizado exitosamente.');
@@ -199,7 +188,6 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
         alert('Producto creado exitosamente.');
       }
 
-      // Actualizar lista y cerrar modal
       fetchProductos();
       closeModal();
     } catch (error: any) {
@@ -211,7 +199,8 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
   };
 
   /**
-   * Maneja la eliminación de un producto
+   * @brief Maneja la eliminación de un producto, con confirmación previa.
+   * @param {number} productoId El ID del producto a eliminar.
    */
   const handleDelete = async (productoId: number) => {
     if (window.confirm('¿Estás seguro de que querés eliminar este producto?')) {
@@ -226,15 +215,10 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
     }
   };
 
-  /**
-   * Renderizado del componente
-   */
-
   return (
     <div className={styles.pageContainer}>
       <h1>Gestión de Productos</h1>
       
-      {/* Barra de herramientas con búsqueda y botones */}
       <div className={styles.toolbar}>
         <div className={styles.searchBarContainer}>
           <input
@@ -258,7 +242,6 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
         </div>
       </div>
 
-      {/* Lista de productos filtrada */}
       <div className={styles.listContainer}>
         {filteredProductos.length > 0 ? (
           filteredProductos.map((producto) => (
