@@ -14,10 +14,6 @@ import createAuthApiClient from '../api/apiClient';
  */
 const PRODUCTOS_API_BASE_URL = import.meta.env.VITE_API_PRODUCTOS_URL;
 
-if (!PRODUCTOS_API_BASE_URL) {
-  console.error('VITE_API_PRODUCTOS_URL no está definida. La comunicación con el servicio de productos/categorías podría fallar.');
-}
-
 /**
  * Cliente API configurado con autenticación para interactuar con el microservicio de productos/categorías.
  * Se reutiliza la misma instancia de cliente API que el servicio de productos.

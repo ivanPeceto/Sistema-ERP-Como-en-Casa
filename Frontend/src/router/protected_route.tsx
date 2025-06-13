@@ -15,7 +15,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   // Muestra un loader o nada mientras se verifica el estado de autenticación inicial.
   if (isLoading) {
-    return <div>Cargando...</div>; // O un componente Spinner
+    return <div>Cargando...</div>;
   }
 
   // Si no está autenticado, redirige a la página de login.

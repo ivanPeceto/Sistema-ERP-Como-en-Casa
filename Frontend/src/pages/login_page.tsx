@@ -26,8 +26,8 @@ const LoginPage: React.FC = () => {
 
   try {
     await login(email, password);
-  
     navigate('/gestion');
+
   } catch (err:any){
     console.error('Error de inicio de sersión: ', err);
     if (err.response && err.response.data){
@@ -46,18 +46,15 @@ const LoginPage: React.FC = () => {
 
 
   return (
-    // Contenedor principal de la página de login
     <div className={styles.authPageContainer}>
       <div className={styles.formContainer}>
 
 
-        {/* El área del logo en la parte superior del formulario. */}
         <div className={styles.formLogo}>
           <LogoIcon />
         </div>
         <h2 className={styles.title}>LOG IN</h2>
 
-        {/* formulario */}
         <form onSubmit={handleSubmit}>
           <div className={styles.formGroup}>
             <label htmlFor="email">Email</label>
@@ -82,13 +79,11 @@ const LoginPage: React.FC = () => {
             />
           </div>
 
-          {/* Botón para iniciar sesión. */}
           <button type="submit" className={styles.submitButton}>
             Login
           </button>
         </form>
 
-        {/* Enlace para ir a la página de registro si el usuario no tiene una cuenta. */}
         <Link to="/register" className={styles.switchFormLink}>
           No tienes una cuenta? Registrarse
         </Link>

@@ -103,7 +103,7 @@ services:
       - ./Frontend:/app
       - /app/node_modules
     ports:
-      - "5173:5173"
+      - "5174:5174"
     environment:
       # variables de entorno
       - VITE_API_USUARIOS_URL=http://localhost:8001

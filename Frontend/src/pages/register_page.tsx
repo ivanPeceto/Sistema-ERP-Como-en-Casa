@@ -41,7 +41,7 @@ const RegisterPage: React.FC = () => {
     }
 
     try{
-      await register(username, email, password);
+      await register(email, password, username);
       navigate('/gestion');
 
     } catch (err: any){
