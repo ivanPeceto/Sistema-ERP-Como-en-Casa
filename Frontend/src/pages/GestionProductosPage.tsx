@@ -4,7 +4,7 @@
  * @details
  * Este componente de React implementa una interfaz de usuario completa para las operaciones
  * CRUD sobre los productos. Se comunica con los servicios `product_service`
- *  y `category_service` para interactuar con el backend. Incluye
+ * y `category_service` para interactuar con el backend. Incluye
  * funcionalidades de búsqueda, un modal para la edición y creación, y feedback para el usuario.
  */
 
@@ -48,7 +48,6 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
     descripcion: '',
     precio_unitario: 0,
     precio_por_bulto: 0,
-    stock: 0,
     disponible: true,
     categoria_id: null,
   });
@@ -122,7 +121,7 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
     if (type === 'checkbox') {
       const target = event.target as HTMLInputElement;
       setFormData(prev => ({ ...prev, [name]: target.checked }));
-    } else if (name === 'precio_unitario' || name === 'precio_por_bulto' || name === 'stock') {
+    } else if (name === 'precio_unitario' || name === 'precio_por_bulto') { // 'stock' removed from here
       setFormData(prev => ({ ...prev, [name]: parseFloat(value) || 0 }));
     } else if (name === 'categoria_id') {
       setFormData(prev => ({ ...prev, [name]: value ? parseInt(value) : null }));
@@ -143,7 +142,7 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
         descripcion: producto.descripcion,
         precio_unitario: +producto.precio_unitario,
         precio_por_bulto: +producto.precio_por_bulto,
-        stock: +producto.stock,
+        // stock: +producto.stock, // Removed stock
         disponible: producto.disponible,
         categoria_id: producto.categoria?.id ?? null,
       });
@@ -154,7 +153,7 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
         descripcion: '',
         precio_unitario: 0,
         precio_por_bulto: 0,
-        stock: 0,
+        // stock: 0, // Removed stock
         disponible: true,
         categoria_id: categorias.length > 0 ? categorias[0].id : null,
       });
@@ -223,7 +222,7 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
   return (
     <div className={styles.pageContainer}>
       <h1>Gestión de Productos</h1>
-      
+
       <div className={styles.toolbar}>
         <div className={styles.searchBarContainer}>
           <input
@@ -235,8 +234,8 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
           />
         </div>
         <div className={styles.toolbarButtons}>
-          <button 
-            onClick={() => navigate('/gestion/categorias')} 
+          <button
+            onClick={() => navigate('/gestion/categorias')}
             className={`${styles.addButton} ${styles.secondaryButton}`}
           >
             Gestionar Categorías
@@ -250,15 +249,15 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
       <div className={styles.listContainer}>
         {filteredProductos.length > 0 ? (
           filteredProductos.map((producto) => (
-            <div 
-              key={producto.id} 
+            <div
+              key={producto.id}
 
               className={`${styles.listItem} ${!producto.disponible ? styles.itemNoDisponible : ''}`}
             >
               <div className={styles.itemInfo}>
                 <strong>{producto.nombre}</strong>
                 <span>Precio: ${(+producto.precio_unitario).toFixed(2)}</span>
-                <span>Stock: {producto.stock}</span>
+                {/* <span>Stock: {producto.stock}</span> Removed stock display */}
                 {producto.categoria && <small>Categoría: {producto.categoria.nombre}</small>}
               </div>
               <div className={styles.itemActions}>
@@ -303,7 +302,7 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
                 </div>
               </div>
               <div className={formStyles.formSection}>
-                <h3 className={formStyles.formSectionTitle}>Precios y Stock</h3>
+                <h3 className={formStyles.formSectionTitle}>Precios</h3> {/* Changed from Precios y Stock */}
                 <div className={formStyles.formField}>
                   <label className={`${formStyles.formLabel} ${formStyles.requiredLabel}`} htmlFor="precio_unitario">Precio Unitario</label>
                   <input
@@ -326,18 +325,6 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
                     value={formData.precio_por_bulto}
                     onChange={handleInputChange}
                     step="0.01"
-                    required
-                    className={formStyles.formInput}
-                  />
-                </div>
-                <div className={formStyles.formField}>
-                  <label className={`${formStyles.formLabel} ${formStyles.requiredLabel}`} htmlFor="stock">Stock</label>
-                  <input
-                    type="number"
-                    id="stock"
-                    name="stock"
-                    value={formData.stock}
-                    onChange={handleInputChange}
                     required
                     className={formStyles.formInput}
                   />

@@ -34,7 +34,6 @@
   font-size: 1.8rem;
 }
 
-/* Este contenedor es para la sección de cliente seleccionado en la cabecera, no el panel lateral */
 .clienteSeleccionadoInline {
   display: block;
   margin-top: 10px;
@@ -48,7 +47,6 @@
   width: fit-content;
   margin-left: auto;
   margin-right: auto;
-  /* Animación */
   transition: all 0.3s ease-in-out;
   animation: fadeInSlideUp 0.5s forwards;
 }
@@ -73,15 +71,13 @@
   flex-grow: 1;
   gap: 20px;
   padding: 20px;
-  overflow: hidden; /* Ayuda a contener desbordes */
+  overflow: hidden; 
 }
 
-/* Panel de Selección de Clientes */
 .clientSelectionPanel {
   flex: 1;
   min-width: 280px;
-  /* Nuevo: Limita el ancho máximo del panel en pantallas grandes para que no se estire demasiado */
-  max-width: 350px; /* Ajusta este valor si necesitas que sea más ancho o más estrecho */
+  max-width: 350px; 
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -104,16 +100,15 @@
 .clientSearch {
   padding: 10px;
   border-bottom: 1px solid #eee;
-  width: 100%; /* Asegura que ocupa todo el ancho de su padre */
+  width: 100%; 
 }
 
 .clientSearch input {
-  width: 100%; /* El input debe ocupar el 100% del espacio disponible de su padre */
+  width: 100%; 
   padding: 8px 12px;
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 0.9rem;
-  /* `box-sizing: border-box;` globalmente ya lo maneja, pero `width: 100%;` con `padding` funciona bien con ello */
 }
 
 .clientList {
@@ -264,6 +259,33 @@
   overflow: hidden;
 }
 
+.deliveryTimeSection {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  background-color: #fcfcfc;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center; 
+  margin-bottom: 10px; 
+}
+
+.deliveryTimeSection label {
+  font-weight: 500;
+  color: #333;
+  white-space: nowrap; 
+}
+
+.timeInput {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  width: 140px; 
+  text-align: center;
+  flex-shrink: 0; 
+}
+
 .orderItemsList {
   flex-grow: 1;
   overflow-y: auto;
@@ -395,10 +417,9 @@
   .productSelectionPanel,
   .currentOrderPanel,
   .clientSelectionPanel {
-    flex: none; /* Deshabilita flex-grow y flex-shrink para que width: 100% funcione directamente */
+    flex: none; 
     min-height: 300px;
-    width: 100%; /* Ocupa todo el ancho disponible */
-    /* Nuevo: Anula el min-width en pantallas pequeñas para permitir que se achique */
+    width: 100%; 
     min-width: unset;
   }
 
@@ -413,15 +434,28 @@
     margin-top: 5px;
   }
 
-  /* Ajustes específicos para el input de búsqueda de clientes en el panel lateral en pantallas pequeñas */
   .clientSearch {
-    width: 100%; /* Asegura que el contenedor de la búsqueda tome el 100% del panel */
-    padding: 10px; /* Mantiene el padding */
+    width: 100%; 
+    padding: 10px; 
   }
 
   .clientSearch input {
-    width: 100%; /* El input debe tomar el 100% del ancho de su contenedor, incluyendo padding y borde */
-    /* Asegura que el input pueda encogerse si es necesario */
+    width: 100%; 
     min-width: unset;
+  }
+
+  .deliveryTimeSection {
+    flex-direction: row; 
+    justify-content: flex-start;
+  }
+  @media (max-width: 500px) { 
+    .deliveryTimeSection {
+      flex-direction: column;
+      align-items: center;
+    }
+    .timeInput {
+      width: 80%;
+      max-width: 200px;
+    }
   }
 }

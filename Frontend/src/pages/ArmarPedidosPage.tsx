@@ -23,7 +23,8 @@ const CrearPedidoPage: React.FC = () => {
   const [clienteSeleccionado, setClienteSeleccionado] = useState<Cliente | null>(null);
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<string>('');
   const [pedidoItems, setPedidoItems] = useState<PedidoItem[]>([]);
-  const [clienteSearchTerm, setClienteSearchTerm] = useState(''); 
+  const [clienteSearchTerm, setClienteSearchTerm] = useState('');
+  const [paraHora, setParaHora] = useState<string>(''); // Nuevo estado para la hora de entrega
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -58,15 +59,15 @@ const CrearPedidoPage: React.FC = () => {
   /** @brief Filtra la lista de clientes basándose en el término de búsqueda. */
   const clientesFiltrados = useMemo(() => {
     if (!clienteSearchTerm) {
-      return clientes; 
+      return clientes;
     }
-    return clientes.filter(c => 
+    return clientes.filter(c =>
       c.nombre.toLowerCase().includes(clienteSearchTerm.toLowerCase()) ||
       c.telefono.includes(clienteSearchTerm) ||
       c.direccion.toLowerCase().includes(clienteSearchTerm.toLowerCase())
     );
   }, [clienteSearchTerm, clientes]);
-  
+
   /** @brief Extrae una lista de nombres de categorías únicas a partir de los productos. */
   const categoriasUnicas = useMemo(() =>
     [...new Set(productos.map(p => p.categoria?.nombre || 'Sin Categoría'))],
@@ -109,20 +110,25 @@ const CrearPedidoPage: React.FC = () => {
       const existingItem = prevItems.find(item => item.id === producto.id);
       if (existingItem) {
         return prevItems.map(item =>
-          item.id === producto.id
+          item.id === producto.id // Corrected: changed 'product.id' to 'producto.id'
             ? { ...item, cantidad: item.cantidad + 1, subtotal: (item.cantidad + 1) * item.precio_unitario }
             : item
         );
       } else {
-        return [...prevItems, { ...producto, cantidad: 1, subtotal: producto.precio_unitario, precio: producto.precio_unitario }];
+        return [...prevItems, { ...producto, cantidad: 1, subtotal: producto.precio_unitario, precio: producto.precio_unitario }]; // Corrected: changed '...product' to '...producto'
       }
     });
   }, []);
-  
+
   const handleSeleccionarCliente = (cliente: Cliente) => {
     setClienteSeleccionado(cliente);
     setClienteSearchTerm(cliente.nombre);
   }
+
+  // Nuevo: Manejador para el cambio de la hora de entrega
+  const handleParaHoraChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setParaHora(e.target.value);
+  };
 
   /**
    * @brief Maneja la confirmación final y envío del pedido al backend.
@@ -148,7 +154,7 @@ const CrearPedidoPage: React.FC = () => {
         numero_pedido: nuevoNumeroPedido,
         fecha_pedido: hoy,
         id_cliente: clienteSeleccionado.id,
-        para_hora: null,
+        para_hora: paraHora || null, // Usamos el nuevo estado para la hora de entrega
         entregado: false,
         pagado: false,
         productos: pedidoItems.map(item => ({
@@ -158,13 +164,15 @@ const CrearPedidoPage: React.FC = () => {
           precio_unitario: item.precio_unitario,
         })),
       };
-      
+
       await createPedido(pedidoData);
       alert(`Pedido #${nuevoNumeroPedido} creado para ${clienteSeleccionado.nombre}.`);
-      
+
+      // Resetear estados después de confirmar el pedido
       setPedidoItems([]);
       setClienteSeleccionado(null);
       setClienteSearchTerm('');
+      setParaHora(''); // Resetear también el campo de la hora
 
     } catch (err) {
       console.error("Error al confirmar el pedido:", err);
@@ -252,6 +260,18 @@ const CrearPedidoPage: React.FC = () => {
 
         <div className={styles.currentOrderPanel}>
           <h2>Pedido Actual</h2>
+          {/* Nuevo: Sección para la hora de entrega */}
+          <div className={styles.deliveryTimeSection}>
+            <label htmlFor="deliveryTime">Hora de Entrega:</label>
+            <input
+              type="time"
+              id="deliveryTime"
+              value={paraHora}
+              onChange={handleParaHoraChange}
+              className={styles.timeInput}
+            />
+          </div>
+          {/* Fin de la nueva sección */}
           <div className={styles.orderItemsList}>
             {pedidoItems.length === 0 ? (
               <p className={styles.emptyOrderText}>Aún no hay productos en el pedido.</p>
