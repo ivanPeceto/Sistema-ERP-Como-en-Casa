@@ -25,33 +25,42 @@ A continuación, se detallan las tecnologías, frameworks y librerías clave uti
 
 El backend se construyó utilizando el ecosistema de Django, aprovechando su robustez y rapidez para el desarrollo de APIs.
 
-**Framework Principal**: Django y Django REST Framework (DRF) para la creación de APIs REST robustas y bien estructuradas.
-**Autenticación**:
+- **Framework Principal**: Django y Django REST Framework (DRF) para la creación de APIs REST robustas y bien estructuradas.
+
+- **Autenticación**:
     Django REST Framework Simple JWT: Para la implementación de la autenticación basada en JSON Web Tokens (JWT), incluyendo la generación y validación de tokens de acceso y refresco.
-**Base de Datos**:
+
+- **Base de Datos**:
     MySQL: Como motor de base de datos para cada microservicio.
     mysqlclient: Driver de Python para la conexión entre Django y MySQL.
-**Manejo de Entorno**:
+
+- **Manejo de Entorno**:
     python-decouple: Para gestionar variables de entorno y secretos (como claves de API y credenciales de base de datos) fuera del código fuente, utilizando archivos .env.
-**Comunicación**:
+
+- **Comunicación**:
     django-cors-headers: Para gestionar las políticas de Cross-Origin Resource Sharing (CORS), permitiendo que el frontend se comunique de forma segura con los microservicios del backend.
 
 ### Frontend (TypeScript)
 
 El frontend es una aplicación construida con las siguientes tecnologías:
 
-**Librería Principal**: React para la construcción de la interfaz de usuario declarativa y basada en componentes.
-**Lenguaje**: TypeScript para añadir tipado estático a JavaScript.
-**Herramienta de Build**: Vite como empaquetador y servidor de desarrollo, ofreciendo un arranque casi instantáneo y Hot Module Replacement (HMR) extremadamente rápido.
-**Comunicación con APIs**:
+- **Librería Principal**: React para la construcción de la interfaz de usuario declarativa y basada en componentes.
+
+- **Lenguaje**: TypeScript para añadir tipado estático a JavaScript.
+
+- **Herramienta de Build**: Vite como empaquetador y servidor de desarrollo, ofreciendo un arranque casi instantáneo y Hot Module Replacement (HMR) extremadamente rápido.
+
+- **Comunicación con APIs**:
     Axios: Como cliente HTTP para realizar las peticiones a los microservicios del backend, configurado con interceptores para el manejo automático de tokens de autenticación.
-**Enrutamiento**:
+
+- **Enrutamiento**:
     React Router DOM: Para gestionar la navegación y las rutas del lado del cliente en esta SPA.
 
 ### Infraestructura
 
-**Containerización**: Docker y Docker Compose para definir, construir y ejecutar todo el entorno multi-contenedor de la aplicación de manera aislada y reproducible.
-**Control de Versiones**: Git y GitHub para el seguimiento de cambios y la colaboración en equipo.
+- **Containerización**: Docker y Docker Compose para definir, construir y ejecutar todo el entorno multi-contenedor de la aplicación de manera aislada y reproducible.
+
+- **Control de Versiones**: Git y GitHub para el seguimiento de cambios y la colaboración en equipo.
 
 ---
 
