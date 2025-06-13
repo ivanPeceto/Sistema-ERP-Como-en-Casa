@@ -4,6 +4,12 @@
  * de tres paneles principales: selección de clientes, selección de productos (con pestañas de categorías)
  * y el resumen del pedido actual, además de estilos para la cabecera y controles.
  **/
+
+/* Asegura que el modelo de caja es consistente en toda la aplicación */
+* {
+  box-sizing: border-box;
+}
+
 .pageContainer {
   display: flex;
   flex-direction: column;
@@ -19,15 +25,16 @@
   background-color: #fff;
   border-bottom: 1px solid #e0e0e0;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  text-align: center; 
+  text-align: center;
 }
 
 .headerSection h1 {
-  margin: 0 0 10px 0; 
+  margin: 0 0 10px 0;
   color: #333;
   font-size: 1.8rem;
 }
 
+/* Este contenedor es para la sección de cliente seleccionado en la cabecera, no el panel lateral */
 .clienteSeleccionadoInline {
   display: block;
   margin-top: 10px;
@@ -41,6 +48,20 @@
   width: fit-content;
   margin-left: auto;
   margin-right: auto;
+  /* Animación */
+  transition: all 0.3s ease-in-out;
+  animation: fadeInSlideUp 0.5s forwards;
+}
+
+@keyframes fadeInSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .clienteSeleccionadoInline strong {
@@ -52,12 +73,15 @@
   flex-grow: 1;
   gap: 20px;
   padding: 20px;
-  overflow: hidden;
+  overflow: hidden; /* Ayuda a contener desbordes */
 }
 
+/* Panel de Selección de Clientes */
 .clientSelectionPanel {
-  flex: 1; 
-  min-width: 280px; 
+  flex: 1;
+  min-width: 280px;
+  /* Nuevo: Limita el ancho máximo del panel en pantallas grandes para que no se estire demasiado */
+  max-width: 350px; /* Ajusta este valor si necesitas que sea más ancho o más estrecho */
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -80,14 +104,16 @@
 .clientSearch {
   padding: 10px;
   border-bottom: 1px solid #eee;
+  width: 100%; /* Asegura que ocupa todo el ancho de su padre */
 }
 
 .clientSearch input {
-  width: 100%;
+  width: 100%; /* El input debe ocupar el 100% del espacio disponible de su padre */
   padding: 8px 12px;
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 0.9rem;
+  /* `box-sizing: border-box;` globalmente ya lo maneja, pero `width: 100%;` con `padding` funciona bien con ello */
 }
 
 .clientList {
@@ -120,7 +146,7 @@
 .clientItem span {
   font-size: 0.85rem;
   color: #555;
-  margin-right: 8px; 
+  margin-right: 8px;
 }
 
 .clientItem small {
@@ -136,7 +162,7 @@
 
 
 .productSelectionPanel {
-  flex: 1.5; 
+  flex: 1.5;
   min-width: 300px;
   background-color: #fff;
   border-radius: 8px;
@@ -228,7 +254,7 @@
 }
 
 .currentOrderPanel {
-  flex: 2; 
+  flex: 2;
   min-width: 350px;
   background-color: #fff;
   border-radius: 8px;
@@ -368,20 +394,34 @@
   }
   .productSelectionPanel,
   .currentOrderPanel,
-  .clientSelectionPanel { 
-    flex: none;
+  .clientSelectionPanel {
+    flex: none; /* Deshabilita flex-grow y flex-shrink para que width: 100% funcione directamente */
     min-height: 300px;
-    width: 100%;
+    width: 100%; /* Ocupa todo el ancho disponible */
+    /* Nuevo: Anula el min-width en pantallas pequeñas para permitir que se achique */
+    min-width: unset;
   }
 
   .clientSelectionPanel {
-    order: -1; 
+    order: -1;
   }
 
   .headerSection {
-    padding-bottom: 0; 
+    padding-bottom: 0;
   }
   .clienteSeleccionadoInline {
-    margin-top: 5px; 
+    margin-top: 5px;
+  }
+
+  /* Ajustes específicos para el input de búsqueda de clientes en el panel lateral en pantallas pequeñas */
+  .clientSearch {
+    width: 100%; /* Asegura que el contenedor de la búsqueda tome el 100% del panel */
+    padding: 10px; /* Mantiene el padding */
+  }
+
+  .clientSearch input {
+    width: 100%; /* El input debe tomar el 100% del ancho de su contenedor, incluyendo padding y borde */
+    /* Asegura que el input pueda encogerse si es necesario */
+    min-width: unset;
   }
 }

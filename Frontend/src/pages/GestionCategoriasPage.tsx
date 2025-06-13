@@ -136,7 +136,7 @@ const GestionCategoriasPage: React.FC = () => {
   return (
     <div className={styles.pageContainer}>
       {/* Encabezado y barra de herramientas */}
-      <h1>CATEGORIAS</h1>
+      <h1>Gestion de Categorias</h1>
       <div className={styles.toolbar}>
         <button 
           onClick={() => navigate('/gestion/productos')} 

@@ -232,7 +232,7 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
 
   return (
     <div className={styles.pageContainer}>
-      <h1>PRODUCTOS</h1>
+      <h1>Gestión de Productos</h1>
       
       {/* Barra de herramientas con búsqueda y botones */}
       <div className={styles.toolbar}>
