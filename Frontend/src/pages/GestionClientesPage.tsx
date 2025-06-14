@@ -163,6 +163,20 @@ const GestionClientesPage: React.FC = () => {
     }
   };
 
+ /**
+ * @brief Añade automáticamente un guión para formatear los números de telefono de esta manera: 123-456-7890.
+ */
+  const handleTelephoneInput = (event: ChangeEvent<HTMLInputElement>) => {
+    const digitsOnly = event.target.value.replace(/\D/g, '');
+    let formattedNumber = digitsOnly.substring(0, 10);
+    if (formattedNumber.length > 6) {
+      formattedNumber = `${formattedNumber.slice(0, 3)}-${formattedNumber.slice(3, 6)}-${formattedNumber.slice(6)}`;
+    } else if (formattedNumber.length > 3) {
+      formattedNumber = `${formattedNumber.slice(0, 3)}-${formattedNumber.slice(3)}`;
+    }
+    setFormData(prev => ({ ...prev, telefono: formattedNumber }));
+  };
+
   return (
     <div className={styles.pageContainer}>
       <h1>Gestión de clientes</h1>
@@ -223,11 +237,15 @@ const GestionClientesPage: React.FC = () => {
                 <div className={formStyles.formField}>
                   <label className={formStyles.formLabel} htmlFor="telefono">Teléfono</label>
                   <input
-                    type="text"
+                    type="tel"
                     id="telefono"
                     name="telefono"
+                    pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+                    placeholder="123-456-7890"
                     value={formData.telefono}
                     onChange={handleInputChange}
+                    onKeyPress={handleTelephoneInput}
+                    maxlength="12"
                     className={formStyles.formInput}
                   />
                 </div>
