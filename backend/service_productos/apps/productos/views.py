@@ -14,10 +14,10 @@ class ProductoCrearView(APIView):
     @details
         Esta vista hereda de APIView y permite crear un nuevo producto
         mediante una solicitud POST.
-        El acceso está restringido a usuarios autenticados que además sean superusuarios.
+        El acceso está restringido a usuarios autenticados.
     """
 
-    permission_classes = [IsAuthenticated, IsSuperUser]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         """!

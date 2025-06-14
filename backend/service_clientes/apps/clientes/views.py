@@ -13,10 +13,9 @@ class ClienteCrearView(APIView):
     @brief Vista para la creación de nuevos clientes.
     @details
         Esta vista, que hereda de APIView, permite crear un nuevo cliente mediante una solicitud POST.
-        Requiere que el usuario esté autenticado y sea un superusuario para acceder a esta funcionalidad.
-        IsSuperUser es un permiso personalizado.
+        Requiere que el usuario esté autenticado.
     """
-    permission_classes = [IsAuthenticated, IsSuperUser]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         """!

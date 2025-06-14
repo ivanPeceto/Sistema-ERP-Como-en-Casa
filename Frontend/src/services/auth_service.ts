@@ -67,7 +67,7 @@ export const logout = () => {
  * @returns {Promise<AuthResponse>} Una promesa que se resuelve con los datos de la sesión del nuevo usuario.
  * @throws {Error} Lanza un error si la petición falla.
  */
-export const register = async (nombre: string, email: string, password: string): Promise<AuthResponse> => {
+export const register = async ( email: string, password: string, nombre: string): Promise<AuthResponse> => {
   const response = await apiClient.post<AuthResponse>('/signup/', {
     nombre,
     email,
