@@ -48,7 +48,6 @@ const GestionClientesPage: React.FC = () => {
       setFilteredClientes(data);
     } catch (error) {
       console.error('Error al cargar clientes:', error);
-      alert('Error al cargar clientes. Por favor, asegúrese de estar autenticado como superusuario y de que el servicio de clientes esté funcionando.');
     }
   }, []);
 
@@ -125,20 +124,15 @@ const GestionClientesPage: React.FC = () => {
     try {
       if (editingCliente) {
         await updateCliente(editingCliente.id, formData);
-        alert('Cliente actualizado exitosamente.');
       } else {
         await createCliente(formData);
-        alert('Cliente creado exitosamente.');
       }
       fetchClientes();
       closeModal();
     } catch (error: any) {
       console.error('Error al guardar cliente:', error);
-      const errorMessage = error.response?.data?.detail
-        || (typeof error.response?.data === 'string' ? error.response.data : JSON.stringify(error.response?.data))
-        || error.message
-        || 'Error al guardar cliente. Verifique la consola para más detalles.';
-      alert(errorMessage);
+      const errorMessage = error.response?.data?.detail || 'Error al guardar el cliente.';
+      console.error(errorMessage);
     }
   };
 
@@ -147,19 +141,13 @@ const GestionClientesPage: React.FC = () => {
    * @param {number} clienteId El ID del cliente a eliminar.
    */
   const handleDelete = async (clienteId: number) => {
-    if (window.confirm('¿Está seguro de que desea eliminar este cliente? Esta acción es irreversible.')) {
-      try {
-        await deleteCliente(clienteId);
-        alert('Cliente eliminado exitosamente.');
-        fetchClientes();
-      } catch (error: any) {
-        console.error('Error al eliminar cliente:', error);
-        const errorMessage = error.response?.data?.detail
-          || (typeof error.response?.data === 'string' ? error.response.data : JSON.stringify(error.response?.data))
-          || error.message
-          || 'Error al eliminar cliente. Verifique la consola para más detalles.';
-        alert(errorMessage);
-      }
+    try {
+      await deleteCliente(clienteId);
+      fetchClientes();
+    } catch (error: any) {
+      console.error('Error al eliminar cliente:', error);
+      const errorMessage = error.response?.data?.detail || 'Error al eliminar el cliente.';
+      console.error(errorMessage);
     }
   };
 
