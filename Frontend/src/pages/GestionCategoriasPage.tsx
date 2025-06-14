@@ -48,7 +48,6 @@ const GestionCategoriasPage: React.FC = () => {
       setCategorias(data);
     } catch (error) {
       console.error('Error al cargar categorías:', error);
-      alert('Error al cargar categorías. Revisa la consola.');
     }
   }, []);
 
@@ -95,16 +94,13 @@ const GestionCategoriasPage: React.FC = () => {
     try {
       if (editingCategoria) {
         await updateCategoria(editingCategoria.id, formData);
-        alert('Categoría actualizada exitosamente.');
       } else {
         await createCategoria(formData);
-        alert('Categoría creada exitosamente.');
       }
       fetchCategorias();
       closeModal();
     } catch (error: any) {
       console.error('Error al guardar categoría:', error);
-      alert(error.response?.data?.detail || 'Error al guardar.');
     }
   };
 
@@ -113,14 +109,12 @@ const GestionCategoriasPage: React.FC = () => {
    * @param {number} categoriaId El ID de la categoría a eliminar.
    */
   const handleDelete = async (categoriaId: number) => {
-    if (window.confirm('¿Seguro que querés eliminar esta categoría?')) {
+    if (window.confirm(`¿Está seguro de eliminar la categoría "${categorias.find(cat => cat.id === categoriaId)?.nombre}"?`)) {
       try {
         await deleteCategoria(categoriaId);
-        alert('Categoría eliminada.');
         fetchCategorias();
-      } catch (error: any) {
+      } catch (error) {
         console.error('Error al eliminar categoría:', error);
-        alert(error.response?.data?.detail || 'Error al eliminar.');
       }
     }
   };

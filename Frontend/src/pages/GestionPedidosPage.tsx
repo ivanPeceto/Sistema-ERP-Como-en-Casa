@@ -11,8 +11,10 @@ import crearPedidoStyles from '../styles/crearPedidoPage.module.css'; // Importa
 
 // --- Servicios y Tipos ---
 import { getPedidosByDate, editarPedido, deletePedido } from '../services/pedido_service';
-import { getClientes, type Cliente } from '../services/client_service';
-import { getProductos, type Producto } from '../services/product_service'; // Importamos getProductos
+import { getClientes } from '../services/client_service';
+import type { Cliente } from '../types/models';
+import { getProductos } from '../services/product_service'; // Importamos getProductos
+import type { Producto } from '../types/models.d.ts';
 import type { Pedido, PedidoInput, PedidoItem } from '../types/models.d.ts';
 
 
@@ -225,7 +227,6 @@ const GestionPedidosPage: React.FC = () => {
 
     if (editingPedidoItems.length === 0) {
       console.error('El pedido no puede estar vacío. Añada al menos un producto.');
-      alert('El pedido no puede estar vacío. Por favor, añada al menos un producto.'); // Added alert
       return;
     }
 
@@ -237,12 +238,10 @@ const GestionPedidosPage: React.FC = () => {
         payload
       );
       console.log('Pedido actualizado exitosamente');
-      alert('Pedido actualizado exitosamente.'); // Added alert
       closeEditModal();
       fetchInitialData(); // Recargar todos los datos para reflejar los cambios
     } catch (error) {
       console.error('Error al actualizar pedido:', error);
-      alert('Ocurrió un error al actualizar el pedido. Por favor, intente de nuevo.'); // Added alert
     }
   }, [editingPedido, editFormData, editingPedidoItems, prepareUpdatePayload, closeEditModal, fetchInitialData]);
 
@@ -290,16 +289,141 @@ const GestionPedidosPage: React.FC = () => {
   }, [fetchInitialData, prepareUpdatePayload]);
 
   const handleDeletePedido = useCallback(async (pedido: Pedido) => {
-    if (window.confirm(`¿Confirma que desea eliminar el Pedido #${pedido.numero_pedido}? Esta acción es irreversible.`)) {
-      try {
-        await deletePedido({ fecha: pedido.fecha_pedido, numero: pedido.numero_pedido });
-        fetchInitialData();
-      } catch (error) {
-        console.error(`Error al eliminar pedido ${pedido.id}:`, error);
-        alert('No se pudo eliminar el pedido.'); // Added alert
-      }
+    try {
+      await deletePedido({ fecha: pedido.fecha_pedido, numero: pedido.numero_pedido });
+      fetchInitialData();
+    } catch (error) {
+      console.error(`Error al eliminar pedido ${pedido.id}:`, error);
     }
   }, [fetchInitialData]);
+
+  // Categorizar los pedidos
+  const pedidosPendientes = useMemo(() => 
+    filteredPedidos.filter(pedido => !pedido.entregado),
+    [filteredPedidos]
+  );
+
+  const pedidosEntregados = useMemo(() => 
+    filteredPedidos.filter(pedido => pedido.entregado),
+    [filteredPedidos]
+  );
+
+  const pedidosPagados = useMemo(() => 
+    filteredPedidos.filter(pedido => pedido.pagado),
+    [filteredPedidos]
+  );
+
+  const pedidosNoPagados = useMemo(() => 
+    filteredPedidos.filter(pedido => !pedido.pagado),
+    [filteredPedidos]
+  );
+
+  const [activeTab, setActiveTab] = useState<'todos' | 'pendientes' | 'entregados' | 'pagados' | 'noPagados'>('todos');
+
+  // Función para formatear la fecha
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric',
+      hour: '2-digit', 
+      minute: '2-digit' 
+    };
+    return new Date(dateString).toLocaleDateString('es-AR', options);
+  };
+
+  // Función para renderizar la lista de pedidos
+  const renderPedidosList = (pedidos: Pedido[]) => (
+    <div className={styles.listContainer}>
+      {isLoading ? (
+        <div className={styles.loadingContainer}>
+          <p>Cargando pedidos...</p>
+        </div>
+      ) : pedidos.length > 0 ? (
+        <div className={styles.pedidosGrid}>
+          {pedidos.map(pedido => (
+            <div key={pedido.id} className={`${styles.pedidoCard} ${pedido.entregado ? styles.entregado : ''} ${pedido.pagado ? styles.pagado : ''}`}>
+              <div className={styles.pedidoHeader}>
+                <div className={styles.pedidoNumero}>Pedido #{pedido.numero_pedido}</div>
+                <div className={styles.pedidoFecha}>
+                  {formatDate(pedido.fecha_pedido)}
+                </div>
+              </div>
+              
+              <div className={styles.pedidoCliente}>
+                <i className="fas fa-user"></i>
+                {clienteNombreMap.get(pedido.id_cliente) || `Cliente #${pedido.id_cliente}`}
+              </div>
+              
+              <div className={styles.pedidoHora}>
+                <i className="fas fa-clock"></i>
+                Hora de entrega: {pedido.para_hora || 'A definir'}
+              </div>
+              
+              <div className={styles.pedidoResumen}>
+                <div className={styles.productosCount}>
+                  <i className="fas fa-box-open"></i>
+                  {pedido.productos_detalle.length} {pedido.productos_detalle.length === 1 ? 'producto' : 'productos'}
+                </div>
+                <div className={styles.pedidoTotal}>
+                  Total: <span>${typeof pedido.total === 'number' ? pedido.total.toFixed(2) : '0.00'}</span>
+                </div>
+              </div>
+              
+              <div className={styles.pedidoEstados}>
+                <div 
+                  className={`${styles.estadoBadge} ${pedido.entregado ? styles.entregadoBadge : styles.pendienteBadge}`}
+                  onClick={() => handleToggleEntregado(pedido)}
+                >
+                  <i className={`fas ${pedido.entregado ? 'fa-check-circle' : 'fa-clock'}`}></i>
+                  {pedido.entregado ? 'Entregado' : 'Pendiente'}
+                </div>
+                <div 
+                  className={`${styles.estadoBadge} ${pedido.pagado ? styles.pagadoBadge : styles.noPagadoBadge}`}
+                  onClick={() => handleTogglePagado(pedido)}
+                >
+                  <i className={`fas ${pedido.pagado ? 'fa-check-circle' : 'fa-exclamation-circle'}`}></i>
+                  {pedido.pagado ? 'Pagado' : 'Pendiente pago'}
+                </div>
+              </div>
+              
+              <div className={styles.pedidoAcciones}>
+                <button 
+                  onClick={() => openViewModal(pedido)} 
+                  className={styles.actionButton}
+                  title="Ver detalles"
+                >
+                  <i className="fas fa-eye"></i>
+                  <span>Ver</span>
+                </button>
+                <button 
+                  onClick={() => openEditModal(pedido)} 
+                  className={styles.actionButton}
+                  title="Editar pedido"
+                >
+                  <i className="fas fa-edit"></i>
+                  <span>Editar</span>
+                </button>
+                <button 
+                  onClick={() => handleDeletePedido(pedido)} 
+                  className={`${styles.actionButton} ${styles.deleteButton}`}
+                  title="Eliminar pedido"
+                >
+                  <i className="fas fa-trash"></i>
+                  <span>Eliminar</span>
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className={styles.noResults}>
+          <i className="fas fa-inbox"></i>
+          <p>No se encontraron pedidos</p>
+        </div>
+      )}
+    </div>
+  );
 
   // --- Renderizado del Componente ---
   return (
@@ -323,44 +447,45 @@ const GestionPedidosPage: React.FC = () => {
         </div>
       </div>
 
-      <div className={styles.listContainer}>
-        {isLoading ? (
-          <p>Cargando pedidos...</p>
-        ) : filteredPedidos.length > 0 ? (
-          filteredPedidos.map(pedido => (
-            <div key={pedido.id} className={styles.listItem}>
-              <div className={styles.itemInfo}>
-                <strong>Pedido #{pedido.numero_pedido}</strong>
-                <span>Fecha: {pedido.fecha_pedido}</span>
-                <span>Cliente: {clienteNombreMap.get(pedido.id_cliente) || `ID: ${pedido.id_cliente}`}</span>
-                <span>Hora: {pedido.para_hora || 'N/A'}</span>
-                {/* Ensure pedido.total is a number before calling toFixed */}
-                <strong>Total: ${typeof pedido.total === 'number' ? pedido.total.toFixed(2) : 'N/A'}</strong>
-              </div>
-              <div className={styles.itemActions}>
-                <button
-                  onClick={() => handleToggleEntregado(pedido)}
-                  className={`${styles.toggleButton} ${pedido.entregado ? styles.statusEntregado : styles.statusPendiente}`}
-                >
-                  {pedido.entregado ? 'Entregado' : 'Pendiente'}
-                </button>
-                <button
-                  onClick={() => handleTogglePagado(pedido)}
-                  className={`${styles.toggleButton} ${pedido.pagado ? styles.statusPagado : styles.statusNoPagado}`}
-                >
-                  {pedido.pagado ? 'Pagado' : 'No Pagado'}
-                </button>
-                <button onClick={() => openViewModal(pedido)} className={styles.viewButton}>Ver Detalles</button>
-                {/* Nuevo botón de Editar */}
-                <button onClick={() => openEditModal(pedido)} className={styles.editButton}>Editar</button>
-                <button onClick={() => handleDeletePedido(pedido)} className={styles.deleteButton}>Eliminar</button>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p className={styles.noResults}>No se encontraron pedidos para la fecha o criterios de búsqueda seleccionados.</p>
-        )}
+      <div className={styles.tabsContainer}>
+        <button 
+          className={`${styles.tabButton} ${activeTab === 'todos' ? styles.activeTab : ''}`}
+          onClick={() => setActiveTab('todos')}
+        >
+          Todos ({filteredPedidos.length})
+        </button>
+        <button 
+          className={`${styles.tabButton} ${activeTab === 'pendientes' ? styles.activeTab : ''}`}
+          onClick={() => setActiveTab('pendientes')}
+        >
+          Pendientes ({pedidosPendientes.length})
+        </button>
+        <button 
+          className={`${styles.tabButton} ${activeTab === 'entregados' ? styles.activeTab : ''}`}
+          onClick={() => setActiveTab('entregados')}
+        >
+          Entregados ({pedidosEntregados.length})
+        </button>
+        <button 
+          className={`${styles.tabButton} ${activeTab === 'pagados' ? styles.activeTab : ''}`}
+          onClick={() => setActiveTab('pagados')}
+        >
+          Pagados ({pedidosPagados.length})
+        </button>
+        <button 
+          className={`${styles.tabButton} ${activeTab === 'noPagados' ? styles.activeTab : ''}`}
+          onClick={() => setActiveTab('noPagados')}
+        >
+          No Pagados ({pedidosNoPagados.length})
+        </button>
       </div>
+
+      {/* Contenido de la pestaña activa */}
+      {activeTab === 'todos' && renderPedidosList(filteredPedidos)}
+      {activeTab === 'pendientes' && renderPedidosList(pedidosPendientes)}
+      {activeTab === 'entregados' && renderPedidosList(pedidosEntregados)}
+      {activeTab === 'pagados' && renderPedidosList(pedidosPagados)}
+      {activeTab === 'noPagados' && renderPedidosList(pedidosNoPagados)}
 
       {/* Modal para ver detalles del pedido (existente) */}
       {isModalOpen && viewingPedido && (

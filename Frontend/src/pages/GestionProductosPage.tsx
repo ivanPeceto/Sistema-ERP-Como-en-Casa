@@ -64,7 +64,6 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
       setFilteredProductos(data);
     } catch (error) {
       console.error('Error al cargar productos:', error);
-      alert('Error al cargar productos. Revisa que el backend esté funcionando.');
     }
   }, []);
 
@@ -179,26 +178,22 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
     event.preventDefault();
 
     if (!formData.categoria_id) {
-      alert('Por favor, seleccione una categoría para el producto.');
       return;
     }
 
     try {
       if (editingProducto) {
         await updateProducto(editingProducto.id, formData);
-        alert('Producto actualizado exitosamente.');
       } else {
         await createProducto(formData);
-        alert('Producto creado exitosamente.');
       }
 
       fetchProductos();
       closeModal();
     } catch (error: any) {
       console.error('Error al guardar producto:', error);
-      const errorMessage = error.response?.data?.detail || JSON.stringify(error.response?.data) || 'Ocurrió un error al guardar.';
-      alert(errorMessage);
-
+      const errorMessage = error.response?.data?.detail || 'Error al guardar el producto.';
+      console.error(errorMessage);
     }
   };
 
@@ -207,14 +202,12 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
    * @param {number} productoId El ID del producto a eliminar.
    */
   const handleDelete = async (productoId: number) => {
-    if (window.confirm('¿Estás seguro de que querés eliminar este producto?')) {
+    if (window.confirm(`¿Está seguro que desea eliminar el producto "${editingProducto?.nombre}"?`)) {
       try {
         await deleteProducto(productoId);
-        alert('Producto eliminado.');
         fetchProductos();
-      } catch (error: any) {
+      } catch (error) {
         console.error('Error al eliminar producto:', error);
-        alert(error.response?.data?.detail || 'Error al eliminar.');
       }
     }
   };

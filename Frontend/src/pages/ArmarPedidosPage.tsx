@@ -108,14 +108,30 @@ const CrearPedidoPage: React.FC = () => {
   const agregarProductoAlPedido = useCallback((producto: Producto) => {
     setPedidoItems(prevItems => {
       const existingItem = prevItems.find(item => item.id === producto.id);
+      const precioUnitario = Number(producto.precio_unitario) || 0;
+      
       if (existingItem) {
+        const nuevaCantidad = existingItem.cantidad + 1;
         return prevItems.map(item =>
-          item.id === producto.id // Corrected: changed 'product.id' to 'producto.id'
-            ? { ...item, cantidad: item.cantidad + 1, subtotal: (item.cantidad + 1) * item.precio_unitario }
+          item.id === producto.id
+            ? { 
+                ...item, 
+                cantidad: nuevaCantidad, 
+                subtotal: Number((nuevaCantidad * (Number(item.precio_unitario) || 0)).toFixed(2))
+              }
             : item
         );
       } else {
-        return [...prevItems, { ...producto, cantidad: 1, subtotal: producto.precio_unitario, precio: producto.precio_unitario }]; // Corrected: changed '...product' to '...producto'
+        return [
+          ...prevItems, 
+          { 
+            ...producto, 
+            cantidad: 1, 
+            precio_unitario: precioUnitario,
+            subtotal: Number(precioUnitario.toFixed(2)),
+            precio: Number(precioUnitario.toFixed(2))
+          }
+        ];
       }
     });
   }, []);
@@ -137,11 +153,9 @@ const CrearPedidoPage: React.FC = () => {
    */
   const handleConfirmarPedido = async () => {
     if (!clienteSeleccionado) {
-      alert('Por favor, seleccione un cliente de la lista.');
       return;
     }
     if (pedidoItems.length === 0) {
-      alert('El pedido está vacío.');
       return;
     }
 
@@ -166,7 +180,6 @@ const CrearPedidoPage: React.FC = () => {
       };
 
       await createPedido(pedidoData);
-      alert(`Pedido #${nuevoNumeroPedido} creado para ${clienteSeleccionado.nombre}.`);
 
       // Resetear estados después de confirmar el pedido
       setPedidoItems([]);
@@ -176,7 +189,6 @@ const CrearPedidoPage: React.FC = () => {
 
     } catch (err) {
       console.error("Error al confirmar el pedido:", err);
-      alert("Ocurrió un error al confirmar el pedido.");
     }
   };
 
