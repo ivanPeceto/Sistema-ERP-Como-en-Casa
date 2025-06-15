@@ -9,7 +9,7 @@
  */
 
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 
 import type { ChangeEvent, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -38,6 +38,8 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [editingProducto, setEditingProducto] = useState<Producto | null>(null);
+  
+  const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [formData, setFormData] = useState<ProductoInput>({
     nombre: '',
     descripcion: '',
@@ -69,7 +71,6 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
     try {
       const data = await getCategorias();
       setCategorias(data);
-      // Establecer la primera categoría como valor por defecto si existe
       if (data.length > 0) {
         setFormData(prev => ({ ...prev, categoria_id: data[0].id }));
       }
@@ -84,14 +85,30 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
     fetchCategorias();
   }, [fetchProductos, fetchCategorias]);
 
+  /** @brief Extrae una lista de nombres de categorías únicas a partir de los productos. */
+  const categoriasUnicas = useMemo(() => {
+    const nombres = new Set(productos.map(p => p.categoria?.nombre).filter(Boolean) as string[]);
+    return ['Todos', ...nombres]; 
+  }, [productos]);
+
+  /**
+   * @brief Efecto para filtrar los productos.
+   * @details Primero filtra por categoría y luego por el término de búsqueda.
+   */
   useEffect(() => {
-    const lowercasedValue = searchTerm.toLowerCase();
-    const results = productos.filter(p =>
-      p.nombre.toLowerCase().includes(lowercasedValue) ||
-      p.descripcion.toLowerCase().includes(lowercasedValue)
-    );
+    let results = productos;
+    if (selectedCategory !== 'Todos') {
+      results = results.filter(p => (p.categoria?.nombre || 'Sin Categoría') === selectedCategory);
+    }
+    if (searchTerm) {
+      const lowercasedValue = searchTerm.toLowerCase();
+      results = results.filter(p =>
+        p.nombre.toLowerCase().includes(lowercasedValue) ||
+        p.descripcion.toLowerCase().includes(lowercasedValue)
+      );
+    }
     setFilteredProductos(results);
-  }, [searchTerm, productos]);
+  }, [searchTerm, selectedCategory, productos]);
 
 
 
@@ -227,6 +244,18 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
             Nuevo Producto
           </button>
         </div>
+      </div>
+
+      <div className={styles.categoryTabs}>
+        {categoriasUnicas.map(cat => (
+          <button
+            key={cat}
+            className={`${styles.categoryTab} ${selectedCategory === cat ? styles.activeTab : ''}`}
+            onClick={() => setSelectedCategory(cat)}
+          >
+            {cat}
+          </button>
+        ))}
       </div>
 
       <div className={styles.listContainer}>
