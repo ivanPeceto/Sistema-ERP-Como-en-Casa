@@ -39,7 +39,6 @@ export interface Producto {
   nombre: string;
   descripcion: string;
   precio_unitario: number;
-  precio_por_bulto: number;
   stock: number;
   disponible: boolean;
   categoria: Categoria | null;
@@ -142,7 +141,6 @@ export interface ProductoInput {
   nombre: string;
   descripcion: string;
   precio_unitario: number;
-  precio_por_bulto: number;
   stock: number;
   disponible: boolean;
   categoria_id: number | null;

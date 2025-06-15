@@ -15,11 +15,6 @@ import type { ChangeEvent, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from '../styles/gestionProductosPage.module.css';
 import formStyles from '../styles/formStyles.module.css';
-
-/**
- * Importaciones de servicios y tipos necesarios para la gestión de productos y categorías.
- */
-
 import {
   getProductos,
   createProducto,
@@ -47,7 +42,6 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
     nombre: '',
     descripcion: '',
     precio_unitario: 0,
-    precio_por_bulto: 0,
     disponible: true,
     categoria_id: null,
   });
@@ -120,7 +114,7 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
     if (type === 'checkbox') {
       const target = event.target as HTMLInputElement;
       setFormData(prev => ({ ...prev, [name]: target.checked }));
-    } else if (name === 'precio_unitario' || name === 'precio_por_bulto') { // 'stock' removed from here
+    } else if (name === 'precio_unitario') { 
       setFormData(prev => ({ ...prev, [name]: parseFloat(value) || 0 }));
     } else if (name === 'categoria_id') {
       setFormData(prev => ({ ...prev, [name]: value ? parseInt(value) : null }));
@@ -140,8 +134,6 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
         nombre: producto.nombre,
         descripcion: producto.descripcion,
         precio_unitario: +producto.precio_unitario,
-        precio_por_bulto: +producto.precio_por_bulto,
-        // stock: +producto.stock, // Removed stock
         disponible: producto.disponible,
         categoria_id: producto.categoria?.id ?? null,
       });
@@ -151,8 +143,6 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
         nombre: '',
         descripcion: '',
         precio_unitario: 0,
-        precio_por_bulto: 0,
-        // stock: 0, // Removed stock
         disponible: true,
         categoria_id: categorias.length > 0 ? categorias[0].id : null,
       });
@@ -250,7 +240,6 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
               <div className={styles.itemInfo}>
                 <strong>{producto.nombre}</strong>
                 <span>Precio: ${(+producto.precio_unitario).toFixed(2)}</span>
-                {/* <span>Stock: {producto.stock}</span> Removed stock display */}
                 {producto.categoria && <small>Categoría: {producto.categoria.nombre}</small>}
               </div>
               <div className={styles.itemActions}>
@@ -295,7 +284,7 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
                 </div>
               </div>
               <div className={formStyles.formSection}>
-                <h3 className={formStyles.formSectionTitle}>Precios</h3> {/* Changed from Precios y Stock */}
+                <h3 className={formStyles.formSectionTitle}>Precios</h3>
                 <div className={formStyles.formField}>
                   <label className={`${formStyles.formLabel} ${formStyles.requiredLabel}`} htmlFor="precio_unitario">Precio Unitario</label>
                   <input
@@ -303,19 +292,6 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
                     id="precio_unitario"
                     name="precio_unitario"
                     value={formData.precio_unitario}
-                    onChange={handleInputChange}
-                    step="0.01"
-                    required
-                    className={formStyles.formInput}
-                  />
-                </div>
-                <div className={formStyles.formField}>
-                  <label className={`${formStyles.formLabel} ${formStyles.requiredLabel}`} htmlFor="precio_por_bulto">Precio por Bulto</label>
-                  <input
-                    type="number"
-                    id="precio_por_bulto"
-                    name="precio_por_bulto"
-                    value={formData.precio_por_bulto}
                     onChange={handleInputChange}
                     step="0.01"
                     required
