@@ -24,7 +24,7 @@ const PRODUCTOS_API_BASE_URL = import.meta.env.VITE_API_PRODUCTOS_URL;
  * @details Se crea llamando a la factoría con la URL base de este servicio.
  * Todas las funciones en este archivo utilizarán esta instancia.
  */
-const apiClient = createAuthApiClient(PRODUCTOS_API_BASE_URL);
+const categoryAPIClient = createAuthApiClient(PRODUCTOS_API_BASE_URL);
 
 
 /**
@@ -35,7 +35,7 @@ const apiClient = createAuthApiClient(PRODUCTOS_API_BASE_URL);
  */
 export const getCategorias = async (): Promise<Categoria[]> => {
   try {
-    const response = await apiClient.get<Categoria[]>('/categoria/listar/');
+    const response = await categoryAPIClient.get<Categoria[]>('/categoria/listar/');
     return response.data;
   } catch (error) {
     console.error('Error en getCategorias:', error);
@@ -53,7 +53,7 @@ export const getCategorias = async (): Promise<Categoria[]> => {
  */
 export const createCategoria = async (categoriaData: Omit<Categoria, 'id'>): Promise<Categoria> => {
   try {
-    const response = await apiClient.post<Categoria>('/categoria/crear/', categoriaData);
+    const response = await categoryAPIClient.post<Categoria>('/categoria/crear/', categoriaData);
     return response.data;
   } catch (error) {
     console.error('Error en createCategoria:', error);
@@ -73,7 +73,7 @@ export const createCategoria = async (categoriaData: Omit<Categoria, 'id'>): Pro
 export const updateCategoria = async (id: number, categoriaData: Omit<Categoria, 'id'>): Promise<any> => {
   try {
     // La URL usa un query param `id` para identificar la categoría a actualizar
-    const response = await apiClient.put(`/categoria/editar/?id=${id}`, categoriaData);
+    const response = await categoryAPIClient.put(`/categoria/editar/?id=${id}`, categoriaData);
     return response.data;
   } catch (error) {
     console.error('Error en updateCategoria:', error);
@@ -91,7 +91,7 @@ export const updateCategoria = async (id: number, categoriaData: Omit<Categoria,
  */
 export const deleteCategoria = async (id: number): Promise<any> => {
   try {
-    const response = await apiClient.post(`/categoria/eliminar/?id=${id}`);
+    const response = await categoryAPIClient.post(`/categoria/eliminar/?id=${id}`);
     return response.data;
   } catch (error) {
     console.error('Error en deleteCategoria:', error);

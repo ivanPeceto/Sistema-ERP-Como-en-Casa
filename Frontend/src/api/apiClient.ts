@@ -9,8 +9,8 @@
  */
 
 import axios from 'axios';
-import { getAccessToken, getRefreshToken, setTokens, removeTokens, type RefreshTokenResponse } from '../services/auth_service';
-
+import { getAccessToken, getRefreshToken, setTokens, removeTokens } from '../services/auth_service';
+import type { RefreshTokenResponse } from '../types/models';
 /**
 /**
  * @brief Crea y configura una instancia de Axios con interceptores para manejar la autenticación JWT.
