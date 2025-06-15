@@ -4,7 +4,7 @@ sequenceDiagram
     actor Administrador
     participant page as GestionCategoriasPage
     participant categoryService as CategoryService
-	    participant productosAPI as ProductosAPI
+	    participant productosAPI as CategoriasAPI
     participant Backend as Backend-MSProductos
 
     %% --- Carga Inicial de Datos (Común y exitoso para ambos roles) ---
@@ -12,7 +12,7 @@ sequenceDiagram
     Note over page: Carga de la página (useEffect)
     page->>categoryService: getCategorias()
     activate categoryService
-    categoryService->>productosAPI: get('/categorias/')
+    categoryService->>productosAPI: get('/categorias/listar/')
     activate productosAPI
     productosAPI->>Backend: HTTP GET
     activate Backend
@@ -34,11 +34,12 @@ sequenceDiagram
         activate page
         page->>categoryService: create/updateCategoria(data)
         activate categoryService
-        categoryService->>productosAPI: post/put('/categorias/{id?}', data)
-        activate productosAPI
+        categoryService->>productosAPI: post('/categorias/crear/?id={id?}', data)
+        categoryService->>productosAPI: put('/categorias/editar/?id={id?}', data)
+		activate productosAPI
         productosAPI->>Backend: HTTP POST/PUT
         activate Backend
-        Backend-->>productosAPI: 200 OK o 201 Created
+        Backend-->>productosAPI: 200 OK
         deactivate Backend
         productosAPI-->>categoryService: Respuesta exitosa
         deactivate categoryService
@@ -46,14 +47,14 @@ sequenceDiagram
         page-->>Administrador: Muestra la categoría nueva/actualizada
         deactivate page
     else Rol es Usuario (Flujo Fallido)
-        Usuario->>page: Clic en "Agregar"/"Editar" y "Guardar"
+        Usuario->>page: Clic en "Editar" y "Guardar"
         activate page
         Note right of page: La UI permite el intento.
-        page->>categoryService: create/updateCategoria(data)
+        page->>categoryService: updateCategoria(data)
         activate categoryService
-        categoryService->>productosAPI: post/put('/categorias/{id?}', data)
+        categoryService->>productosAPI: put('/categorias/?id={id?}', data)
         activate productosAPI
-        productosAPI->>Backend: HTTP POST/PUT
+        productosAPI->>Backend: HTTP PUT
         activate Backend
         Backend-->>productosAPI: 403 Forbidden (Error de Permiso)
         deactivate Backend
@@ -68,14 +69,13 @@ sequenceDiagram
     %% --- Intento de Eliminación de Categoría (Solo Administrador) ---
     Administrador->>page: Clic en "Eliminar"
     activate page
-    Note right of page: El botón "Eliminar" solo es visible<br/>para Administradores (user.is_superuser).
     page->>categoryService: deleteCategoria(id)
     activate categoryService
-    categoryService->>productosAPI: delete('/categorias/{id}/')
+    categoryService->>productosAPI: delete('/categorias/eliminar/?id?={id}/')
     activate productosAPI
     productosAPI->>Backend: HTTP DELETE
     activate Backend
-    Backend-->>productosAPI: 204 No Content
+    Backend-->>productosAPI: 200 OK
     deactivate Backend
     productosAPI-->>categoryService: Respuesta exitosa
     deactivate categoryService

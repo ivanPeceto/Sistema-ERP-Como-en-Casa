@@ -37,26 +37,11 @@ classDiagram
         +put(url, data): Promise~AxiosResponse~
         +delete(url): Promise~AxiosResponse~
     }
+    
+    GestionProductosPage ..> ProductService : "uses"
+    GestionProductosPage ..> CategoryService : "uses"
+    GestionCategoriasPage ..> CategoryService : "uses"
+    ProductService ..> ProductosAPI : "uses"
+    CategoryService ..> ProductosAPI : "uses"
 
-    class Producto {
-        +id: number
-        +nombre: string
-        +descripcion: string
-        +precio_por_unidad: number
-        +stock: number
-    }
-
-    class Categoria {
-        +id: number
-        +nombre: string
-        +descripcion: string
-    }
-
-    GestionProductosPage ..> ProductService
-    GestionProductosPage ..> CategoryService
-    GestionCategoriasPage ..> CategoryService
-    ProductService ..> ProductosAPI
-    CategoryService ..> ProductosAPI
-
-    Producto "1..*" -- "1" Categoria : pertenece a
 ```

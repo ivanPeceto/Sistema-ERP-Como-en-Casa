@@ -46,7 +46,7 @@ sequenceDiagram
         
         activate registerPage
         Note right of registerPage: El registro fue exitoso.
-        registerPage->>router: 11. Llama a navigate('/login')
+        registerPage->>router: 11. Llama a navigate('/gestion')
         deactivate registerPage
     end
 ```

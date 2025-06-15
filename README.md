@@ -62,6 +62,11 @@ El frontend es una aplicación construida con las siguientes tecnologías:
 
 - **Control de Versiones**: Git y GitHub para el seguimiento de cambios y la colaboración en equipo.
 
+### Maquetación y Gráficos
+
+- **Entidad-Relación**: Se utilizó tanto Draw.io como Dbdiagram.
+
+- **Diagramas de secuencia y clases**: Para los dos tipos de diagrama se ha usado Obsidian para escribir los diagramas en MD y renderizarlos en PDF. 
 ---
 
 ## Diagrama de Arquitectura
