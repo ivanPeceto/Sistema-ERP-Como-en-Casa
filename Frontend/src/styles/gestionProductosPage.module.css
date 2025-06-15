@@ -212,3 +212,39 @@
 .cancelButton:hover {
   background-color: #545b62;
 }
+
+.categoryTabs {
+  display: flex;
+  flex-wrap: nowrap; 
+  overflow-x: auto;
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #e0e0e0;
+  
+  scrollbar-width: thin;
+  scrollbar-color: #a0a0a0 #f0f0f0;
+}
+
+.categoryTab {
+  flex-shrink: 0; 
+  padding: 8px 16px;
+  margin-right: 10px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  background-color: #f9f9f9;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  white-space: nowrap;
+}
+
+.categoryTab:hover {
+  background-color: #e0e0e0;
+  border-color: #a0a0a0;
+}
+
+.activeTab {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+  font-weight: bold;
+}
