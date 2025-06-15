@@ -239,7 +239,7 @@ const GestionPedidosPage: React.FC = () => {
       );
       console.log('Pedido actualizado exitosamente');
       closeEditModal();
-      fetchInitialData(); // Recargar todos los datos para reflejar los cambios
+      fetchInitialData(); 
     } catch (error) {
       console.error('Error al actualizar pedido:', error);
     }
@@ -263,7 +263,7 @@ const GestionPedidosPage: React.FC = () => {
       fetchInitialData();
     } catch (error) {
       console.error(`Error al cambiar estado 'entregado' para pedido ${pedido.id}:`, error);
-      alert('No se pudo actualizar el estado del pedido.'); // Added alert
+      alert('No se pudo actualizar el estado del pedido.'); 
     }
   }, [fetchInitialData, prepareUpdatePayload]);
 
@@ -273,7 +273,6 @@ const GestionPedidosPage: React.FC = () => {
         id: item.id_producto,
         nombre: item.nombre_producto,
         cantidad: item.cantidad_producto,
-        // Ensure price is a number before passing
         precio_unitario: parseFloat(item.precio_unitario.toString()) || 0,
         subtotal: (parseFloat(item.cantidad_producto.toString()) * (parseFloat(item.precio_unitario.toString()) || 0)) || 0,
       })));

@@ -22,7 +22,7 @@ const USERS_API_BASE_URL = import.meta.env.VITE_API_USUARIOS_URL;
  * @details Se crea llamando a la factoría con la URL base de este servicio.
  * Todas las funciones en este archivo utilizarán esta instancia.
  */
-const apiClient = createAuthApiClient(USERS_API_BASE_URL);
+const userAPIClient = createAuthApiClient(USERS_API_BASE_URL);
 
 /**
  * @brief Realiza la petición de login al backend.
@@ -34,7 +34,7 @@ const apiClient = createAuthApiClient(USERS_API_BASE_URL);
  * @throws {Error} Lanza un error (gestionado por Axios) si la petición falla.
  */
 export const login = async (email: string, password: string): Promise<AuthResponse> => {
-  const response = await apiClient.post<AuthResponse>('/login/', {
+  const response = await userAPIClient.post<AuthResponse>('/login/', {
     email,
     password,
   });
@@ -68,7 +68,7 @@ export const logout = () => {
  * @throws {Error} Lanza un error si la petición falla.
  */
 export const register = async ( email: string, password: string, nombre: string): Promise<AuthResponse> => {
-  const response = await apiClient.post<AuthResponse>('/signup/', {
+  const response = await userAPIClient.post<AuthResponse>('/signup/', {
     nombre,
     email,
     password,

@@ -21,7 +21,7 @@ const PEDIDOS_API_BASE_URL = import.meta.env.VITE_API_PEDIDOS_URL;
  * @details Se crea llamando a la factoría con la URL base de este servicio.
  * Todas las funciones en este archivo utilizarán esta instancia.
  */
-const apiClient = createAuthApiClient(PEDIDOS_API_BASE_URL);
+const pedidoAPICLient = createAuthApiClient(PEDIDOS_API_BASE_URL);
 
 /**
  * @brief Envía la petición para crear un nuevo pedido al backend.
@@ -31,7 +31,7 @@ const apiClient = createAuthApiClient(PEDIDOS_API_BASE_URL);
  * @throws {Error} Relanza el error si la petición a la API falla.
  */
 export const createPedido = async (pedidoData: PedidoInput): Promise<any> => {
-  const response = await apiClient.post('/crear/', pedidoData);
+  const response = await pedidoAPICLient.post('/crear/', pedidoData);
   return response.data;
 };
 
@@ -43,7 +43,7 @@ export const createPedido = async (pedidoData: PedidoInput): Promise<any> => {
  * @throws {Error} Relanza el error si la petición a la API falla.
  */
 export const getPedidosByDate = async (fecha: string): Promise<any[]> => {
-  const response = await apiClient.get(`/buscar/?fecha=${fecha}`);
+  const response = await pedidoAPICLient.get(`/buscar/?fecha=${fecha}`);
   return response.data;
 };
 
@@ -62,7 +62,7 @@ export const editarPedido = async (
   { fecha, numero }: { fecha: string; numero: number },
   data: Partial<Pedido>
 ): Promise<any> => {
-  const response = await apiClient.put(`/editar/?fecha=${fecha}&numero=${numero}`, data);
+  const response = await pedidoAPICLient.put(`/editar/?fecha=${fecha}&numero=${numero}`, data);
   return response.data;
 };
 
@@ -77,6 +77,6 @@ export const editarPedido = async (
 * @throws {Error} Relanza el error si la petición a la API falla.
 */
 export const deletePedido = async ({ fecha, numero }: { fecha: string; numero: number }): Promise<any> => {
-  const response = await apiClient.post(`/eliminar/?fecha=${fecha}&numero=${numero}`);
+  const response = await pedidoAPICLient.post(`/eliminar/?fecha=${fecha}&numero=${numero}`);
   return response.data;
 };

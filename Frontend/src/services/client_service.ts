@@ -23,7 +23,7 @@ const CLIENTES_API_BASE_URL = import.meta.env.VITE_API_CLIENTES_URL;
  * @details Se crea llamando a la factoría con la URL base de este servicio.
  * Todas las funciones en este archivo utilizarán esta instancia.
  */
-const apiClient = createAuthApiClient(CLIENTES_API_BASE_URL);
+const clientAPIClient = createAuthApiClient(CLIENTES_API_BASE_URL);
 
 /**
  * @brief Obtiene la lista completa de clientes desde el backend.
@@ -32,7 +32,7 @@ const apiClient = createAuthApiClient(CLIENTES_API_BASE_URL);
  * @throws {Error} Relanza el error si la petición a la API falla.
  */
 export const getClientes = async (): Promise<Cliente[]> => {
-    const response = await apiClient.get<Cliente[]>('/listar/');
+    const response = await clientAPIClient.get<Cliente[]>('/listar/');
     return response.data;
 };
 
@@ -45,7 +45,7 @@ export const getClientes = async (): Promise<Cliente[]> => {
  * @throws {Error} Relanza el error si la petición a la API falla.
  */
 export const createCliente = async (clienteData: Omit<Cliente, 'id'>): Promise<Cliente> => {
-    const response = await apiClient.post<Cliente>('/crear/', clienteData);
+    const response = await clientAPIClient.post<Cliente>('/crear/', clienteData);
     return response.data;
 };
 
@@ -59,7 +59,7 @@ export const createCliente = async (clienteData: Omit<Cliente, 'id'>): Promise<C
  * @throws {Error} Relanza el error si la petición a la API falla.
  */
 export const updateCliente = async (id: number, clienteData: Omit<Cliente, 'id'>): Promise<any> => {
-    const response = await apiClient.put(`/editar/?id=${id}`, clienteData);
+    const response = await clientAPIClient.put(`/editar/?id=${id}`, clienteData);
     return response.data;
 };
 
@@ -72,6 +72,6 @@ export const updateCliente = async (id: number, clienteData: Omit<Cliente, 'id'>
  * @throws {Error} Relanza el error si la petición a la API falla.
  */
 export const deleteCliente = async (id: number): Promise<any> => {
-    const response = await apiClient.post(`/eliminar/?id=${id}`);
+    const response = await clientAPIClient.post(`/eliminar/?id=${id}`);
     return response.data;
 };
