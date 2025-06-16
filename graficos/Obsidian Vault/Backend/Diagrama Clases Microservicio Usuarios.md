@@ -35,11 +35,4 @@ classDiagram
         LoginSerializer --|> Usuario : serializes
     end
 
-    subgraph URLs
-        class UserURLPatterns {
-            + /signup/ -> SignupView
-            + /login/ -> LoginView
-            + /token_refresh/ -> TokenRefreshView
-        }
-    end
 ```
