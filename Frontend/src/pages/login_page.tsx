@@ -8,10 +8,10 @@
  * contra el backend.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom'; 
 import styles from '../styles/login.module.css'; 
-import { login } from '../services/auth_service'
+import { useAuth } from '../context/auth_context';
 
 
 /**
@@ -23,11 +23,23 @@ const LoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { login, isAuthenticated } = useAuth();
+
+  /**
+   * @brief Efecto que se ejecuta cuando el estado de autenticación cambia.
+   * @details Si el usuario se autentica exitosamente (`isAuthenticated` se vuelve true),
+   * este efecto lo redirigirá a la página de gestión.
+   */
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/gestion', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault(); 
+    event.preventDefault();
     setError(null);
-  
+
 
     if (!email || !password) {
       setError('Por favor, complete ambos campos.');
@@ -36,17 +48,12 @@ const LoginPage: React.FC = () => {
 
     try {
       await login(email, password);
-      navigate('/gestion');
 
-    } catch (err:any){
-      console.error('Error de inicio de sersión: ', err);
-      if (err.response && err.response.data){
-        setError('Credenciales invállidas. Por favor, intente de nuevo.')
-      } else {
-        setError('Ocurrió un error al intentar iniciar sesión.');
-      }
+    } catch (err: any) {
+      console.error('Error de inicio de sesión: ', err);
+      setError('Credenciales inválidas o error en el servidor.');
     }
-  };
+  }
 
   const LogoIcon = () => (
     <svg viewBox="0 0 24 24" fill="currentColor" height="1em" width="1em">
