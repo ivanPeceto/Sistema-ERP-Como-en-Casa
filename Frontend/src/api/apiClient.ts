@@ -37,7 +37,9 @@ const createAuthApiClient = (baseURL: string) => {
   instance.interceptors.request.use(
     (config) => {
       const token = getAccessToken();
-      if (token) {
+      const publicUrls = ['/login/', '/signup/', '/refresh_token/'];
+
+      if (token && !publicUrls.some(url => config.url?.includes(url))) {
         config.headers = config.headers || {};
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -50,13 +52,13 @@ const createAuthApiClient = (baseURL: string) => {
     (response) => response,
     async (error) => {
       const originalRequest = error.config;
+      const refreshUrl = `${import.meta.env.VITE_API_USUARIOS_URL}/refresh_token/`;
 
-      if (error.response?.status === 401 && !originalRequest._retry) {
+      if (error.response?.status === 401 && !originalRequest._retry && originalRequest.url !== refreshUrl) {        
+        
         originalRequest._retry = true;
-
         const refreshToken = getRefreshToken();
         if (!refreshToken) {
-          console.warn("No refresh token disponible. Redirigiendo a login.");
           removeTokens();
           window.location.href = '/login';
           return Promise.reject(error);
@@ -64,7 +66,7 @@ const createAuthApiClient = (baseURL: string) => {
 
         try {
           const refreshResponse = await axios.post<RefreshTokenResponse>(
-            `${import.meta.env.VITE_API_USUARIOS_URL}/refresh_token/`,
+            refreshUrl,
             { refresh: refreshToken, }
           );
 
@@ -76,7 +78,6 @@ const createAuthApiClient = (baseURL: string) => {
           return instance(originalRequest);
 
         } catch (refreshError) {
-          console.error("Error al refrescar el token. Sesión expirada o refresh token inválido:", refreshError);
           removeTokens();
           window.location.href = '/login';
           return Promise.reject(refreshError);
