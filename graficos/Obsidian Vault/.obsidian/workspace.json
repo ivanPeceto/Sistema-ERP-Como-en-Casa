@@ -4,21 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "eaf4d1feed5d6bd4",
+        "id": "40a9f11faf2ef802",
         "type": "tabs",
         "children": [
           {
-            "id": "e9d1c9ed5c8b1089",
+            "id": "ebc3993d392cf9c0",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Backend/Diagrama Clases Microservicio Clientes.md",
-                "mode": "source",
+                "file": "Backend/Diagrama Clases Microservicio Productos.md",
+                "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Diagrama Clases Microservicio Clientes"
+              "title": "Diagrama Clases Microservicio Productos"
             }
           }
         ]
@@ -78,8 +78,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "right": {
     "id": "e527b2465a559a00",
@@ -169,12 +168,14 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "e9d1c9ed5c8b1089",
+  "active": "ebc3993d392cf9c0",
   "lastOpenFiles": [
     "Backend/Diagrama Clases Microservicio Clientes.md",
+    "Backend/Diagrama Clases Microservicio Productos.md",
+    "Backend/Flujo Datos Microservicio Clientes.md",
+    "Backend/Diagrama Clases Microservicio Usuarios.md",
     "Backend/Flujo Datos Microservicio Usuarios.md",
     "Frontend/Flujo Datos Clientes.md",
-    "Backend/Diagrama Clases Microservicio Usuarios.md",
     "Backend",
     "Frontend/Flujo Datos Ruta Protegida.md",
     "Graficos obsidian/Flujo Datos Ruta Protegida.pdf",

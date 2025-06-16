@@ -1,60 +1,44 @@
 ```mermaid
 classDiagram
     direction LR
-		
+
 	class ClienteViewSet {
 		+queryset = Cliente.objects.all()
-		+serializer_class = ClienteSerializer
+		+serializer_classes = [ClienteSerializer]
 		+authentication_classes = [JWTAuthentication]
-		+permission_classes = [IsAuthenticated, IsSuperUser]
+		+permission_classes = [IsSuperUser]
+		+crearCliente(request): 
 	}
-	
-	class ClienteSerializer {
-	}
-	
-	class Cliente {
-		+nombre: CharField
-		+direccion: CharField
-		+telefono: CharField
-	}
-	
-	
-	
-	class JWTAuthentication {
-		+authenticate(request): UserProxy 
-	} 
-		
-	class UserProxy {
 
-		 +is_superuser: boolean 
+	class ClienteSerializer {
+		+id: AutoField
+		+nombre: CharField
+		+telefono: CharField
+		+direccion: TextField
+	 }
+	  
+	 class Cliente {
+		+id: AutoField
+		+nombre: CharField
+		+telefono: CharField
+		+direccion: TextField
+	  }
+
+	class JWTAuthentication {
+		+authenticate(request): FalseUser
 	}
-	
-	
-	
+	 class FalseUser {
+		+is_superuser: boolean
+	}
+
 	class IsSuperUser {
 		+has_permission(request, view): boolean
-	}
-	
-	
-	
-	class ServiceUsuarios {
-	+/api/users/token/verify/
-	}
-	
-
-
-    ClienteViewSet --|> ModelViewSet
-    ClienteSerializer --|> ModelSerializer
-    Cliente --|> Model
-    JWTAuthentication --|> BaseAuthentication
-    IsAdminOrReadOnly --|> BasePermission
-
-
-    ClienteViewSet ..> ClienteSerializer : uses
+	}  
+            
     ClienteViewSet ..> JWTAuthentication : uses
-    ClienteViewSet ..> IsAdminOrReadOnly : uses
-    ClienteSerializer ..> Cliente : serializes
-
-
-    JWTAuthentication ..> ServiceUsuarios : validates token with
+    ClienteViewSet ..> IsSuperUser : uses
+    ClienteViewSet ..> ClienteSerializer : uses
+    ClienteSerializer --|> Cliente : serializes
+    JWTAuthentication ..> FalseUser : creates
+    IsSuperUser ..> FalseUser : reads
 ```
