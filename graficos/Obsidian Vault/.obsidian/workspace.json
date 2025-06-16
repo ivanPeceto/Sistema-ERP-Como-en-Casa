@@ -4,21 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "3241585f1dbab913",
+        "id": "40a9f11faf2ef802",
         "type": "tabs",
         "children": [
           {
-            "id": "4ddcb8d4877fa0b8",
+            "id": "ebc3993d392cf9c0",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Frontend/Flujo Datos Ruta Protegida.md",
-                "mode": "source",
+                "file": "Backend/Diagrama Clases Microservicio Productos.md",
+                "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Flujo Datos Ruta Protegida"
+              "title": "Diagrama Clases Microservicio Productos"
             }
           }
         ]
@@ -168,8 +168,16 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "4ddcb8d4877fa0b8",
+  "active": "ebc3993d392cf9c0",
   "lastOpenFiles": [
+    "Backend/Diagrama Clases Microservicio Clientes.md",
+    "Backend/Diagrama Clases Microservicio Productos.md",
+    "Backend/Flujo Datos Microservicio Clientes.md",
+    "Backend/Diagrama Clases Microservicio Usuarios.md",
+    "Backend/Flujo Datos Microservicio Usuarios.md",
+    "Frontend/Flujo Datos Clientes.md",
+    "Backend",
+    "Frontend/Flujo Datos Ruta Protegida.md",
     "Graficos obsidian/Flujo Datos Ruta Protegida.pdf",
     "Graficos obsidian/Flujo Datos Register.pdf",
     "Graficos obsidian/Flujo Datos Productos.pdf",
@@ -179,21 +187,17 @@
     "Graficos obsidian/Flujo Datos Clientes.pdf",
     "Graficos obsidian/Flujo Datos Categorías.pdf",
     "Graficos obsidian/Flujo Datos Armar Pedidos.pdf",
-    "Graficos obsidian/Diagrama Clases Productos.pdf",
-    "Graficos obsidian/Diagrama Clases Pedidos.pdf",
     "Frontend/Flujo Datos Register.md",
     "Frontend/Flujo Datos Productos.md",
     "Frontend/Flujo Datos Pedidos.md",
     "Frontend/Flujo Datos Login.md",
     "Frontend/Flujo Datos Interceptor apiClient.md",
-    "Frontend/Flujo Datos Clientes.md",
     "Frontend/Flujo Datos Categorías.md",
     "Frontend/Flujo Datos Armar Pedidos.md",
     "Frontend/Diagrama Clases Productos.md",
     "Frontend/Diagrama Clases Pedidos.md",
     "Frontend/Diagrama Clases Login y Register.md",
     "Frontend/Diagrama Clases Clientes.md",
-    "Frontend/Flujo Datos Ruta Protegida.md",
     "Welcome.md"
   ]
 }

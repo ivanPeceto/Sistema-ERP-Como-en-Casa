@@ -141,7 +141,6 @@ const CrearPedidoPage: React.FC = () => {
     setClienteSearchTerm(cliente.nombre);
   }
 
-  // Nuevo: Manejador para el cambio de la hora de entrega
   const handleParaHoraChange = (e: ChangeEvent<HTMLInputElement>) => {
     setParaHora(e.target.value);
   };
@@ -168,7 +167,7 @@ const CrearPedidoPage: React.FC = () => {
         numero_pedido: nuevoNumeroPedido,
         fecha_pedido: hoy,
         id_cliente: clienteSeleccionado.id,
-        para_hora: paraHora || null, // Usamos el nuevo estado para la hora de entrega
+        para_hora: paraHora || null,
         entregado: false,
         pagado: false,
         productos: pedidoItems.map(item => ({
@@ -181,11 +180,10 @@ const CrearPedidoPage: React.FC = () => {
 
       await createPedido(pedidoData);
 
-      // Resetear estados después de confirmar el pedido
       setPedidoItems([]);
       setClienteSeleccionado(null);
       setClienteSearchTerm('');
-      setParaHora(''); // Resetear también el campo de la hora
+      setParaHora(''); 
 
     } catch (err) {
       console.error("Error al confirmar el pedido:", err);
@@ -272,7 +270,6 @@ const CrearPedidoPage: React.FC = () => {
 
         <div className={styles.currentOrderPanel}>
           <h2>Pedido Actual</h2>
-          {/* Nuevo: Sección para la hora de entrega */}
           <div className={styles.deliveryTimeSection}>
             <label htmlFor="deliveryTime">Hora de Entrega:</label>
             <input
@@ -283,7 +280,6 @@ const CrearPedidoPage: React.FC = () => {
               className={styles.timeInput}
             />
           </div>
-          {/* Fin de la nueva sección */}
           <div className={styles.orderItemsList}>
             {pedidoItems.length === 0 ? (
               <p className={styles.emptyOrderText}>Aún no hay productos en el pedido.</p>
