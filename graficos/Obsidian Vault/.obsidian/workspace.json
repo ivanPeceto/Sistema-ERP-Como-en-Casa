@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Backend/Diagrama Clases Microservicio Productos.md",
+                "file": "Backend/Flujo Datos Microservicio Usuarios.md",
                 "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Diagrama Clases Microservicio Productos"
+              "title": "Flujo Datos Microservicio Usuarios"
             }
           }
         ]
@@ -170,10 +170,14 @@
   },
   "active": "ebc3993d392cf9c0",
   "lastOpenFiles": [
-    "Backend/Diagrama Clases Microservicio Clientes.md",
-    "Backend/Diagrama Clases Microservicio Productos.md",
+    "Backend/Flujo Datos Microservicio Productos.md",
+    "Backend/Flujo Datos Microservicio Pedidos.md",
     "Backend/Flujo Datos Microservicio Clientes.md",
     "Backend/Diagrama Clases Microservicio Usuarios.md",
+    "Backend/Diagrama Clases Microservicio Productos.md",
+    "Backend/Diagrama Clases Microservicio Pedidos.md",
+    "Backend/Diagrama Clases Microservicio Clientes.md",
+    "Diagrama de Componentes Docker.md",
     "Backend/Flujo Datos Microservicio Usuarios.md",
     "Frontend/Flujo Datos Clientes.md",
     "Backend",
