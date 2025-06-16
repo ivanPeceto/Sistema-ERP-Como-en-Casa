@@ -14,31 +14,34 @@
  */
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import styles from '../styles/gestionPedidosPage.module.css';
-import formStyles from '../styles/formStyles.module.css'; 
-import crearPedidoStyles from '../styles/crearPedidoPage.module.css'; 
+import formStyles from '../styles/formStyles.module.css';
+import crearPedidoStyles from '../styles/crearPedidoPage.module.css';
 
 import { getPedidosByDate, editarPedido, deletePedido } from '../services/pedido_service';
 import { getClientes } from '../services/client_service';
 import type { Cliente } from '../types/models';
-import { getProductos } from '../services/product_service'; 
+import { getProductos } from '../services/product_service';
 import type { Producto } from '../types/models.d.ts';
 import type { Pedido, PedidoInput, PedidoItem } from '../types/models.d.ts';
 
 
 const GestionPedidosPage: React.FC = () => {
+  const navigate = useNavigate(); // Initialize useNavigate hook
+
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [clientes, setClientes] = useState<Cliente[]>([]);
-  const [productos, setProductos] = useState<Producto[]>([]); 
+  const [productos, setProductos] = useState<Producto[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [searchDate, setSearchDate] = useState<string>(new Date().toISOString().split('T')[0]);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false); 
-  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false); 
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [viewingPedido, setViewingPedido] = useState<Pedido | null>(null);
-  const [editingPedido, setEditingPedido] = useState<Pedido | null>(null); 
-  const [editFormData, setEditFormData] = useState<Partial<Pedido>>({}); 
+  const [editingPedido, setEditingPedido] = useState<Pedido | null>(null);
+  const [editFormData, setEditFormData] = useState<Partial<Pedido>>({});
   const [editingPedidoItems, setEditingPedidoItems] = useState<PedidoItem[]>([]);
-  const [editCategoriaSeleccionada, setEditCategoriaSeleccionada] = useState<string>(''); 
+  const [editCategoriaSeleccionada, setEditCategoriaSeleccionada] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
    /**
@@ -50,7 +53,7 @@ const GestionPedidosPage: React.FC = () => {
       const [pedidosData, clientesData, productosData] = await Promise.all([
         getPedidosByDate(searchDate),
         getClientes(),
-        getProductos() 
+        getProductos()
       ]);
       setPedidos(pedidosData);
       setClientes(clientesData);
@@ -58,7 +61,7 @@ const GestionPedidosPage: React.FC = () => {
       if (productosData.length > 0) {
         const categoriasUnicas = [...new Set(productosData.map(p => p.categoria?.nombre || 'Sin Categoría'))];
         if (categoriasUnicas.length > 0) {
-          setEditCategoriaSeleccionada(categoriasUnicas[0]); 
+          setEditCategoriaSeleccionada(categoriasUnicas[0]);
         }
       }
     } catch (error) {
@@ -91,7 +94,7 @@ const GestionPedidosPage: React.FC = () => {
     });
   }, [searchTerm, pedidos, clienteNombreMap]);
 
-  /** @brief Extrae las categorías únicas para el selector de productos en el modal de edición. */  
+  /** @brief Extrae las categorías únicas para el selector de productos en el modal de edición. */
   const editCategoriasUnicas = useMemo(() =>
     [...new Set(productos.map(p => p.categoria?.nombre || 'Sin Categoría'))],
     [productos]
@@ -109,25 +112,25 @@ const GestionPedidosPage: React.FC = () => {
   }, [editingPedidoItems]);
 
   /** @brief Deriva la lista de pedidos pendientes a partir de la lista filtrada. */
-  const pedidosPendientes = useMemo(() => 
+  const pedidosPendientes = useMemo(() =>
     filteredPedidos.filter(pedido => !pedido.entregado),
     [filteredPedidos]
   );
 
   /** @brief Deriva la lista de pedidos entregados. */
-  const pedidosEntregados = useMemo(() => 
+  const pedidosEntregados = useMemo(() =>
     filteredPedidos.filter(pedido => pedido.entregado),
     [filteredPedidos]
   );
 
   /** @brief Deriva la lista de pedidos pagados. */
-  const pedidosPagados = useMemo(() => 
+  const pedidosPagados = useMemo(() =>
     filteredPedidos.filter(pedido => pedido.pagado),
     [filteredPedidos]
   );
 
   /** @brief Deriva la lista de pedidos no pagados. */
-  const pedidosNoPagados = useMemo(() => 
+  const pedidosNoPagados = useMemo(() =>
     filteredPedidos.filter(pedido => !pedido.pagado),
     [filteredPedidos]
   );
@@ -153,10 +156,10 @@ const GestionPedidosPage: React.FC = () => {
       pagado: pedido.pagado,
     });
     setEditingPedidoItems(pedido.productos_detalle.map(item => ({
-      id: item.id_producto, 
+      id: item.id_producto,
       nombre: item.nombre_producto,
-      cantidad: parseFloat(item.cantidad_producto.toString()) || 0, 
-      precio_unitario: parseFloat(item.precio_unitario.toString()) || 0, 
+      cantidad: parseFloat(item.cantidad_producto.toString()) || 0,
+      precio_unitario: parseFloat(item.precio_unitario.toString()) || 0,
       subtotal: (parseFloat(item.cantidad_producto.toString()) * (parseFloat(item.precio_unitario.toString()) || 0)) || 0, // Aseguramos que sea número
     })));
     setIsEditModalOpen(true);
@@ -180,7 +183,7 @@ const GestionPedidosPage: React.FC = () => {
   const addProductToEditingOrder = useCallback((product: Producto) => {
     setEditingPedidoItems(prevItems => {
       const existingItem = prevItems.find(item => item.id === product.id);
-      const productPrice = parseFloat(product.precio_unitario.toString()) || 0; 
+      const productPrice = parseFloat(product.precio_unitario.toString()) || 0;
       if (existingItem) {
         return prevItems.map(item =>
           item.id === product.id
@@ -229,7 +232,7 @@ const GestionPedidosPage: React.FC = () => {
       id_producto: item.id,
       nombre_producto: item.nombre,
       cantidad_producto: item.cantidad,
-      precio_unitario: parseFloat(item.precio_unitario.toString()) || 0, 
+      precio_unitario: parseFloat(item.precio_unitario.toString()) || 0,
     }));
 
     return {
@@ -250,6 +253,7 @@ const GestionPedidosPage: React.FC = () => {
 
     if (editingPedidoItems.length === 0) {
       console.error('El pedido no puede estar vacío. Añada al menos un producto.');
+      alert('El pedido no puede estar vacío. Por favor, añada al menos un producto.'); // Added alert
       return;
     }
 
@@ -261,10 +265,12 @@ const GestionPedidosPage: React.FC = () => {
         payload
       );
       console.log('Pedido actualizado exitosamente');
+      alert('Pedido actualizado exitosamente.'); // Added alert
       closeEditModal();
-      fetchInitialData(); 
+      fetchInitialData();
     } catch (error) {
       console.error('Error al actualizar pedido:', error);
+      alert('Ocurrió un error al actualizar el pedido. Por favor, intente de nuevo.'); // Added alert
     }
   }, [editingPedido, editFormData, editingPedidoItems, prepareUpdatePayload, closeEditModal, fetchInitialData]);
 
@@ -285,7 +291,7 @@ const GestionPedidosPage: React.FC = () => {
       fetchInitialData();
     } catch (error) {
       console.error(`Error al cambiar estado 'entregado' para pedido ${pedido.id}:`, error);
-      alert('No se pudo actualizar el estado del pedido.'); 
+      alert('No se pudo actualizar el estado del pedido.'); // Added alert
     }
   }, [fetchInitialData, prepareUpdatePayload]);
 
@@ -305,16 +311,19 @@ const GestionPedidosPage: React.FC = () => {
       fetchInitialData();
     } catch (error) {
       console.error(`Error al cambiar estado 'pagado' para pedido ${pedido.id}:`, error);
-      alert('No se pudo actualizar el estado del pedido.'); 
+      alert('No se pudo actualizar el estado del pedido.'); // Added alert
     }
   }, [fetchInitialData, prepareUpdatePayload]);
 
   const handleDeletePedido = useCallback(async (pedido: Pedido) => {
-    try {
-      await deletePedido({ fecha: pedido.fecha_pedido, numero: pedido.numero_pedido });
-      fetchInitialData();
-    } catch (error) {
-      console.error(`Error al eliminar pedido ${pedido.id}:`, error);
+    if (window.confirm(`¿Confirma que desea eliminar el Pedido #${pedido.numero_pedido}? Esta acción es irreversible.`)) {
+      try {
+        await deletePedido({ fecha: pedido.fecha_pedido, numero: pedido.numero_pedido });
+        fetchInitialData();
+      } catch (error) {
+        console.error(`Error al eliminar pedido ${pedido.id}:`, error);
+        alert('No se pudo eliminar el pedido.'); // Added alert
+      }
     }
   }, [fetchInitialData]);
 
@@ -323,12 +332,12 @@ const GestionPedidosPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'todos' | 'pendientes' | 'entregados' | 'pagados' | 'noPagados'>('todos');
 
   const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = { 
-      year: 'numeric', 
-      month: 'short', 
+    const options: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: 'short',
       day: 'numeric',
-      hour: '2-digit', 
-      minute: '2-digit' 
+      hour: '2-digit',
+      minute: '2-digit'
     };
     return new Date(dateString).toLocaleDateString('es-AR', options);
   };
@@ -354,17 +363,17 @@ const GestionPedidosPage: React.FC = () => {
                   {formatDate(pedido.fecha_pedido)}
                 </div>
               </div>
-              
+
               <div className={styles.pedidoCliente}>
                 <i className="fas fa-user"></i>
                 {clienteNombreMap.get(pedido.id_cliente) || `Cliente #${pedido.id_cliente}`}
               </div>
-              
+
               <div className={styles.pedidoHora}>
                 <i className="fas fa-clock"></i>
                 Hora de entrega: {pedido.para_hora || 'A definir'}
               </div>
-              
+
               <div className={styles.pedidoResumen}>
                 <div className={styles.productosCount}>
                   <i className="fas fa-box-open"></i>
@@ -374,16 +383,16 @@ const GestionPedidosPage: React.FC = () => {
                   Total: <span>${typeof pedido.total === 'number' ? pedido.total.toFixed(2) : '0.00'}</span>
                 </div>
               </div>
-              
+
               <div className={styles.pedidoEstados}>
-                <div 
+                <div
                   className={`${styles.estadoBadge} ${pedido.entregado ? styles.entregadoBadge : styles.pendienteBadge}`}
                   onClick={() => handleToggleEntregado(pedido)}
                 >
                   <i className={`fas ${pedido.entregado ? 'fa-check-circle' : 'fa-clock'}`}></i>
                   {pedido.entregado ? 'Entregado' : 'Pendiente'}
                 </div>
-                <div 
+                <div
                   className={`${styles.estadoBadge} ${pedido.pagado ? styles.pagadoBadge : styles.noPagadoBadge}`}
                   onClick={() => handleTogglePagado(pedido)}
                 >
@@ -391,26 +400,26 @@ const GestionPedidosPage: React.FC = () => {
                   {pedido.pagado ? 'Pagado' : 'Pendiente pago'}
                 </div>
               </div>
-              
+
               <div className={styles.pedidoAcciones}>
-                <button 
-                  onClick={() => openViewModal(pedido)} 
+                <button
+                  onClick={() => openViewModal(pedido)}
                   className={styles.actionButton}
                   title="Ver detalles"
                 >
                   <i className="fas fa-eye"></i>
                   <span>Ver</span>
                 </button>
-                <button 
-                  onClick={() => openEditModal(pedido)} 
+                <button
+                  onClick={() => openEditModal(pedido)}
                   className={styles.actionButton}
                   title="Editar pedido"
                 >
                   <i className="fas fa-edit"></i>
                   <span>Editar</span>
                 </button>
-                <button 
-                  onClick={() => handleDeletePedido(pedido)} 
+                <button
+                  onClick={() => handleDeletePedido(pedido)}
                   className={`${styles.actionButton} ${styles.deleteButton}`}
                   title="Eliminar pedido"
                 >
@@ -449,34 +458,41 @@ const GestionPedidosPage: React.FC = () => {
             className={styles.searchInput}
           />
         </div>
+        {/* Nuevo Botón "Armar Pedido" */}
+        <button
+          onClick={() => navigate('/gestion')} // Redirige a la ruta de Armar Pedido
+          className={styles.newOrderButton} // Clase CSS para el nuevo botón
+        >
+          Armar Nuevo Pedido
+        </button>
       </div>
 
       <div className={styles.tabsContainer}>
-        <button 
+        <button
           className={`${styles.tabButton} ${activeTab === 'todos' ? styles.activeTab : ''}`}
           onClick={() => setActiveTab('todos')}
         >
           Todos ({filteredPedidos.length})
         </button>
-        <button 
+        <button
           className={`${styles.tabButton} ${activeTab === 'pendientes' ? styles.activeTab : ''}`}
           onClick={() => setActiveTab('pendientes')}
         >
           Pendientes ({pedidosPendientes.length})
         </button>
-        <button 
+        <button
           className={`${styles.tabButton} ${activeTab === 'entregados' ? styles.activeTab : ''}`}
           onClick={() => setActiveTab('entregados')}
         >
           Entregados ({pedidosEntregados.length})
         </button>
-        <button 
+        <button
           className={`${styles.tabButton} ${activeTab === 'pagados' ? styles.activeTab : ''}`}
           onClick={() => setActiveTab('pagados')}
         >
           Pagados ({pedidosPagados.length})
         </button>
-        <button 
+        <button
           className={`${styles.tabButton} ${activeTab === 'noPagados' ? styles.activeTab : ''}`}
           onClick={() => setActiveTab('noPagados')}
         >
@@ -519,7 +535,7 @@ const GestionPedidosPage: React.FC = () => {
 
       {isEditModalOpen && editingPedido && (
         <div className={styles.modalOverlay}>
-          <div className={styles.modalContentWide}> 
+          <div className={styles.modalContentWide}>
             <h2>Editar Pedido #{editingPedido.numero_pedido}</h2>
             <form onSubmit={handleEditSubmit} className={formStyles.formContainer}>
               <div className={formStyles.formSection}>
@@ -537,7 +553,7 @@ const GestionPedidosPage: React.FC = () => {
                       name="para_hora"
                       value={editFormData.para_hora || ''}
                       onChange={handleEditInputChange}
-                      className={`${formStyles.formInput} ${styles.editTimeInput}`} 
+                      className={`${formStyles.formInput} ${styles.editTimeInput}`}
                     />
                   </div>
 
@@ -568,7 +584,7 @@ const GestionPedidosPage: React.FC = () => {
               </div>
 
               <div className={styles.editModalProductsSection}>
-                <div className={crearPedidoStyles.productSelectionPanel}> 
+                <div className={crearPedidoStyles.productSelectionPanel}>
                   <h2>Añadir Productos</h2>
                   <div className={crearPedidoStyles.categoryTabs}>
                     {(editCategoriasUnicas || []).map(cat => (
