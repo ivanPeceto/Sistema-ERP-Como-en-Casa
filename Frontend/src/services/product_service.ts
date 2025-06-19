@@ -15,7 +15,7 @@ import type { Producto, ProductoInput } from '../types/models.d.ts';
  * @details Se obtiene de las variables de entorno de Vite, definidas en el archivo `.env`
  * y cargadas en el entorno de Docker.
  */
-const PRODUCTOS_API_BASE_URL = import.meta.env.VITE_API_PRODUCTOS_URL;
+const PRODUCTOS_API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 /**
  * @brief Instancia de cliente API exclusiva para el servicio de productos.
@@ -31,7 +31,7 @@ const productAPIClient = createAuthApiClient(PRODUCTOS_API_BASE_URL);
  * @throws {Error} Relanza el error si la petición a la API falla.
  */
 export const getProductos = async (): Promise<Producto[]> => {
-    const response = await productAPIClient.get<Producto[]>('/listar/');
+    const response = await productAPIClient.get<Producto[]>('/api/productos/listar/');
     return response.data;
 };
 
@@ -43,7 +43,7 @@ export const getProductos = async (): Promise<Producto[]> => {
  * @throws {Error} Relanza el error si la petición a la API falla.
  */
 export const createProducto = async (productoData: ProductoInput): Promise<Producto> => {
-    const response = await productAPIClient.post<Producto>('/crear/', productoData);
+    const response = await productAPIClient.post<Producto>('/api/productos/crear/', productoData);
     return response.data;
 };
 
@@ -57,7 +57,7 @@ export const createProducto = async (productoData: ProductoInput): Promise<Produ
  * @throws {Error} Relanza el error si la petición a la API falla.
  */
 export const updateProducto = async (id: number, productoData: ProductoInput): Promise<any> => {
-    const response = await productAPIClient.put(`/editar/?id=${id}`, productoData);
+    const response = await productAPIClient.put(`/api/productos/editar/?id=${id}`, productoData);
     return response.data;
 };
 
@@ -70,7 +70,7 @@ export const updateProducto = async (id: number, productoData: ProductoInput): P
  * @throws {Error} Relanza el error si la petición a la API falla.
  */
 export const deleteProducto = async (id: number): Promise<any> => {
-    const response = await productAPIClient.post(`/eliminar/?id=${id}`);
+    const response = await productAPIClient.post(`/api/productos/eliminar/?id=${id}`);
     return response.data;
 };
 
@@ -84,6 +84,6 @@ export const deleteProducto = async (id: number): Promise<any> => {
  */
 export const cambiarDisponibilidad = async (producto: Producto): Promise<Producto> => {
   const actualizado = { ...producto, disponible: !producto.disponible };
-  const response = await productAPIClient.put(`/editar/?id=${id}`, actualizado);
+  const response = await productAPIClient.put(`/api/productos/editar/?id=${producto.id}`, actualizado);
   return response.data;
 };

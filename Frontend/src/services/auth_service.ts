@@ -15,7 +15,7 @@ import type { User, AuthResponse } from '../types/models.ts';
  * @brief URL base del microservicio de usuarios.
  * @details Se obtiene de las variables de entorno de Vite, inyectadas por Docker Compose.
  */
-const USERS_API_BASE_URL = import.meta.env.VITE_API_USUARIOS_URL;
+const USERS_API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 /**
  * @brief Instancia de cliente API exclusiva para el servicio de usuarios.
@@ -34,7 +34,7 @@ const userAPIClient = createAuthApiClient(USERS_API_BASE_URL);
  * @throws {Error} Lanza un error (gestionado por Axios) si la petición falla.
  */
 export const login = async (email: string, password: string): Promise<AuthResponse> => {
-  const response = await userAPIClient.post<AuthResponse>('/login/', {
+  const response = await userAPIClient.post<AuthResponse>('/api/usuarios/login/', {
     email,
     password,
   });
@@ -68,7 +68,7 @@ export const logout = () => {
  * @throws {Error} Lanza un error si la petición falla.
  */
 export const register = async ( email: string, password: string, nombre: string): Promise<AuthResponse> => {
-  const response = await userAPIClient.post<AuthResponse>('/signup/', {
+  const response = await userAPIClient.post<AuthResponse>('/api/usuarios/signup/', {
     nombre,
     email,
     password,

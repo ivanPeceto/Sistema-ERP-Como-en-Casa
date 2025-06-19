@@ -10,7 +10,8 @@
  */
 
 import { createContext, useState, useContext, useEffect, type ReactNode } from 'react';
-import { login as apiLogin, logout as apiLogout, register as apiRegister, getCurrentUser, type AuthResponse } from '../services/auth_service';
+import { login as apiLogin, logout as apiLogout, register as apiRegister, getCurrentUser} from '../services/auth_service';
+import type { AuthResponse } from '../types/models';
 import { type User } from '../types/models';
 
 

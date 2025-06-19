@@ -37,7 +37,7 @@ const createAuthApiClient = (baseURL: string) => {
   instance.interceptors.request.use(
     (config) => {
       const token = getAccessToken();
-      const publicUrls = ['/login/', '/signup/', '/refresh_token/'];
+      const publicUrls = ['/api/usuarios/login/', '/api/usuarios/signup/', '/api/usuarios/refresh_token/'];
 
       if (token && !publicUrls.some(url => config.url?.includes(url))) {
         config.headers = config.headers || {};
@@ -52,7 +52,7 @@ const createAuthApiClient = (baseURL: string) => {
     (response) => response,
     async (error) => {
       const originalRequest = error.config;
-      const refreshUrl = `${import.meta.env.VITE_API_USUARIOS_URL}/refresh_token/`;
+      const refreshUrl = `${import.meta.env.VITE_API_USUARIOS_URL}/api/usuarios/refresh_token/`;
 
       if (error.response?.status === 401 && !originalRequest._retry && originalRequest.url !== refreshUrl) {        
         
