@@ -115,7 +115,7 @@ services:
     environment:
       # variables de entorno
       #Host
-      - VITE_API_BASE_URL=https://1274-186-0-205-132.ngrok-free.app
+      - VITE_API_BASE_URL=https://6d1e-45-234-34-97.ngrok-free.app
       - VITE_API_USUARIOS_URL=VITE_API_BASE_URL
       - VITE_API_CLIENTES_URL=VITE_API_BASE_URL
       - VITE_API_PRODUCTOS_URL=VITE_API_BASE_URL
