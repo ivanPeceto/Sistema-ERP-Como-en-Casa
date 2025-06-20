@@ -9,8 +9,7 @@
  */
 
 import axios from 'axios';
-import { getAccessToken, getRefreshToken, setTokens, removeTokens } from '../services/auth_service';
-import type { RefreshTokenResponse } from '../types/models';
+import type { RefreshTokenResponse, User } from '../types/models';
 /**
 /**
  * @brief Crea y configura una instancia de Axios con interceptores para manejar la autenticación JWT.
@@ -91,3 +90,29 @@ const createAuthApiClient = (baseURL: string) => {
 };
 
 export default createAuthApiClient;
+
+/**
+ * @brief Guarda el par de tokens en el almacenamiento local.
+ * @param {string} accessToken El token de acceso JWT.
+ * @param {string} refreshToken El token de refresco JWT.
+ */
+export const setTokens = (accessToken: string, refreshToken: string) => {
+  localStorage.setItem('accessToken', accessToken);
+  localStorage.setItem('refreshToken', refreshToken);
+};
+
+/**
+ * @brief Elimina todos los datos de la sesión del almacenamiento local.
+ */
+export const removeTokens = () => {
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('refreshToken');
+  localStorage.removeItem('user');
+};
+
+export const getAccessToken = (): string | null => localStorage.getItem('accessToken');
+export const getRefreshToken = (): string | null => localStorage.getItem('refreshToken');
+export const getCurrentUser = (): User | null => {
+  const user = localStorage.getItem('user');
+  return user ? JSON.parse(user) : null;
+};
