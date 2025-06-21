@@ -47,10 +47,14 @@ export interface Producto {
 /**
  * @interface PedidoItem
  * @brief Representa un producto dentro de un pedido que se está armando en el frontend.
- * @details Extiende la interfaz 'Producto' y añade propiedades específicas del contexto de un pedido.
- * @extends Producto
+ * @details Extiende parcialmente la interfaz 'Producto' (haciendo sus campos opcionales)
+ * y añade propiedades específicas del contexto de un pedido.
+ * @extends Partial<Producto>
  */
-export interface PedidoItem extends Producto {
+export interface PedidoItem extends Partial<Producto> {
+    id: number;
+    nombre: string;
+    precio_unitario: number;
     cantidad: number;
     subtotal: number;
 }
