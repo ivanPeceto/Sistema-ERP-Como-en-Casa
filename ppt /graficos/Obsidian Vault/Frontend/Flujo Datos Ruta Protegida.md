@@ -1,11 +1,11 @@
 ```mermaid
 sequenceDiagram
     actor Usuario
-    participant Router as "React Router"
-    participant ProtectedRoute as "Componente <ProtectedRoute>"
-    participant AuthContext as "Contexto de Autenticación"
-    participant PaginaProtegida as "Página de Destino"
-    participant LoginPage as "Página de Login"
+    participant Router as React Router
+    participant ProtectedRoute as ProtectedRoute
+    participant AuthContext as Auth_Context
+    participant PaginaProtegida as Página de Destino
+    participant LoginPage as Página de Login
 
     Usuario->>Router: 1. Intenta navegar a una URL protegida (ej: /gestion/)
     activate Router

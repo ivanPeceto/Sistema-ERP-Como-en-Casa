@@ -1,40 +1,46 @@
 ```mermaid
 classDiagram
+    direction TD
+
     class LoginPage {
-        -email: string
-        -password: string
         +handleSubmit(event): void
     }
     
     class RegisterPage {
-	    -nombre: string
-        -email: string
-        -password: string
         +handleSubmit(event): void
     }
 
     class AuthContext {
         -isAuthenticated: boolean
-        -user: User
-        +login(data: LoginData): Promise~void~
-        +register(data: RegisterData): Promise~void~
-        +logout(): void
+        -user: User | null
+        +login(email, password)
+        +register(email, password, username)
+        +logout()
     }
 
     class AuthService {
-        +login(data: LoginData): Promise~ApiResponse~
-        +register(data: RegisterData): Promise~ApiResponse~
-        +setTokens(tokens): void
-        +getAccessToken(): string
+        <<Service>>
+        +login(email, password): Promise~AuthResponse~
+        +register(email, password, nombre): Promise~AuthResponse~
+        +logout(): void
     }
 
-    class userAPI {
-        +post(url, data): Promise~AxiosResponse~
-        +get(url): Promise~AxiosResponse~
+    class ApiClient {
+        +createAuthApiClient(baseURL): AxiosInstance
+        +setTokens(accessToken, refreshToken): void
+        +removeTokens(): void
+        +getAccessToken(): string | null
+        +getRefreshToken(): string | null
+        +getCurrentUser(): User | null
     }
+    
+    note for ApiClient "Contiene la factoría de clientes Axios<br/>y toda la lógica de gestión de tokens (localStorage)."
 
-    LoginPage ..> AuthContext : "uses"
-	RegisterPage..> AuthContext: "uses"
-	AuthContext ..> AuthService : "uses"
-    AuthService ..> userAPI : "uses"
-``` 
+    LoginPage ..> AuthContext : "invoca login()"
+    RegisterPage ..> AuthContext : "invoca register()"
+    
+    AuthContext ..> AuthService : "Usa"
+    AuthContext ..> ApiClient : "Usa getCurrentUser()"
+
+    AuthService ..> ApiClient : "Usa la factoría y las funciones de token"
+```

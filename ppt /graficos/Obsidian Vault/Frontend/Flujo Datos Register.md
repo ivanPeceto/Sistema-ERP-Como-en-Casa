@@ -1,52 +1,50 @@
 ```mermaid
 sequenceDiagram
-    actor Usuario
-    participant registerPage as RegisterPage
-    participant authContext as AuthContext
-    participant authService as AuthService
-    participant userApi as UserAPI
+    participant Usuario
+    participant RegisterPage
+    participant AuthContext
+    participant AuthService
+    participant ApiClient as Interceptor ApiClient
     participant Backend as Backend-MSUsuarios
-    participant router as Router
+    participant Router
 
-    Usuario->>registerPage: 1. Ingresa datos de registro
-    Usuario->>registerPage: 2. Clic en "Registrarse"
-    activate registerPage
+    Usuario->>RegisterPage: 1. Ingresa datos y clica "Registrarse"
+    activate RegisterPage
 
-    registerPage->>registerPage: 3. Se ejecuta handleSubmit(event)
+    registerPage->>RegisterPage: 2. Se ejecuta handleSubmit(event)
 
     alt Las contraseñas NO coinciden
-        registerPage->>registerPage: 4a. valida(password !== confirmPassword)
-        Note right of registerPage: Flujo finaliza aquí.<br/>Muestra un error en la UI.
-        registerPage-->>Usuario: Muestra mensaje de error
+        registerPage-->>Usuario: Muestra error de validación en la UI
     else Las contraseñas SÍ coinciden
-        registerPage->>registerPage: 4b. Validación exitosa
-        registerPage->>authContext: 5. Llama a register({username, email, password})
-        deactivate registerPage
-        
-        activate authContext
-        authContext->>authService: 6. Llama a auth_service.register(data)
-        deactivate authContext
-        
-        activate authService
-        authService->>userApi: 7. Llama a userApi.post('/register/', data)
-        activate userApi
-        userApi->>Backend: HTTP POST /register/
+        registerPage->>AuthContext: 3. Llama a register(...)
+        deactivate RegisterPage
+        activate AuthContext
+
+        AuthContext->>AuthService: 4. Llama a la función register del servicio
+        activate AuthService
+
+        AuthService->>ApiClient: 5. Llama a apiClient.post('/signup/', data)
+        activate ApiClient
+        ApiClient->>Backend: 6. HTTP POST /signup/
         activate Backend
-        Backend-->>userApi: 200 OK
+        Backend-->>ApiClient: 7. 201 Created (con userData y tokens)
         deactivate Backend
-        userApi-->>authService: 8. Retorna Promise resuelta
-        deactivate userApi
-        
-        authService-->>authContext: 9. Propaga la respuesta
-        deactivate authService
-        
-        activate authContext
-        authContext-->>registerPage: 10. Retorna Promise resuelta
-        deactivate authContext
-        
-        activate registerPage
-        Note right of registerPage: El registro fue exitoso.
-        registerPage->>router: 11. Llama a navigate('/gestion')
-        deactivate registerPage
+        ApiClient-->>AuthService: 8. Retorna la respuesta exitosa
+        deactivate ApiClient
+
+        Note right of AuthService: El servicio gestiona el guardado de la sesión.
+        AuthService->>ApiClient: 9. Llama a setTokens(access, refresh)
+        AuthService->>AuthService: 10. Guarda 'user' en localStorage
+
+        AuthService-->>AuthContext: 11. Retorna la AuthResponse completa
+        deactivate AuthService
+
+        Note right of AuthContext: El contexto se actualiza para loguear<br/>automáticamente al nuevo usuario.
+        AuthContext->>AuthContext: 12. setUser(user), setIsAuthenticated(true)
+
+        AuthContext-->>RegisterPage: 13. Retorna Promise resuelta
+
+        RegisterPage->>Router: 14. Llama a navigate('/login')
     end
+    deactivate AuthContext
 ```

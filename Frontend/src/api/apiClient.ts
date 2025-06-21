@@ -1,16 +1,19 @@
 /**
  * @file apiClient.ts
- * @brief Archivo que exporta una función factoría para crear clientes HTTP (Axios) con autenticación JWT.
+ * @brief Módulo cliente API con autenticación JWT
+ * @date 2025-06-21
+ * 
  * @details
- * Este módulo es el núcleo de la comunicación con el backend. En lugar de exportar una única
- * instancia de Axios, exporta una función `createAuthApiClient`. Esta función es una "fábrica"
- * que genera instancias de Axios pre-configuradas para un microservicio específico,
- * equipadas con interceptores para manejar la autenticación JWT de forma automática.
+ * Este módulo implementa un cliente HTTP basado en Axios con manejo automático de autenticación JWT.
+ * Proporciona una función factoría para crear instancias de cliente HTTP pre-configuradas con:
+ * - Inyección automática del token de acceso en las cabeceras
+ * - Manejo de refresco de tokens vencidos
+ * - Reintento automático de peticiones fallidas por token expirado
+ * - Gestión centralizada de errores de autenticación
  */
 
 import axios from 'axios';
-import { getAccessToken, getRefreshToken, setTokens, removeTokens } from '../services/auth_service';
-import type { RefreshTokenResponse } from '../types/models';
+import type { RefreshTokenResponse, User } from '../types/models';
 /**
 /**
  * @brief Crea y configura una instancia de Axios con interceptores para manejar la autenticación JWT.
@@ -26,7 +29,19 @@ import type { RefreshTokenResponse } from '../types/models';
  * @param {string} baseURL La URL base del microservicio al que esta instancia se conectará.
  * @returns {import('axios').AxiosInstance} Una instancia de Axios configurada y lista para usar.
  */
+/**
+ * @brief Crea una instancia de Axios configurada con autenticación JWT
+ * @param baseURL URL base del servicio API
+ * @return {axios.AxiosInstance} Instancia de Axios configurada
+ * 
+ * @details
+ * La instancia incluye interceptores para:
+ * - Inyectar automáticamente el token de acceso en las cabeceras
+ * - Manejar la renovación de tokens vencidos
+ * - Reintentar peticiones fallidas por token expirado
+ */
 const createAuthApiClient = (baseURL: string) => { 
+  // Crea una instancia base de Axios con la configuración inicial
   const instance = axios.create({
     baseURL: baseURL,
     headers: {
@@ -34,7 +49,14 @@ const createAuthApiClient = (baseURL: string) => {
     },
   });
 
+  // Interceptor para inyectar el token de acceso en cada petición
   instance.interceptors.request.use(
+    /**
+     * @brief Interceptor de petición para inyectar el token de acceso
+     * @private
+     * @param config Configuración de la petición
+     * @returns Configuración modificada con el token de acceso
+     */
     (config) => {
       const token = getAccessToken();
       const publicUrls = ['/api/usuarios/login/', '/api/usuarios/signup/', '/api/usuarios/refresh_token/'];
@@ -48,8 +70,23 @@ const createAuthApiClient = (baseURL: string) => {
     (error) => Promise.reject(error)
   );
 
+  // Interceptor para manejar respuestas con error 401 (No autorizado)
   instance.interceptors.response.use(
     (response) => response,
+    /**
+     * @brief Maneja errores de autenticación y renueva tokens expirados
+     * @private
+     * @param error Objeto de error que contiene la respuesta fallida
+     * @returns {Promise} Promesa que resuelve con la respuesta exitosa o rechaza con el error
+     * 
+     * @details
+     * Este manejador asíncrono se activa cuando una petición recibe una respuesta de error.
+     * Su principal función es manejar el error 401 (No autorizado) intentando:
+     * 1. Verificar si el error es por token expirado (401) y no es una petición de refresco
+     * 2. Obtener un nuevo token de acceso usando el refresh token
+     * 3. Reintentar la petición original con el nuevo token
+     * 4. Redirigir al login si el refresh token también es inválido
+     */
     async (error) => {
       const originalRequest = error.config;
       const refreshUrl = `${import.meta.env.VITE_API_USUARIOS_URL}/api/usuarios/refresh_token/`;
@@ -91,3 +128,59 @@ const createAuthApiClient = (baseURL: string) => {
 };
 
 export default createAuthApiClient;
+
+/**
+ * @brief Almacena los tokens de autenticación en el almacenamiento local.
+ * @param accessToken Token de acceso JWT para autenticación
+ * @param refreshToken Token de refresco para renovar el token de acceso
+ * 
+ * @details
+ * Almacena tanto el token de acceso como el de refresco en el localStorage del navegador.
+ * Estos tokens son necesarios para autenticar las peticiones posteriores al servidor.
+ * 
+ * @note Los tokens se almacenan en localStorage para persistencia entre recargas de página
+ */
+export const setTokens = (accessToken: string, refreshToken: string) => {
+  localStorage.setItem('accessToken', accessToken);
+  localStorage.setItem('refreshToken', refreshToken);
+};
+
+/**
+ * @brief Elimina todos los datos de autenticación del almacenamiento local.
+ * 
+ * @details
+ * Esta función limpia todos los tokens y datos de usuario almacenados,
+ * efectivamente cerrando la sesión del usuario de manera segura.
+ * 
+ * @see setTokens
+ */
+export const removeTokens = () => {
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('refreshToken');
+  localStorage.removeItem('user');
+};
+
+/**
+ * @brief Obtiene el token de acceso almacenado
+ * @return {string | null} Token de acceso o null si no existe
+ */
+export const getAccessToken = (): string | null => localStorage.getItem('accessToken');
+
+/**
+ * @brief Obtiene el token de refresco almacenado
+ * @return {string | null} Token de refresco o null si no existe
+ */
+export const getRefreshToken = (): string | null => localStorage.getItem('refreshToken');
+
+/**
+ * @brief Obtiene los datos del usuario actual almacenados
+ * @return {User | null} Datos del usuario o null si no hay sesión activa
+ * 
+ * @details
+ * Los datos del usuario se almacenan como una cadena JSON en el localStorage.
+ * Esta función se encarga de parsear dicha cadena y devolver el objeto User correspondiente.
+ */
+export const getCurrentUser = (): User | null => {
+  const user = localStorage.getItem('user');
+  return user ? JSON.parse(user) : null;
+};

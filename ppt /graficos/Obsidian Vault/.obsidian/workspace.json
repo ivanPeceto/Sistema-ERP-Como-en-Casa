@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Backend/Flujo Datos Microservicio Usuarios.md",
+                "file": "Frontend/Flujo Datos Interceptor apiClient.md",
                 "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Flujo Datos Microservicio Usuarios"
+              "title": "Flujo Datos Interceptor apiClient"
             }
           }
         ]
@@ -170,6 +170,14 @@
   },
   "active": "ebc3993d392cf9c0",
   "lastOpenFiles": [
+    "Frontend/Diagrama Clases Login y Register.md",
+    "Frontend/Flujo Datos Login.md",
+    "Frontend/Flujo Datos Pedidos.md",
+    "Frontend/Flujo Datos Ruta Protegida.md",
+    "Frontend/Flujo Datos Register.md",
+    "Frontend/Flujo Datos Interceptor apiClient.md",
+    "Frontend/Diagrama Clases Clientes.md",
+    "Backend/Flujo Datos Microservicio Usuarios.md",
     "Backend/Flujo Datos Microservicio Productos.md",
     "Backend/Flujo Datos Microservicio Pedidos.md",
     "Backend/Flujo Datos Microservicio Clientes.md",
@@ -178,10 +186,8 @@
     "Backend/Diagrama Clases Microservicio Pedidos.md",
     "Backend/Diagrama Clases Microservicio Clientes.md",
     "Diagrama de Componentes Docker.md",
-    "Backend/Flujo Datos Microservicio Usuarios.md",
     "Frontend/Flujo Datos Clientes.md",
     "Backend",
-    "Frontend/Flujo Datos Ruta Protegida.md",
     "Graficos obsidian/Flujo Datos Ruta Protegida.pdf",
     "Graficos obsidian/Flujo Datos Register.pdf",
     "Graficos obsidian/Flujo Datos Productos.pdf",
@@ -191,17 +197,11 @@
     "Graficos obsidian/Flujo Datos Clientes.pdf",
     "Graficos obsidian/Flujo Datos Categorías.pdf",
     "Graficos obsidian/Flujo Datos Armar Pedidos.pdf",
-    "Frontend/Flujo Datos Register.md",
     "Frontend/Flujo Datos Productos.md",
-    "Frontend/Flujo Datos Pedidos.md",
-    "Frontend/Flujo Datos Login.md",
-    "Frontend/Flujo Datos Interceptor apiClient.md",
     "Frontend/Flujo Datos Categorías.md",
     "Frontend/Flujo Datos Armar Pedidos.md",
     "Frontend/Diagrama Clases Productos.md",
     "Frontend/Diagrama Clases Pedidos.md",
-    "Frontend/Diagrama Clases Login y Register.md",
-    "Frontend/Diagrama Clases Clientes.md",
     "Welcome.md"
   ]
 }
