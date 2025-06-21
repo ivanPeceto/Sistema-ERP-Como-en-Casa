@@ -1,39 +1,76 @@
 /**
  * @file auth_service.ts
- * @brief Servicio para gestionar la autenticación de usuarios (login, registro, tokens).
+ * @brief Servicio de autenticación de usuarios
  * @details
- * Este archivo encapsula toda la lógica de comunicación con el microservicio de usuarios.
- * Sigue el patrón de "capa de servicio", abstrayendo las llamadas a la API de los componentes
- * de React. Utiliza la factoría `createAuthApiClient` para generar una instancia de Axios
- * configurada específicamente para el endpoint de usuarios.
+ * Este módulo implementa el servicio de autenticación que maneja:
+ * - Inicio de sesión de usuarios existentes
+ * - Registro de nuevos usuarios
+ * - Gestión de tokens de autenticación
+ * - Cierre de sesión
+ * 
+ * Sigue el patrón de diseño de capa de servicios, aislando la lógica de autenticación
+ * de los componentes de la interfaz de usuario. Utiliza la factoría `createAuthApiClient`
+ * para crear una instancia de Axios configurada específicamente para el endpoint de usuarios.
+ * 
+ * @see apiClient.ts Para más información sobre el cliente HTTP subyacente
  */
 
 import createAuthApiClient from '../api/apiClient'; 
 import type { AuthResponse } from '../types/models.ts'; 
 import { setTokens, removeTokens } from '../api/apiClient';
 
+/**
+ * @defgroup AuthService Servicio de Autenticación
+ * @brief Funcionalidades para la gestión de autenticación de usuarios
+ */
 
 /**
- * @brief URL base del microservicio de usuarios.
- * @details Se obtiene de las variables de entorno de Vite, inyectadas por Docker Compose.
+ * @var USERS_API_BASE_URL
+ * @brief URL base del microservicio de usuarios
+ * 
+ * @details
+ * Se obtiene de las variables de entorno de Vite, las cuales son inyectadas
+ * durante el proceso de construcción. En producción, estas variables son
+ * proporcionadas por Docker Compose.
  */
 const USERS_API_BASE_URL = import.meta.env.VITE_API_USUARIOS_URL;
 
 /**
- * @brief Instancia de cliente API exclusiva para el servicio de usuarios.
- * @details Se crea llamando a la factoría con la URL base de este servicio.
- * Todas las funciones en este archivo utilizarán esta instancia.
+ * @var userAPIClient
+ * @brief Instancia de cliente HTTP configurada para el servicio de usuarios
+ * 
+ * @details
+ * Esta instancia de Axios está preconfigurada con:
+ * - URL base del servicio de usuarios
+ * - Interceptores para manejo de autenticación
+ * - Cabeceras por defecto
+ * 
+ * Todas las peticiones de autenticación utilizan esta instancia.
  */
 const userAPIClient = createAuthApiClient(USERS_API_BASE_URL);
 
 /**
- * @brief Realiza la petición de login al backend.
- * @details Envía las credenciales al endpoint `/login/`. Si la respuesta es exitosa,
- * persiste la sesión del usuario guardando los tokens y los datos del usuario en localStorage.
- * @param {string} email El correo electrónico del usuario.
- * @param {string} password La contraseña del usuario.
- * @returns {Promise<AuthResponse>} Una promesa que se resuelve con los datos de la sesión (tokens y usuario).
- * @throws {Error} Lanza un error (gestionado por Axios) si la petición falla.
+ * @brief Autentica a un usuario en el sistema
+ * @param email Correo electrónico del usuario
+ * @param password Contraseña del usuario
+ * @return {Promise<AuthResponse>} Promesa que resuelve con los datos de la sesión
+ * 
+ * @details
+ * Realiza una petición POST al endpoint `/login/` del servicio de usuarios con las
+ * credenciales proporcionadas. En caso de éxito:
+ * 1. Almacena el token de acceso y refresh en localStorage
+ * 2. Guarda los datos del usuario en localStorage
+ * 3. Retorna los datos de la sesión
+ * 
+ * @throws {AxiosError} Si las credenciales son incorrectas o hay un error de red
+ * 
+ * @example
+ * try {
+ *   const session = await login('usuario@ejemplo.com', 'contraseña');
+ *   console.log('Usuario autenticado:', session.user);
+ * } catch (error) {
+ *   console.error('Error de autenticación:', error);
+ * }
  */
 export const login = async (email: string, password: string): Promise<AuthResponse> => {
   const response = await userAPIClient.post<AuthResponse>('/login/', {
@@ -50,26 +87,40 @@ export const login = async (email: string, password: string): Promise<AuthRespon
 };
 
 /**
- * @brief Cierra la sesión del usuario en el lado del cliente.
- * @details Llama a la función `removeTokens` para limpiar toda la información de la sesión
- * del `localStorage`. La redirección es manejada por el `AuthContext`.
+ * @brief Cierra la sesión del usuario actual
+ * 
+ * @details
+ * Realiza las siguientes acciones para cerrar la sesión:
+ * 1. Elimina los tokens de autenticación (access y refresh)
+ * 2. Elimina los datos del usuario del localStorage
+ * 
+ * @note Esta función no realiza una petición al servidor, solo limpia el estado local.
+ * La redirección posterior al cierre de sesión debe manejarse en el componente o contexto
+ * que llame a esta función.
+ * 
+ * @see AuthContext Para el manejo del estado de autenticación
  */
-export const logout = () => {
+export const logout = (): void => {
   removeTokens();
 };
 
 /**
- * @brief Realiza la petición de registro de un nuevo usuario.
- * @details Envía los datos del nuevo usuario al endpoint `/signup/`. Si el registro
- * es exitoso, el backend devuelve tokens, y esta función los guarda para iniciar sesión
- * automáticamente para el nuevo usuario.
- * @param {string} nombre El nombre del nuevo usuario.
- * @param {string} email El correo electrónico del nuevo usuario.
- * @param {string} password La contraseña para el nuevo usuario.
- * @returns {Promise<AuthResponse>} Una promesa que se resuelve con los datos de la sesión del nuevo usuario.
- * @throws {Error} Lanza un error si la petición falla.
+ * @brief Registra un nuevo usuario en el sistema
+ * @param email Correo electrónico del nuevo usuario
+ * @param password Contraseña para la nueva cuenta
+ * @param nombre Nombre completo del usuario
+ * @return {Promise<AuthResponse>} Promesa que resuelve con los datos de la sesión
+ * 
+ * @details
+ * Realiza una petición POST al endpoint `/signup/` con los datos del nuevo usuario.
+ * Si el registro es exitoso:
+ * 1. Inicia sesión automáticamente al usuario
+ * 2. Almacena los tokens de autenticación
+ * 3. Guarda los datos del usuario en localStorage
+ * 
+ * @throws {AxiosError} Si el correo ya está registrado o hay un error de validación
  */
-export const register = async ( email: string, password: string, nombre: string): Promise<AuthResponse> => {
+export const register = async (email: string, password: string, nombre: string): Promise<AuthResponse> => {
   const response = await userAPIClient.post<AuthResponse>('/signup/', {
     nombre,
     email,
