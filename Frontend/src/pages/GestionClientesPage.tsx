@@ -24,6 +24,16 @@ import { type Cliente } from '../types/models';
  * @brief Componente principal para la página de gestión de clientes.
  * @returns {React.ReactElement} El JSX que renderiza la página completa.
  */
+/**
+ * @brief Estado principal del componente
+ * @description 
+ * - clientes: Almacena la lista completa de clientes obtenidos del servidor
+ * - filteredClientes: Almacena la lista filtrada de clientes según el término de búsqueda
+ * - searchTerm: Almacena el valor actual del campo de búsqueda
+ * - isModalOpen: Controla la visibilidad del modal de edición/creación
+ * - editingCliente: Almacena el cliente que se está editando (null para creación)
+ * - formData: Almacena los datos del formulario del modal
+ */
 const GestionClientesPage: React.FC = () => {
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [filteredClientes, setFilteredClientes] = useState<Cliente[]>([]);
@@ -91,6 +101,14 @@ const GestionClientesPage: React.FC = () => {
    * @brief Abre el modal y configura el formulario para crear o editar un cliente.
    * @param {Cliente | null} cliente El cliente a editar, o `null` para crear uno nuevo.
    */
+  /**
+   * @brief Abre el modal para crear o editar un cliente
+   * @description
+   * - Si se proporciona un cliente, configura el formulario en modo edición
+   * - Si no se proporciona un cliente, prepara el formulario para crear uno nuevo
+   * - Actualiza el estado del modal a visible
+   * @param {Cliente | null} cliente - Cliente a editar o null para crear uno nuevo
+   */
   const openModal = useCallback((cliente: Cliente | null = null) => {
     if (cliente) {
       setEditingCliente(cliente);
@@ -109,6 +127,13 @@ const GestionClientesPage: React.FC = () => {
   /**
    * @brief Cierra el modal y resetea los estados del formulario.
    */
+  /**
+   * @brief Cierra el modal y limpia el formulario
+   * @description
+   * - Oculta el modal
+   * - Limpia el cliente en edición
+   * - Reinicia los datos del formulario
+   */
   const closeModal = useCallback(() => {
     setIsModalOpen(false);
     setEditingCliente(null);
@@ -118,6 +143,17 @@ const GestionClientesPage: React.FC = () => {
   /**
    * @brief Maneja el envío del formulario, llamando al servicio para crear o actualizar un cliente.
    * @param {FormEvent<HTMLFormElement>} event El evento de envío del formulario.
+   */
+  /**
+   * @brief Maneja el envío del formulario de cliente
+   * @description
+   * - Previene el comportamiento por defecto del formulario
+   * - Valida los datos del formulario
+   * - Llama al servicio correspondiente para crear o actualizar el cliente
+   * - Actualiza la lista de clientes si la operación es exitosa
+   * - Cierra el modal y limpia el formulario
+   * - Muestra mensajes de error si la operación falla
+   * @param {FormEvent<HTMLFormElement>} event - Evento de envío del formulario
    */
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -140,6 +176,15 @@ const GestionClientesPage: React.FC = () => {
    * @brief Maneja la eliminación de un cliente, con un diálogo de confirmación.
    * @param {number} clienteId El ID del cliente a eliminar.
    */
+  /**
+   * @brief Maneja la eliminación de un cliente
+   * @description
+   * - Muestra un diálogo de confirmación antes de eliminar
+   * - Llama al servicio para eliminar el cliente del servidor
+   * - Actualiza la lista de clientes después de la eliminación
+   * - Muestra un mensaje de error si la operación falla
+   * @param {number} clienteId - ID del cliente a eliminar
+   */
   const handleDelete = async (clienteId: number) => {
     try {
       await deleteCliente(clienteId);
@@ -154,17 +199,67 @@ const GestionClientesPage: React.FC = () => {
  /**
  * @brief Añade automáticamente un guión para formatear los números de telefono de esta manera: 123-456-7890.
  */
-  const handleTelephoneInput = (event: ChangeEvent<HTMLInputElement>) => {
-    const digitsOnly = event.target.value.replace(/\D/g, '');
-    let formattedNumber = digitsOnly.substring(0, 10);
-    if (formattedNumber.length > 6) {
-      formattedNumber = `${formattedNumber.slice(0, 3)}-${formattedNumber.slice(3, 6)}-${formattedNumber.slice(6)}`;
-    } else if (formattedNumber.length > 3) {
-      formattedNumber = `${formattedNumber.slice(0, 3)}-${formattedNumber.slice(3)}`;
+  const handleTelephoneInput = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    const input = event.target as HTMLInputElement;
+    const value = input.value;
+    
+    // Solo formatear cuando se escribe un número
+    if (/^\d$/.test(event.key)) {
+      event.preventDefault();
+      
+      // Obtener la posición actual del cursor
+      const cursorPosition = input.selectionStart || 0;
+      
+      // Eliminar caracteres que no sean dígitos
+      const digitsOnly = value.replace(/\D/g, '');
+      
+      // Formatear el número
+      let formattedNumber = digitsOnly.substring(0, 10);
+      if (formattedNumber.length > 6) {
+        formattedNumber = `${formattedNumber.slice(0, 3)}-${formattedNumber.slice(3, 6)}-${formattedNumber.slice(6)}`;
+      } else if (formattedNumber.length > 3) {
+        formattedNumber = `${formattedNumber.slice(0, 3)}-${formattedNumber.slice(3)}`;
+      }
+      
+      // Actualizar el estado del formulario
+      setFormData(prev => ({ ...prev, telefono: formattedNumber }));
+      
+      // Establecer la posición del cursor después de la actualización del estado
+      setTimeout(() => {
+        // Calcular la nueva posición del cursor (ajustar para los guiones agregados)
+        let newPosition = cursorPosition;
+        if (cursorPosition >= 3 && cursorPosition <= 4 && formattedNumber.length > 3) newPosition++;
+        if (cursorPosition >= 7 && cursorPosition <= 8 && formattedNumber.length > 7) newPosition++;
+        
+        input.setSelectionRange(newPosition, newPosition);
+      }, 0);
+    } else if (event.key === 'Backspace') {
+      // Manejar la tecla de retroceso para mantener el formato
+      event.preventDefault();
+      const cursorPosition = input.selectionStart || 0;
+      
+      // Si se presiona retroceso en un guión, mover el cursor una posición más atrás
+      if (cursorPosition > 0 && (value[cursorPosition - 1] === '-' || value[cursorPosition] === '-')) {
+        input.setSelectionRange(cursorPosition - 1, cursorPosition - 1);
+      }
+      
+      // Eliminar el carácter antes del cursor
+      if (cursorPosition > 0) {
+        const newValue = value.substring(0, cursorPosition - 1) + value.substring(cursorPosition);
+        const digitsOnly = newValue.replace(/\D/g, '');
+        setFormData(prev => ({ ...prev, telefono: digitsOnly }));
+      }
     }
-    setFormData(prev => ({ ...prev, telefono: formattedNumber }));
   };
 
+  /**
+   * @brief Renderiza la interfaz de usuario
+   * @description
+   * - Barra de búsqueda para filtrar clientes
+   * - Botón para agregar nuevo cliente
+   * - Tabla que muestra la lista de clientes con opciones de edición/eliminación
+   * - Modal para crear/editar clientes
+   */
   return (
     <div className={styles.pageContainer}>
       <h1>Gestión de clientes</h1>
@@ -233,7 +328,7 @@ const GestionClientesPage: React.FC = () => {
                     value={formData.telefono}
                     onChange={handleInputChange}
                     onKeyPress={handleTelephoneInput}
-                    maxlength="12"
+                    maxLength={12}
                     className={formStyles.formInput}
                   />
                 </div>

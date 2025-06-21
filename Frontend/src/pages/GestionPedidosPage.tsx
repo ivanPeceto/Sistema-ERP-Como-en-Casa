@@ -153,14 +153,13 @@ const GestionPedidosPage: React.FC = () => {
     setEditFormData({
       para_hora: pedido.para_hora,
       entregado: pedido.entregado,
-      pagado: pedido.pagado,
     });
     setEditingPedidoItems(pedido.productos_detalle.map(item => ({
       id: item.id_producto,
       nombre: item.nombre_producto,
-      cantidad: parseFloat(item.cantidad_producto.toString()) || 0,
       precio_unitario: parseFloat(item.precio_unitario.toString()) || 0,
-      subtotal: (parseFloat(item.cantidad_producto.toString()) * (parseFloat(item.precio_unitario.toString()) || 0)) || 0, // Aseguramos que sea número
+      cantidad: parseFloat(item.cantidad_producto.toString()) || 0,
+      subtotal: (parseFloat(item.cantidad_producto.toString()) * (parseFloat(item.precio_unitario.toString()) || 0)) || 0,
     })));
     setIsEditModalOpen(true);
   }, []);
