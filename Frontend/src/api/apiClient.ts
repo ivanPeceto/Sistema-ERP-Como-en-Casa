@@ -39,10 +39,6 @@ import type { RefreshTokenResponse, User } from '../types/models';
  * - Inyectar automáticamente el token de acceso en las cabeceras
  * - Manejar la renovación de tokens vencidos
  * - Reintentar peticiones fallidas por token expirado
- * 
- * @example
- * const api = createAuthApiClient('https://api.ejemplo.com');
- * const response = await api.get('/ruta-protegida');
  */
 const createAuthApiClient = (baseURL: string) => { 
   // Crea una instancia base de Axios con la configuración inicial
