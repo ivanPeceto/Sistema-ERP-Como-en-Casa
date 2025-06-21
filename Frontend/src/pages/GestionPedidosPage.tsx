@@ -28,7 +28,7 @@ import type { Pedido, PedidoInput, PedidoItem } from '../types/models.d.ts';
 
 
 const GestionPedidosPage: React.FC = () => {
-  const navigate = useNavigate(); // Initialize useNavigate hook
+  const navigate = useNavigate();
 
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [clientes, setClientes] = useState<Cliente[]>([]);

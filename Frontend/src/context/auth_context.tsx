@@ -10,16 +10,10 @@
  */
 
 import { createContext, useState, useContext, useEffect, type ReactNode } from 'react';
-<<<<<<< HEAD
-import { login as apiLogin, logout as apiLogout, register as apiRegister, getCurrentUser} from '../services/auth_service';
-import type { AuthResponse } from '../types/models';
-import { type User } from '../types/models';
 
-=======
 import { login as apiLogin, logout as apiLogout, register as apiRegister } from '../services/auth_service';
 import { type User, type AuthResponse } from '../types/models';
 import {getCurrentUser} from '../api/apiClient';
->>>>>>> main
 
 /**
  * @interface AuthContextType
