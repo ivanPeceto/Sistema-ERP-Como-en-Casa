@@ -161,7 +161,7 @@ const CrearPedidoPage: React.FC = () => {
     try {
       const hoy = new Date().toISOString().split('T')[0];
       const pedidosDeHoy = await getPedidosByDate(hoy);
-      const nuevoNumeroPedido = pedidosDeHoy.length + 1;
+      const nuevoNumeroPedido: number =  (pedidosDeHoy.length === 0)? 1 : pedidosDeHoy[pedidosDeHoy.length-1].numero_pedido + 1;
 
       const pedidoData: PedidoInput = {
         numero_pedido: nuevoNumeroPedido,
