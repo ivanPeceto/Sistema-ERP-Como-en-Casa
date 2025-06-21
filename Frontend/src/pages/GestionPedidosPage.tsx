@@ -14,7 +14,7 @@
  */
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom'; 
 import styles from '../styles/gestionPedidosPage.module.css';
 import formStyles from '../styles/formStyles.module.css';
 import crearPedidoStyles from '../styles/crearPedidoPage.module.css';
@@ -28,7 +28,7 @@ import type { Pedido, PedidoInput, PedidoItem } from '../types/models.d.ts';
 
 
 const GestionPedidosPage: React.FC = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
 
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [clientes, setClientes] = useState<Cliente[]>([]);
