@@ -27,84 +27,25 @@ import type { Producto } from '../types/models.d.ts';
 import type { Pedido, PedidoInput, PedidoItem } from '../types/models.d.ts';
 
 
-/**
- * @class GestionPedidosPage
- * @brief Componente principal para la gestión de pedidos
- * 
- * @details
- * Este componente proporciona una interfaz completa para gestionar pedidos, incluyendo:
- * - Visualización de pedidos con filtrado por fecha y búsqueda
- * - Gestión de estados de pedidos (entregado, pagado)
- * - Edición de pedidos existentes
- * - Eliminación de pedidos
- * - Vista detallada de pedidos
- * 
- * @note Este componente utiliza múltiples estados para manejar la información de:
- * - Lista de pedidos
- * - Clientes
- * - Productos
- * - Filtros de búsqueda
- * - Estados de los modales
- * 
- * @see Pedido
- * @see Cliente
- * @see Producto
- */
 const GestionPedidosPage: React.FC = () => {
-  /** Hook para navegación entre rutas */
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Initialize useNavigate hook
 
-  // Estados principales
-  /** @brief Lista completa de pedidos */
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
-  
-  /** @brief Lista de clientes para búsqueda y visualización */
   const [clientes, setClientes] = useState<Cliente[]>([]);
-  
-  /** @brief Lista de productos disponibles */
   const [productos, setProductos] = useState<Producto[]>([]);
-  
-  /** @brief Término de búsqueda para filtrar pedidos */
   const [searchTerm, setSearchTerm] = useState<string>('');
-  
-  /** @brief Fecha para filtrar los pedidos (formato YYYY-MM-DD) */
   const [searchDate, setSearchDate] = useState<string>(new Date().toISOString().split('T')[0]);
-  
-  // Estados de los modales
-  /** @brief Controla la visibilidad del modal de visualización */
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  
-  /** @brief Controla la visibilidad del modal de edición */
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
-  
-  /** @brief Almacena el pedido que se está visualizando */
   const [viewingPedido, setViewingPedido] = useState<Pedido | null>(null);
-  
-  /** @brief Almacena el pedido que se está editando */
   const [editingPedido, setEditingPedido] = useState<Pedido | null>(null);
-  
-  /** @brief Datos del formulario de edición */
   const [editFormData, setEditFormData] = useState<Partial<Pedido>>({});
-  
-  /** @brief Items del pedido que se está editando */
   const [editingPedidoItems, setEditingPedidoItems] = useState<PedidoItem[]>([]);
-  
-  /** @brief Categoría seleccionada en el filtro de productos */
   const [editCategoriaSeleccionada, setEditCategoriaSeleccionada] = useState<string>('');
-  
-  /** @brief Estado de carga inicial de datos */
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
    /**
    * @brief Carga todos los datos iniciales necesarios para la página en paralelo.
-   * @details
-   * Realiza las siguientes operaciones de forma paralela:
-   * 1. Obtiene los pedidos para la fecha seleccionada
-   * 2. Obtiene la lista de clientes
-   * 3. Obtiene la lista de productos
-   * 
-   * @throws {Error} Si ocurre un error al cargar los datos
-   * @async
    */
   const fetchInitialData = useCallback(async () => {
     setIsLoading(true);
@@ -194,57 +135,19 @@ const GestionPedidosPage: React.FC = () => {
     [filteredPedidos]
   );
 
-  /**
-   * @brief Maneja el cambio en el término de búsqueda
-   * @param {ChangeEvent<HTMLInputElement>} event - Evento del input de búsqueda
-   */
-  const handleSearchTermChange = (event: ChangeEvent<HTMLInputElement>) => 
-    setSearchTerm(event.target.value);
-  
-  /**
-   * @brief Maneja el cambio en la fecha de búsqueda
-   * @param {ChangeEvent<HTMLInputElement>} event - Evento del input de fecha
-   */
-  const handleSearchDateChange = (event: ChangeEvent<HTMLInputElement>) => 
-    setSearchDate(event.target.value);
+  const handleSearchTermChange = (event: ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value);
+  const handleSearchDateChange = (event: ChangeEvent<HTMLInputElement>) => setSearchDate(event.target.value);
 
-  /**
-   * @brief Abre el modal de visualización de un pedido
-   * @param {Pedido} pedido - Pedido a visualizar
-   */
   const openViewModal = useCallback((pedido: Pedido) => {
     setViewingPedido(pedido);
     setIsModalOpen(true);
   }, []);
 
-  /**
-   * @brief Cierra el modal de visualización
-   */
   const closeModal = useCallback(() => {
     setIsModalOpen(false);
     setViewingPedido(null);
   }, []);
 
-  /**
-   * @brief Cierra el modal de edición y limpia los estados relacionados
-   * @description
-   * Esta función se encarga de cerrar el modal de edición y limpiar
-   * todos los estados relacionados con la edición de un pedido.
-   */
-  const closeEditModal = useCallback(() => {
-    setIsEditModalOpen(false);
-    setEditingPedido(null);
-    setEditingPedidoItems([]);
-    setEditFormData({});
-  }, []);
-
-  /**
-   * @brief Abre el modal de edición de un pedido
-   * @param {Pedido} pedido - Pedido a editar
-   * @description
-   * Inicializa el estado de edición con los datos del pedido seleccionado,
-   * incluyendo la información de los productos asociados.
-   */
   const openEditModal = useCallback((pedido: Pedido) => {
     setEditingPedido(pedido);
     setEditFormData({
@@ -261,13 +164,13 @@ const GestionPedidosPage: React.FC = () => {
     setIsEditModalOpen(true);
   }, []);
 
-  /**
-   * @brief Maneja los cambios en los campos del formulario de edición
-   * @param {ChangeEvent<HTMLInputElement>} event - Evento del input que cambió
-   * @description
-   * Actualiza el estado del formulario con los nuevos valores,
-   * manejando correctamente los diferentes tipos de inputs (checkbox, text, etc.)
-   */
+  const closeEditModal = useCallback(() => {
+    setIsEditModalOpen(false);
+    setEditingPedido(null);
+    setEditFormData({});
+    setEditingPedidoItems([]);
+  }, []);
+
   const handleEditInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = event.target;
     setEditFormData(prev => ({
@@ -343,25 +246,12 @@ const GestionPedidosPage: React.FC = () => {
   }, []);
 
 
-  /**
-   * @brief Maneja el envío del formulario de edición de un pedido
-   * @param {React.MouseEvent<HTMLButtonElement>} [e] - Evento opcional del botón de envío
-   * @returns {Promise<void>}
-   * @description
-   * Esta función se encarga de:
-   * 1. Validar que el pedido tenga al menos un producto
-   * 2. Preparar los datos para el envío
-   * 3. Enviar la actualización al servidor
-   * 4. Manejar la respuesta y actualizar la UI
-   * @throws {Error} Si ocurre un error durante la actualización
-   */
   const handleEditSubmit = useCallback(async (e?: React.MouseEvent<HTMLButtonElement>) => {
     e?.preventDefault();
     if (!editingPedido) return;
 
     if (editingPedidoItems.length === 0) {
       console.error('El pedido no puede estar vacío. Añada al menos un producto.');
-      console.log('El pedido no puede estar vacío. Por favor, añada al menos un producto.');
       return;
     }
 
@@ -373,24 +263,14 @@ const GestionPedidosPage: React.FC = () => {
         payload
       );
       console.log('Pedido actualizado exitosamente');
-      console.log('Pedido actualizado exitosamente.');
       closeEditModal();
       fetchInitialData();
     } catch (error) {
       console.error('Error al actualizar pedido:', error);
-      console.error('Error al actualizar el pedido:', error);
     }
   }, [editingPedido, editFormData, editingPedidoItems, prepareUpdatePayload, closeEditModal, fetchInitialData]);
 
 
-  /**
-   * @brief Alterna el estado de 'entregado' de un pedido
-   * @param {Pedido} pedido - El pedido cuyo estado se va a modificar
-   * @returns {Promise<void>}
-   * @description
-   * Cambia el estado de entrega de un pedido y actualiza la información
-   * en el servidor. Muestra mensajes de éxito/error al usuario.
-   */
   const handleToggleEntregado = useCallback(async (pedido: Pedido) => {
     try {
       const payload = prepareUpdatePayload(pedido, { entregado: !pedido.entregado }, pedido.productos_detalle.map(item => ({
@@ -407,7 +287,6 @@ const GestionPedidosPage: React.FC = () => {
       fetchInitialData();
     } catch (error) {
       console.error(`Error al cambiar estado 'entregado' para pedido ${pedido.id}:`, error);
-      console.error('No se pudo actualizar el estado del pedido.');
     }
   }, [fetchInitialData, prepareUpdatePayload]);
 
@@ -427,19 +306,15 @@ const GestionPedidosPage: React.FC = () => {
       fetchInitialData();
     } catch (error) {
       console.error(`Error al cambiar estado 'pagado' para pedido ${pedido.id}:`, error);
-      console.error('No se pudo actualizar el estado del pedido.');
     }
   }, [fetchInitialData, prepareUpdatePayload]);
 
   const handleDeletePedido = useCallback(async (pedido: Pedido) => {
-    if (window.confirm(`¿Confirma que desea eliminar el Pedido #${pedido.numero_pedido}? Esta acción es irreversible.`)) {
-      try {
-        await deletePedido({ fecha: pedido.fecha_pedido, numero: pedido.numero_pedido });
-        fetchInitialData();
-      } catch (error) {
-        console.error(`Error al eliminar pedido ${pedido.id}:`, error);
-        console.error('No se pudo eliminar el pedido.');
-      }
+    try {
+      await deletePedido({ fecha: pedido.fecha_pedido, numero: pedido.numero_pedido });
+      fetchInitialData();
+    } catch (error) {
+      console.error(`Error al eliminar pedido ${pedido.id}:`, error);
     }
   }, [fetchInitialData]);
 
@@ -574,10 +449,10 @@ const GestionPedidosPage: React.FC = () => {
             className={styles.searchInput}
           />
         </div>
-        {/* Botón "Armar Pedido" */}
+        {/* Nuevo Botón "Armar Pedido" */}
         <button
-          onClick={() => navigate('/gestion')} 
-          className={styles.newOrderButton} 
+          onClick={() => navigate('/gestion')} // Redirige a la ruta de Armar Pedido
+          className={styles.newOrderButton} // Clase CSS para el nuevo botón
         >
           Armar Nuevo Pedido
         </button>
@@ -654,7 +529,7 @@ const GestionPedidosPage: React.FC = () => {
           <div className={modalStyles.modalContentWide}>
             <div className={modalStyles.modalHeader}>
               <h2 className={modalStyles.modalTitle}>
-                <i className={`fas fa-edit ${modalStyles.iconMarginRight}`}></i>
+                <i className="fas fa-edit" style={{marginRight: '10px'}}></i>
                 Editar Pedido #{editingPedido.numero_pedido}
               </h2>
             </div>
@@ -664,7 +539,7 @@ const GestionPedidosPage: React.FC = () => {
                 {/* Panel de información del pedido */}
                 <div className={modalStyles.editModalInfo}>
                   <h3 className={modalStyles.modalSectionTitle}>
-                    <i className={`fas fa-info-circle ${modalStyles.iconMarginRight}`}></i>
+                    <i className="fas fa-info-circle" style={{marginRight: '8px'}}></i>
                     Información del Pedido
                   </h3>
                   
@@ -700,7 +575,7 @@ const GestionPedidosPage: React.FC = () => {
                   
                   <div className={modalStyles.formGroup}>
                     <label className={modalStyles.formLabel}>Estado</label>
-                    <div className={modalStyles.checkboxGroupContainer}>
+                    <div className={styles.statusContainer}>
                       <div className={modalStyles.checkboxContainer}>
                         <input
                           type="checkbox"
@@ -719,7 +594,14 @@ const GestionPedidosPage: React.FC = () => {
                       </div>
                       
                       <div className={modalStyles.checkboxContainer}>
-                        <input type="checkbox" id="pagado" name="pagado" checked={editFormData.pagado || false} onChange={handleEditInputChange} className={modalStyles.checkboxInput}/>
+                        <input
+                          type="checkbox"
+                          id="pagado"
+                          name="pagado"
+                          checked={editFormData.pagado || false}
+                          onChange={handleEditInputChange}
+                          className={modalStyles.checkboxInput}
+                        />
                         <label htmlFor="pagado" className={modalStyles.formLabel}>
                           <span className={`${modalStyles.statusBadge} ${editFormData.pagado ? modalStyles.statusPaid : modalStyles.statusUnpaid}`}>
                             <i className={`fas ${editFormData.pagado ? 'fa-check-circle' : 'fa-exclamation-circle'}`}></i>
@@ -732,7 +614,7 @@ const GestionPedidosPage: React.FC = () => {
                   
                   <div className={modalStyles.formGroup}>
                     <label className={modalStyles.formLabel}>Productos en el pedido</label>
-                    <p className={modalStyles.emphasizedText} style={{fontSize: '1.1rem'}}>
+                    <p className={styles.productQuantityText}>
                       {editingPedidoItems.length} {editingPedidoItems.length === 1 ? 'producto' : 'productos'}
                     </p>
                   </div>
@@ -750,11 +632,11 @@ const GestionPedidosPage: React.FC = () => {
                   {/* Sección para agregar productos */}
                   <div className={modalStyles.modalSection}>
                     <h3 className={modalStyles.modalSectionTitle}>
-                      <i className={`fas fa-plus-circle ${modalStyles.iconMarginRight}`}></i>
+                      <i className={`fas fa-plus-circle ${styles.iconMarginRight}`}></i>
                       Añadir Productos
                     </h3>
                     
-                    <div className={modalStyles.actionContainer}>
+                    <div className={styles.addProductsSection}>
                       <div className={crearPedidoStyles.categoryTabs}>
                         {(editCategoriasUnicas || []).map(cat => (
                           <button
@@ -769,7 +651,7 @@ const GestionPedidosPage: React.FC = () => {
                       </div>
                     </div>
                     
-                    <div className={crearPedidoStyles.productList} style={{maxHeight: '200px', overflowY: 'auto'}}>
+                    <div className={`${crearPedidoStyles.productList} ${styles.productListContainer}`}>
                       {editProductosFiltradosPorCategoria.length > 0 ? (
                         editProductosFiltradosPorCategoria.map(producto => (
                           <div key={producto.id} className={crearPedidoStyles.productItem}>
@@ -780,31 +662,31 @@ const GestionPedidosPage: React.FC = () => {
                             <button
                               type="button"
                               onClick={() => addProductToEditingOrder(producto)}
-                              className={`${modalStyles.addButton} ${modalStyles.modalButtonPrimary}`}
+                              className={`${modalStyles.modalButton} ${modalStyles.addButton}`}
                             >
                               <i className="fas fa-plus"></i> Añadir
                             </button>
                           </div>
                         ))
                       ) : (
-                        <p className={modalStyles.centeredText}>No hay productos en esta categoría</p>
+                        <p className={styles.emptyStateText}>No hay productos en esta categoría</p>
                       )}
                     </div>
                   </div>
                   
                   {/* Lista de productos actuales */}
-                  <div className={modalStyles.modalSection} style={{flexGrow: 1}}>
+                  <div className={`${modalStyles.modalSection} ${styles.flexGrow}`}>
                     <h3 className={modalStyles.modalSectionTitle}>
-                      <i className="fas fa-shopping-basket" style={{marginRight: '8px'}}></i>
+                      <i className={`fas fa-shopping-basket ${styles.iconMarginRight}`}></i>
                       Productos del Pedido
                     </h3>
                     
                     <div className={modalStyles.productsList}>
                       {editingPedidoItems.length === 0 ? (
-                        <div className={modalStyles.emptyListContainer}>
-                          <i className={`fas fa-inbox ${modalStyles.emptyListIcon}`}></i>
+                        <div className={styles.emptyStateContainer}>
+                          <i className={`fas fa-inbox ${styles.emptyStateIcon}`}></i>
                           <p>No hay productos en el pedido</p>
-                          <p className={modalStyles.emptyListMessage}>Agrega productos desde el panel superior</p>
+                          <p className={styles.emptyStateText}>Agrega productos desde el panel superior</p>
                         </div>
                       ) : (
                         editingPedidoItems.map(item => (
@@ -816,7 +698,7 @@ const GestionPedidosPage: React.FC = () => {
                               </span>
                             </div>
                             
-                            <div className={modalStyles.quantityContainer}>
+                            <div className={styles.productControls}>
                               <div className={modalStyles.quantityControls}>
                                 <button
                                   type="button"
@@ -846,16 +728,16 @@ const GestionPedidosPage: React.FC = () => {
                                 </button>
                               </div>
                               
-                              <div className={modalStyles.textRight}>
-                                <div className={modalStyles.emphasizedText}>
+                              <div className={styles.productActions}>
+                                <div className={styles.productPrice}>
                                   ${(parseFloat(item.subtotal.toString()) || 0).toFixed(2)}
                                 </div>
                                 <button
                                   type="button"
                                   onClick={() => removeProductFromEditingOrder(item.id)}
-                                  className={modalStyles.deleteButton}
+                                  className={styles.deleteProductButton}
                                 >
-                                  <i className="fas fa-trash-alt" style={{fontSize: '0.8rem'}}></i>
+                                  <i className={`fas fa-trash-alt ${styles.smallIcon}`}></i>
                                   <span>Eliminar</span>
                                 </button>
                               </div>
@@ -877,7 +759,7 @@ const GestionPedidosPage: React.FC = () => {
                 onClick={closeEditModal}
                 className={`${modalStyles.modalButton} ${modalStyles.modalButtonSecondary}`}
               >
-                <i className={`fas fa-times ${modalStyles.iconMarginRight}`}></i>
+                <i className={`fas fa-times ${styles.iconMarginRight}`}></i>
                 Cancelar
               </button>
               <button
@@ -886,7 +768,7 @@ const GestionPedidosPage: React.FC = () => {
                 className={`${modalStyles.modalButton} ${modalStyles.modalButtonPrimary}`}
                 disabled={editingPedidoItems.length === 0}
               >
-                <i className={`fas fa-save ${modalStyles.iconMarginRight}`}></i>
+                <i className={`fas fa-save ${styles.iconMarginRight}`}></i>
                 Guardar Cambios
               </button>
             </div>
