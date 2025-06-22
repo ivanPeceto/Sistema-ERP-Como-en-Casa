@@ -13,13 +13,8 @@
  * Orquesta la comunicación con múltiples servicios del backend (pedidos, clientes, productos).
  */
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-<<<<<<< HEAD
 import type { ChangeEvent, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom'; 
-=======
-import type { ChangeEvent } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
->>>>>>> main
 import styles from '../styles/gestionPedidosPage.module.css';
 import crearPedidoStyles from '../styles/crearPedidoPage.module.css';
 import modalStyles from '../styles/modalStyles.module.css';
@@ -56,12 +51,7 @@ import type { Pedido, PedidoInput, PedidoItem } from '../types/models.d.ts';
  * @see Producto
  */
 const GestionPedidosPage: React.FC = () => {
-<<<<<<< HEAD
   const navigate = useNavigate(); 
-=======
-  /** Hook para navegación entre rutas */
-  const navigate = useNavigate();
->>>>>>> main
 
   // Estados principales
   /** @brief Lista completa de pedidos */
