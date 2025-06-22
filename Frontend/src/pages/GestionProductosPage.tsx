@@ -209,7 +209,7 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
    * @param {number} productoId El ID del producto a eliminar.
    */
   const handleDelete = async (productoId: number) => {
-    if (window.confirm(`¿Está seguro que desea eliminar el producto "${editingProducto?.nombre}"?`)) {
+    if (window.confirm(`¿Está seguro que desea eliminar el producto?`)) {
       try {
         await deleteProducto(productoId);
         fetchProductos();

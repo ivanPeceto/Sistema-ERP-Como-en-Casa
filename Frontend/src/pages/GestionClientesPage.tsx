@@ -196,60 +196,27 @@ const GestionClientesPage: React.FC = () => {
     }
   };
 
- /**
- * @brief Añade automáticamente un guión para formatear los números de telefono de esta manera: 123-456-7890.
- */
-  const handleTelephoneInput = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    const input = event.target as HTMLInputElement;
-    const value = input.value;
-    
-    // Solo formatear cuando se escribe un número
-    if (/^\d$/.test(event.key)) {
-      event.preventDefault();
-      
-      // Obtener la posición actual del cursor
-      const cursorPosition = input.selectionStart || 0;
-      
-      // Eliminar caracteres que no sean dígitos
-      const digitsOnly = value.replace(/\D/g, '');
-      
-      // Formatear el número
-      let formattedNumber = digitsOnly.substring(0, 10);
-      if (formattedNumber.length > 6) {
-        formattedNumber = `${formattedNumber.slice(0, 3)}-${formattedNumber.slice(3, 6)}-${formattedNumber.slice(6)}`;
-      } else if (formattedNumber.length > 3) {
-        formattedNumber = `${formattedNumber.slice(0, 3)}-${formattedNumber.slice(3)}`;
-      }
-      
-      // Actualizar el estado del formulario
-      setFormData(prev => ({ ...prev, telefono: formattedNumber }));
-      
-      // Establecer la posición del cursor después de la actualización del estado
-      setTimeout(() => {
-        // Calcular la nueva posición del cursor (ajustar para los guiones agregados)
-        let newPosition = cursorPosition;
-        if (cursorPosition >= 3 && cursorPosition <= 4 && formattedNumber.length > 3) newPosition++;
-        if (cursorPosition >= 7 && cursorPosition <= 8 && formattedNumber.length > 7) newPosition++;
-        
-        input.setSelectionRange(newPosition, newPosition);
-      }, 0);
-    } else if (event.key === 'Backspace') {
-      // Manejar la tecla de retroceso para mantener el formato
-      event.preventDefault();
-      const cursorPosition = input.selectionStart || 0;
-      
-      // Si se presiona retroceso en un guión, mover el cursor una posición más atrás
-      if (cursorPosition > 0 && (value[cursorPosition - 1] === '-' || value[cursorPosition] === '-')) {
-        input.setSelectionRange(cursorPosition - 1, cursorPosition - 1);
-      }
-      
-      // Eliminar el carácter antes del cursor
-      if (cursorPosition > 0) {
-        const newValue = value.substring(0, cursorPosition - 1) + value.substring(cursorPosition);
-        const digitsOnly = newValue.replace(/\D/g, '');
-        setFormData(prev => ({ ...prev, telefono: digitsOnly }));
-      }
+  /**
+   * @brief Maneja los cambios en el input de teléfono, aplicando el formato automático.
+   * @details Esta función se activa en cada cambio, limpia el valor para obtener solo
+   * los dígitos, y luego reconstruye el string con el formato deseado antes de
+   * actualizar el estado. Esto maneja correctamente la escritura, el borrado y el pegado.
+   * @param {ChangeEvent<HTMLInputElement>} event El evento del input de teléfono.
+   */
+  const handleTelephoneInput = (event: ChangeEvent<HTMLInputElement>) => {
+    // 1. Obtener el valor actual y limpiar todo lo que no sea un dígito.
+    const digitsOnly = event.target.value.replace(/\D/g, '');
+
+    // 2. Aplicar el formato 123-456-7890, limitado a 10 dígitos.
+    let formattedNumber = digitsOnly.substring(0, 10);
+    if (formattedNumber.length > 6) {
+      formattedNumber = `${formattedNumber.slice(0, 3)}-${formattedNumber.slice(3, 6)}-${formattedNumber.slice(6)}`;
+    } else if (formattedNumber.length > 3) {
+      formattedNumber = `${formattedNumber.slice(0, 3)}-${formattedNumber.slice(3)}`;
     }
+
+    // 3. Actualizar el estado de React. React se encargará de actualizar el input.
+    setFormData(prev => ({ ...prev, telefono: formattedNumber }));
   };
 
   /**
@@ -324,10 +291,9 @@ const GestionClientesPage: React.FC = () => {
                     id="telefono"
                     name="telefono"
                     pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
-                    placeholder="123-456-7890"
+                    required
                     value={formData.telefono}
-                    onChange={handleInputChange}
-                    onKeyPress={handleTelephoneInput}
+                    onChange={handleTelephoneInput}
                     maxLength={12}
                     className={formStyles.formInput}
                   />
