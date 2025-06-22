@@ -13,11 +13,16 @@
  * Orquesta la comunicación con múltiples servicios del backend (pedidos, clientes, productos).
  */
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+<<<<<<< HEAD
 import type { ChangeEvent, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom'; 
+=======
+import type { ChangeEvent } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
+>>>>>>> main
 import styles from '../styles/gestionPedidosPage.module.css';
-import formStyles from '../styles/formStyles.module.css';
 import crearPedidoStyles from '../styles/crearPedidoPage.module.css';
+import modalStyles from '../styles/modalStyles.module.css';
 
 import { getPedidosByDate, editarPedido, deletePedido } from '../services/pedido_service';
 import { getClientes } from '../services/client_service';
@@ -27,25 +32,88 @@ import type { Producto } from '../types/models.d.ts';
 import type { Pedido, PedidoInput, PedidoItem } from '../types/models.d.ts';
 
 
+/**
+ * @class GestionPedidosPage
+ * @brief Componente principal para la gestión de pedidos
+ * 
+ * @details
+ * Este componente proporciona una interfaz completa para gestionar pedidos, incluyendo:
+ * - Visualización de pedidos con filtrado por fecha y búsqueda
+ * - Gestión de estados de pedidos (entregado, pagado)
+ * - Edición de pedidos existentes
+ * - Eliminación de pedidos
+ * - Vista detallada de pedidos
+ * 
+ * @note Este componente utiliza múltiples estados para manejar la información de:
+ * - Lista de pedidos
+ * - Clientes
+ * - Productos
+ * - Filtros de búsqueda
+ * - Estados de los modales
+ * 
+ * @see Pedido
+ * @see Cliente
+ * @see Producto
+ */
 const GestionPedidosPage: React.FC = () => {
+<<<<<<< HEAD
   const navigate = useNavigate(); 
+=======
+  /** Hook para navegación entre rutas */
+  const navigate = useNavigate();
+>>>>>>> main
 
+  // Estados principales
+  /** @brief Lista completa de pedidos */
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
+  
+  /** @brief Lista de clientes para búsqueda y visualización */
   const [clientes, setClientes] = useState<Cliente[]>([]);
+  
+  /** @brief Lista de productos disponibles */
   const [productos, setProductos] = useState<Producto[]>([]);
+  
+  /** @brief Término de búsqueda para filtrar pedidos */
   const [searchTerm, setSearchTerm] = useState<string>('');
+  
+  /** @brief Fecha para filtrar los pedidos (formato YYYY-MM-DD) */
   const [searchDate, setSearchDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  
+  // Estados de los modales
+  /** @brief Controla la visibilidad del modal de visualización */
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  
+  /** @brief Controla la visibilidad del modal de edición */
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+  
+  /** @brief Almacena el pedido que se está visualizando */
   const [viewingPedido, setViewingPedido] = useState<Pedido | null>(null);
+  
+  /** @brief Almacena el pedido que se está editando */
   const [editingPedido, setEditingPedido] = useState<Pedido | null>(null);
+  
+  /** @brief Datos del formulario de edición */
   const [editFormData, setEditFormData] = useState<Partial<Pedido>>({});
+  
+  /** @brief Items del pedido que se está editando */
   const [editingPedidoItems, setEditingPedidoItems] = useState<PedidoItem[]>([]);
+  
+  /** @brief Categoría seleccionada en el filtro de productos */
   const [editCategoriaSeleccionada, setEditCategoriaSeleccionada] = useState<string>('');
+  
+  /** @brief Estado de carga inicial de datos */
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
    /**
    * @brief Carga todos los datos iniciales necesarios para la página en paralelo.
+   * @details
+   * Realiza las siguientes operaciones de forma paralela:
+   * 1. Obtiene los pedidos para la fecha seleccionada
+   * 2. Obtiene la lista de clientes
+   * 3. Obtiene la lista de productos
+   * 
+   * @throws {Error} Si ocurre un error al cargar los datos
+   * @async
    */
   const fetchInitialData = useCallback(async () => {
     setIsLoading(true);
@@ -135,19 +203,57 @@ const GestionPedidosPage: React.FC = () => {
     [filteredPedidos]
   );
 
-  const handleSearchTermChange = (event: ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value);
-  const handleSearchDateChange = (event: ChangeEvent<HTMLInputElement>) => setSearchDate(event.target.value);
+  /**
+   * @brief Maneja el cambio en el término de búsqueda
+   * @param {ChangeEvent<HTMLInputElement>} event - Evento del input de búsqueda
+   */
+  const handleSearchTermChange = (event: ChangeEvent<HTMLInputElement>) => 
+    setSearchTerm(event.target.value);
+  
+  /**
+   * @brief Maneja el cambio en la fecha de búsqueda
+   * @param {ChangeEvent<HTMLInputElement>} event - Evento del input de fecha
+   */
+  const handleSearchDateChange = (event: ChangeEvent<HTMLInputElement>) => 
+    setSearchDate(event.target.value);
 
+  /**
+   * @brief Abre el modal de visualización de un pedido
+   * @param {Pedido} pedido - Pedido a visualizar
+   */
   const openViewModal = useCallback((pedido: Pedido) => {
     setViewingPedido(pedido);
     setIsModalOpen(true);
   }, []);
 
+  /**
+   * @brief Cierra el modal de visualización
+   */
   const closeModal = useCallback(() => {
     setIsModalOpen(false);
     setViewingPedido(null);
   }, []);
 
+  /**
+   * @brief Cierra el modal de edición y limpia los estados relacionados
+   * @description
+   * Esta función se encarga de cerrar el modal de edición y limpiar
+   * todos los estados relacionados con la edición de un pedido.
+   */
+  const closeEditModal = useCallback(() => {
+    setIsEditModalOpen(false);
+    setEditingPedido(null);
+    setEditingPedidoItems([]);
+    setEditFormData({});
+  }, []);
+
+  /**
+   * @brief Abre el modal de edición de un pedido
+   * @param {Pedido} pedido - Pedido a editar
+   * @description
+   * Inicializa el estado de edición con los datos del pedido seleccionado,
+   * incluyendo la información de los productos asociados.
+   */
   const openEditModal = useCallback((pedido: Pedido) => {
     setEditingPedido(pedido);
     setEditFormData({
@@ -164,13 +270,13 @@ const GestionPedidosPage: React.FC = () => {
     setIsEditModalOpen(true);
   }, []);
 
-  const closeEditModal = useCallback(() => {
-    setIsEditModalOpen(false);
-    setEditingPedido(null);
-    setEditFormData({});
-    setEditingPedidoItems([]);
-  }, []);
-
+  /**
+   * @brief Maneja los cambios en los campos del formulario de edición
+   * @param {ChangeEvent<HTMLInputElement>} event - Evento del input que cambió
+   * @description
+   * Actualiza el estado del formulario con los nuevos valores,
+   * manejando correctamente los diferentes tipos de inputs (checkbox, text, etc.)
+   */
   const handleEditInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = event.target;
     setEditFormData(prev => ({
@@ -246,13 +352,25 @@ const GestionPedidosPage: React.FC = () => {
   }, []);
 
 
-  const handleEditSubmit = useCallback(async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  /**
+   * @brief Maneja el envío del formulario de edición de un pedido
+   * @param {React.MouseEvent<HTMLButtonElement>} [e] - Evento opcional del botón de envío
+   * @returns {Promise<void>}
+   * @description
+   * Esta función se encarga de:
+   * 1. Validar que el pedido tenga al menos un producto
+   * 2. Preparar los datos para el envío
+   * 3. Enviar la actualización al servidor
+   * 4. Manejar la respuesta y actualizar la UI
+   * @throws {Error} Si ocurre un error durante la actualización
+   */
+  const handleEditSubmit = useCallback(async (e?: React.MouseEvent<HTMLButtonElement>) => {
+    e?.preventDefault();
     if (!editingPedido) return;
 
     if (editingPedidoItems.length === 0) {
       console.error('El pedido no puede estar vacío. Añada al menos un producto.');
-      alert('El pedido no puede estar vacío. Por favor, añada al menos un producto.'); // Added alert
+      console.log('El pedido no puede estar vacío. Por favor, añada al menos un producto.');
       return;
     }
 
@@ -264,16 +382,24 @@ const GestionPedidosPage: React.FC = () => {
         payload
       );
       console.log('Pedido actualizado exitosamente');
-      alert('Pedido actualizado exitosamente.'); // Added alert
+      console.log('Pedido actualizado exitosamente.');
       closeEditModal();
       fetchInitialData();
     } catch (error) {
       console.error('Error al actualizar pedido:', error);
-      alert('Ocurrió un error al actualizar el pedido. Por favor, intente de nuevo.'); // Added alert
+      console.error('Error al actualizar el pedido:', error);
     }
   }, [editingPedido, editFormData, editingPedidoItems, prepareUpdatePayload, closeEditModal, fetchInitialData]);
 
 
+  /**
+   * @brief Alterna el estado de 'entregado' de un pedido
+   * @param {Pedido} pedido - El pedido cuyo estado se va a modificar
+   * @returns {Promise<void>}
+   * @description
+   * Cambia el estado de entrega de un pedido y actualiza la información
+   * en el servidor. Muestra mensajes de éxito/error al usuario.
+   */
   const handleToggleEntregado = useCallback(async (pedido: Pedido) => {
     try {
       const payload = prepareUpdatePayload(pedido, { entregado: !pedido.entregado }, pedido.productos_detalle.map(item => ({
@@ -290,7 +416,7 @@ const GestionPedidosPage: React.FC = () => {
       fetchInitialData();
     } catch (error) {
       console.error(`Error al cambiar estado 'entregado' para pedido ${pedido.id}:`, error);
-      alert('No se pudo actualizar el estado del pedido.'); // Added alert
+      console.error('No se pudo actualizar el estado del pedido.');
     }
   }, [fetchInitialData, prepareUpdatePayload]);
 
@@ -310,7 +436,7 @@ const GestionPedidosPage: React.FC = () => {
       fetchInitialData();
     } catch (error) {
       console.error(`Error al cambiar estado 'pagado' para pedido ${pedido.id}:`, error);
-      alert('No se pudo actualizar el estado del pedido.'); // Added alert
+      console.error('No se pudo actualizar el estado del pedido.');
     }
   }, [fetchInitialData, prepareUpdatePayload]);
 
@@ -321,7 +447,7 @@ const GestionPedidosPage: React.FC = () => {
         fetchInitialData();
       } catch (error) {
         console.error(`Error al eliminar pedido ${pedido.id}:`, error);
-        alert('No se pudo eliminar el pedido.'); // Added alert
+        console.error('No se pudo eliminar el pedido.');
       }
     }
   }, [fetchInitialData]);
@@ -457,10 +583,10 @@ const GestionPedidosPage: React.FC = () => {
             className={styles.searchInput}
           />
         </div>
-        {/* Nuevo Botón "Armar Pedido" */}
+        {/* Botón "Armar Pedido" */}
         <button
-          onClick={() => navigate('/gestion')} // Redirige a la ruta de Armar Pedido
-          className={styles.newOrderButton} // Clase CSS para el nuevo botón
+          onClick={() => navigate('/gestion')} 
+          className={styles.newOrderButton} 
         >
           Armar Nuevo Pedido
         </button>
@@ -533,163 +659,246 @@ const GestionPedidosPage: React.FC = () => {
       )}
 
       {isEditModalOpen && editingPedido && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContentWide}>
-            <h2>Editar Pedido #{editingPedido.numero_pedido}</h2>
-            <form onSubmit={handleEditSubmit} className={formStyles.formContainer}>
-              <div className={formStyles.formSection}>
-                <h3 className={formStyles.formSectionTitle}>Información del Pedido</h3>
-
-                <p><strong>Cliente:</strong> {clienteNombreMap.get(editingPedido.id_cliente) || `ID: ${editingPedido.id_cliente}`}</p>
-                <p><strong>Fecha:</strong> {editingPedido.fecha_pedido}</p>
-
-                <div className={formStyles.formRow}>
-                  <div className={formStyles.formField}>
-                    <label className={formStyles.formLabel} htmlFor="para_hora">Hora de Entrega</label>
+        <div className={modalStyles.modalOverlay}>
+          <div className={modalStyles.modalContentWide}>
+            <div className={modalStyles.modalHeader}>
+              <h2 className={modalStyles.modalTitle}>
+                <i className={`fas fa-edit ${modalStyles.iconMarginRight}`}></i>
+                Editar Pedido #{editingPedido.numero_pedido}
+              </h2>
+            </div>
+            
+            <div className={modalStyles.modalBody}>
+              <div className={modalStyles.editModalGrid}>
+                {/* Panel de información del pedido */}
+                <div className={modalStyles.editModalInfo}>
+                  <h3 className={modalStyles.modalSectionTitle}>
+                    <i className={`fas fa-info-circle ${modalStyles.iconMarginRight}`}></i>
+                    Información del Pedido
+                  </h3>
+                  
+                  <div className={`${modalStyles.formGroup} ${modalStyles.infoField}`}>
+                    <label className={modalStyles.formLabel}>Cliente</label>
+                    <p className={modalStyles.formControl} style={{background: '#fff'}}>
+                      {clienteNombreMap.get(editingPedido.id_cliente) || `ID: ${editingPedido.id_cliente}`}
+                    </p>
+                  </div>
+                  
+                  <div className={`${modalStyles.formGroup} ${modalStyles.infoField}`}>
+                    <label className={modalStyles.formLabel}>Fecha del Pedido</label>
+                    <p className={modalStyles.formControl} style={{background: '#fff'}}>
+                      {new Date(editingPedido.fecha_pedido).toLocaleDateString('es-AR', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </p>
+                  </div>
+                  
+                  <div className={modalStyles.formGroup}>
+                    <label className={modalStyles.formLabel} htmlFor="para_hora">Hora de Entrega</label>
                     <input
                       type="time"
                       id="para_hora"
                       name="para_hora"
                       value={editFormData.para_hora || ''}
                       onChange={handleEditInputChange}
-                      className={`${formStyles.formInput} ${styles.editTimeInput}`}
+                      className={`${modalStyles.formControl} ${modalStyles.timeInput}`}
                     />
                   </div>
-
-                  <div className={`${formStyles.formField} ${styles.checkboxField}`}>
-                    <input
-                      type="checkbox"
-                      id="entregado"
-                      name="entregado"
-                      checked={editFormData.entregado || false}
-                      onChange={handleEditInputChange}
-                      className={formStyles.formCheckbox}
-                    />
-                    <label htmlFor="entregado" className={formStyles.formLabel}>Entregado</label>
-                  </div>
-
-                  <div className={`${formStyles.formField} ${styles.checkboxField}`}>
-                    <input
-                      type="checkbox"
-                      id="pagado"
-                      name="pagado"
-                      checked={editFormData.pagado || false}
-                      onChange={handleEditInputChange}
-                      className={formStyles.formCheckbox}
-                    />
-                    <label htmlFor="pagado" className={formStyles.formLabel}>Pagado</label>
-                  </div>
-                </div>
-              </div>
-
-              <div className={styles.editModalProductsSection}>
-                <div className={crearPedidoStyles.productSelectionPanel}>
-                  <h2>Añadir Productos</h2>
-                  <div className={crearPedidoStyles.categoryTabs}>
-                    {(editCategoriasUnicas || []).map(cat => (
-                      <button
-                        key={cat}
-                        className={`${crearPedidoStyles.categoryTab} ${editCategoriaSeleccionada === cat ? crearPedidoStyles.activeTab : ''}`}
-                        onClick={() => setEditCategoriaSeleccionada(cat)}
-                      >
-                        {cat}
-                      </button>
-                    ))}
-                  </div>
-                  <div className={crearPedidoStyles.productList}>
-                    {editProductosFiltradosPorCategoria.length > 0 ? (
-                      editProductosFiltradosPorCategoria.map(producto => (
-                        <div key={producto.id} className={crearPedidoStyles.productItem}>
-                          <div className={crearPedidoStyles.productInfo}>
-                            <strong>{producto.nombre}</strong>
-                            <span>${(parseFloat(producto.precio_unitario.toString()) || 0).toFixed(2)}</span>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => addProductToEditingOrder(producto)}
-                            className={crearPedidoStyles.addButtonSmall}
-                          >
-                            Añadir
-                          </button>
-                        </div>
-                      ))
-                    ) : (
-                      <p>No hay productos disponibles en esta categoría.</p>
-                    )}
-                  </div>
-                </div>
-
-                <div className={crearPedidoStyles.currentOrderPanel}>
-                  <h2>Productos del Pedido</h2>
-                  <div className={crearPedidoStyles.orderItemsList}>
-                    {editingPedidoItems.length === 0 ? (
-                      <p className={crearPedidoStyles.emptyOrderText}>No hay productos en el pedido.</p>
-                    ) : (
-                      editingPedidoItems.map(item => (
-                        <div key={item.id} className={crearPedidoStyles.orderItem}>
-                          <div className={crearPedidoStyles.orderItemInfo}>
-                            <strong>{item.nombre}</strong>
-                            <span>${(parseFloat(item.precio_unitario.toString()) || 0).toFixed(2)} c/u</span>
-                          </div>
-                          <div className={crearPedidoStyles.orderItemControls}>
-                            <button
-                              type="button"
-                              onClick={() => updateEditingItemQuantity(item.id, item.cantidad - 1)}
-                              className={crearPedidoStyles.quantityButton}
-                            >
-                              -
-                            </button>
-                            <input
-                              type="number"
-                              min="1"
-                              value={item.cantidad}
-                              onChange={(e: ChangeEvent<HTMLInputElement>) => updateEditingItemQuantity(item.id, parseInt(e.target.value) || 1)}
-                              className={crearPedidoStyles.quantityInput}
-                            />
-                            <button
-                              type="button"
-                              onClick={() => updateEditingItemQuantity(item.id, item.cantidad + 1)}
-                              className={crearPedidoStyles.quantityButton}
-                            >
-                              +
-                            </button>
-                          </div>
-                          <span className={crearPedidoStyles.orderItemSubtotal}>${(parseFloat(item.subtotal.toString()) || 0).toFixed(2)}</span>
-                          <button
-                            type="button"
-                            onClick={() => removeProductFromEditingOrder(item.id)}
-                            className={crearPedidoStyles.deleteItemButton}
-                          >
-                            ×
-                          </button>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                  <div className={crearPedidoStyles.orderSummary}>
-                    <div className={crearPedidoStyles.totalDisplay}>
-                      <strong>TOTAL: ${totalEditingPedido.toFixed(2)}</strong>
+                  
+                  <div className={modalStyles.formGroup}>
+                    <label className={modalStyles.formLabel}>Estado</label>
+                    <div className={modalStyles.checkboxGroupContainer}>
+                      <div className={modalStyles.checkboxContainer}>
+                        <input
+                          type="checkbox"
+                          id="entregado"
+                          name="entregado"
+                          checked={editFormData.entregado || false}
+                          onChange={handleEditInputChange}
+                          className={modalStyles.checkboxInput}
+                        />
+                        <label htmlFor="entregado" className={modalStyles.formLabel}>
+                          <span className={`${modalStyles.statusBadge} ${editFormData.entregado ? modalStyles.statusDelivered : modalStyles.statusPending}`}>
+                            <i className={`fas ${editFormData.entregado ? 'fa-check-circle' : 'fa-clock'}`}></i>
+                            {editFormData.entregado ? 'Entregado' : 'Pendiente'}
+                          </span>
+                        </label>
+                      </div>
+                      
+                      <div className={modalStyles.checkboxContainer}>
+                        <input type="checkbox" id="pagado" name="pagado" checked={editFormData.pagado || false} onChange={handleEditInputChange} className={modalStyles.checkboxInput}/>
+                        <label htmlFor="pagado" className={modalStyles.formLabel}>
+                          <span className={`${modalStyles.statusBadge} ${editFormData.pagado ? modalStyles.statusPaid : modalStyles.statusUnpaid}`}>
+                            <i className={`fas ${editFormData.pagado ? 'fa-check-circle' : 'fa-exclamation-circle'}`}></i>
+                            {editFormData.pagado ? 'Pagado' : 'Pendiente de pago'}
+                          </span>
+                        </label>
+                      </div>
                     </div>
                   </div>
+                  
+                  <div className={modalStyles.formGroup}>
+                    <label className={modalStyles.formLabel}>Productos en el pedido</label>
+                    <p className={modalStyles.emphasizedText} style={{fontSize: '1.1rem'}}>
+                      {editingPedidoItems.length} {editingPedidoItems.length === 1 ? 'producto' : 'productos'}
+                    </p>
+                  </div>
+                  
+                  <div className={modalStyles.totalSection}>
+                    <label className={modalStyles.formLabel}>Subtotal</label>
+                    <p className={modalStyles.totalAmount}>
+                      ${totalEditingPedido.toFixed(2)}
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Panel de gestión de productos */}
+                <div className={modalStyles.editModalProducts}>
+                  {/* Sección para agregar productos */}
+                  <div className={modalStyles.modalSection}>
+                    <h3 className={modalStyles.modalSectionTitle}>
+                      <i className={`fas fa-plus-circle ${modalStyles.iconMarginRight}`}></i>
+                      Añadir Productos
+                    </h3>
+                    
+                    <div className={modalStyles.actionContainer}>
+                      <div className={crearPedidoStyles.categoryTabs}>
+                        {(editCategoriasUnicas || []).map(cat => (
+                          <button
+                            key={cat}
+                            type="button"
+                            className={`${crearPedidoStyles.categoryTab} ${editCategoriaSeleccionada === cat ? crearPedidoStyles.activeTab : ''}`}
+                            onClick={() => setEditCategoriaSeleccionada(cat)}
+                          >
+                            {cat}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div className={crearPedidoStyles.productList} style={{maxHeight: '200px', overflowY: 'auto'}}>
+                      {editProductosFiltradosPorCategoria.length > 0 ? (
+                        editProductosFiltradosPorCategoria.map(producto => (
+                          <div key={producto.id} className={crearPedidoStyles.productItem}>
+                            <div className={crearPedidoStyles.productInfo}>
+                              <strong>{producto.nombre}</strong>
+                              <span>${(parseFloat(producto.precio_unitario.toString()) || 0).toFixed(2)}</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => addProductToEditingOrder(producto)}
+                              className={`${modalStyles.addButton} ${modalStyles.modalButtonPrimary}`}
+                            >
+                              <i className="fas fa-plus"></i> Añadir
+                            </button>
+                          </div>
+                        ))
+                      ) : (
+                        <p className={modalStyles.centeredText}>No hay productos en esta categoría</p>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Lista de productos actuales */}
+                  <div className={modalStyles.modalSection} style={{flexGrow: 1}}>
+                    <h3 className={modalStyles.modalSectionTitle}>
+                      <i className="fas fa-shopping-basket" style={{marginRight: '8px'}}></i>
+                      Productos del Pedido
+                    </h3>
+                    
+                    <div className={modalStyles.productsList}>
+                      {editingPedidoItems.length === 0 ? (
+                        <div className={modalStyles.emptyListContainer}>
+                          <i className={`fas fa-inbox ${modalStyles.emptyListIcon}`}></i>
+                          <p>No hay productos en el pedido</p>
+                          <p className={modalStyles.emptyListMessage}>Agrega productos desde el panel superior</p>
+                        </div>
+                      ) : (
+                        editingPedidoItems.map(item => (
+                          <div key={item.id} className={modalStyles.productCard}>
+                            <div className={modalStyles.productHeader}>
+                              <h4 className={modalStyles.productName}>{item.nombre}</h4>
+                              <span className={modalStyles.productPrice}>
+                                ${(parseFloat(item.precio_unitario.toString()) || 0).toFixed(2)} c/u
+                              </span>
+                            </div>
+                            
+                            <div className={modalStyles.quantityContainer}>
+                              <div className={modalStyles.quantityControls}>
+                                <button
+                                  type="button"
+                                  onClick={() => updateEditingItemQuantity(item.id, item.cantidad - 1)}
+                                  className={modalStyles.quantityButton}
+                                  disabled={item.cantidad <= 1}
+                                >
+                                  −
+                                </button>
+                                
+                                <input
+                                  type="number"
+                                  min="1"
+                                  value={item.cantidad}
+                                  onChange={(e: ChangeEvent<HTMLInputElement>) => 
+                                    updateEditingItemQuantity(item.id, Math.max(1, parseInt(e.target.value) || 1))
+                                  }
+                                  className={modalStyles.quantityInput}
+                                />
+                                
+                                <button
+                                  type="button"
+                                  onClick={() => updateEditingItemQuantity(item.id, item.cantidad + 1)}
+                                  className={modalStyles.quantityButton}
+                                >
+                                  +
+                                </button>
+                              </div>
+                              
+                              <div className={modalStyles.textRight}>
+                                <div className={modalStyles.emphasizedText}>
+                                  ${(parseFloat(item.subtotal.toString()) || 0).toFixed(2)}
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => removeProductFromEditingOrder(item.id)}
+                                  className={modalStyles.deleteButton}
+                                >
+                                  <i className="fas fa-trash-alt" style={{fontSize: '0.8rem'}}></i>
+                                  <span>Eliminar</span>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                    
+                    {/* Sección de total eliminada según solicitud */}
+                  </div>
                 </div>
               </div>
-
-              <div className={formStyles.formButtons}>
-                <button
-                  type="button"
-                  onClick={closeEditModal}
-                  className={formStyles.secondaryButton}
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className={formStyles.primaryButton}
-                >
-                  Guardar Cambios
-                </button>
-              </div>
-            </form>
+            </div>
+            
+            <div className={modalStyles.modalFooter}>
+              <button
+                type="button"
+                onClick={closeEditModal}
+                className={`${modalStyles.modalButton} ${modalStyles.modalButtonSecondary}`}
+              >
+                <i className={`fas fa-times ${modalStyles.iconMarginRight}`}></i>
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleEditSubmit}
+                className={`${modalStyles.modalButton} ${modalStyles.modalButtonPrimary}`}
+                disabled={editingPedidoItems.length === 0}
+              >
+                <i className={`fas fa-save ${modalStyles.iconMarginRight}`}></i>
+                Guardar Cambios
+              </button>
+            </div>
           </div>
         </div>
       )}
