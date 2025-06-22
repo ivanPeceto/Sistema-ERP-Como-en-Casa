@@ -51,48 +51,19 @@ import type { Pedido, PedidoInput, PedidoItem } from '../types/models.d.ts';
  * @see Producto
  */
 const GestionPedidosPage: React.FC = () => {
-  /** Hook para navegación entre rutas */
   const navigate = useNavigate();
-
-  // Estados principales
-  /** @brief Lista completa de pedidos */
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
-  
-  /** @brief Lista de clientes para búsqueda y visualización */
   const [clientes, setClientes] = useState<Cliente[]>([]);
-  
-  /** @brief Lista de productos disponibles */
   const [productos, setProductos] = useState<Producto[]>([]);
-  
-  /** @brief Término de búsqueda para filtrar pedidos */
   const [searchTerm, setSearchTerm] = useState<string>('');
-  
-  /** @brief Fecha para filtrar los pedidos (formato YYYY-MM-DD) */
   const [searchDate, setSearchDate] = useState<string>(new Date().toISOString().split('T')[0]);
-  
-  // Estados de los modales
-  /** @brief Controla la visibilidad del modal de visualización */
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  
-  /** @brief Controla la visibilidad del modal de edición */
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
-  
-  /** @brief Almacena el pedido que se está visualizando */
   const [viewingPedido, setViewingPedido] = useState<Pedido | null>(null);
-  
-  /** @brief Almacena el pedido que se está editando */
   const [editingPedido, setEditingPedido] = useState<Pedido | null>(null);
-  
-  /** @brief Datos del formulario de edición */
   const [editFormData, setEditFormData] = useState<Partial<Pedido>>({});
-  
-  /** @brief Items del pedido que se está editando */
   const [editingPedidoItems, setEditingPedidoItems] = useState<PedidoItem[]>([]);
-  
-  /** @brief Categoría seleccionada en el filtro de productos */
   const [editCategoriaSeleccionada, setEditCategoriaSeleccionada] = useState<string>('');
-  
-  /** @brief Estado de carga inicial de datos */
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
    /**

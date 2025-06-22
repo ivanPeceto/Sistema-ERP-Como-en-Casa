@@ -24,8 +24,7 @@ const CrearPedidoPage: React.FC = () => {
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<string>('');
   const [pedidoItems, setPedidoItems] = useState<PedidoItem[]>([]);
   const [clienteSearchTerm, setClienteSearchTerm] = useState('');
-  const [paraHora, setParaHora] = useState<string>(''); // Nuevo estado para la hora de entrega
-
+  const [paraHora, setParaHora] = useState<string>(''); 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
