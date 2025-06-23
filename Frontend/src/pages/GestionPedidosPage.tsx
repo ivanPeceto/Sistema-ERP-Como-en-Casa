@@ -249,6 +249,7 @@ const GestionPedidosPage: React.FC = () => {
     setEditFormData({
       para_hora: pedido.para_hora,
       entregado: pedido.entregado,
+      pagado: pedido.pagado,
     });
     setEditingPedidoItems(pedido.productos_detalle.map(item => ({
       id: item.id_producto,
