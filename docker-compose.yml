@@ -115,16 +115,7 @@ services:
     environment:
       # variables de entorno
       #Host
-      - VITE_API_BASE_URL=https://e6c6-45-234-34-97.ngrok-free.app
-      - VITE_API_USUARIOS_URL=VITE_API_BASE_URL
-      - VITE_API_CLIENTES_URL=VITE_API_BASE_URL
-      - VITE_API_PRODUCTOS_URL=VITE_API_BASE_URL
-      - VITE_API_PEDIDOS_URL=VITE_API_BASE_URL
-      #Dev
-     # - VITE_API_USUARIOS_URL=http://localhost:8001
-     # - VITE_API_CLIENTES_URL=http://localhost:8002
-     # - VITE_API_PRODUCTOS_URL=http://localhost:8003
-     # - VITE_API_PEDIDOS_URL=http://localhost:8004
+      - VITE_API_BASE_URL=https://deketeideketeidei
     depends_on:
       - usuarios
       - clientes
