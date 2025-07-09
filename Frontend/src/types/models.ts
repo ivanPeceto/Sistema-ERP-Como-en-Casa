@@ -70,7 +70,10 @@ export interface Pedido {
   fecha_pedido: string; 
   id_cliente: number;
   para_hora: string | null; 
+  estado: string; // 'PENDIENTE', 'LISTO', 'ENTREGADO'
+  // Deprecated
   entregado: boolean;
+  //--
   pagado: boolean;
   total: number;
   productos_detalle: {
@@ -93,7 +96,10 @@ export interface PedidoInput {
     fecha_pedido: string; 
     id_cliente: number;
     para_hora: string | null; 
+    estado: string; // 'PENDIENTE', 'LISTO', 'ENTREGADO'
+    // Deprecated
     entregado: boolean;
+    //--
     pagado: boolean;
     productos: {
         id_producto: number;
@@ -102,6 +108,9 @@ export interface PedidoInput {
         precio_unitario: number;
     }[];
 }
+
+// Unión de tipos para los estados de pedido para mayor seguridad de tipo
+export type PedidoEstado = 'PENDIENTE' | 'LISTO' | 'ENTREGADO';
 
 
 // --- Tipos de Autenticación ---

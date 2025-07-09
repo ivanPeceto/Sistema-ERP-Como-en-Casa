@@ -21,10 +21,8 @@ import modalStyles from '../styles/modalStyles.module.css';
 
 import { getPedidosByDate, editarPedido, deletePedido } from '../services/pedido_service';
 import { getClientes } from '../services/client_service';
-import type { Cliente } from '../types/models';
 import { getProductos } from '../services/product_service';
-import type { Producto } from '../types/models.d.ts';
-import type { Pedido, PedidoInput, PedidoItem } from '../types/models.d.ts';
+import type { Producto, Cliente, Pedido, PedidoInput, PedidoItem, PedidoEstado } from '../types/models.d.ts';
 
 
 /**
@@ -169,17 +167,23 @@ const GestionPedidosPage: React.FC = () => {
     return editingPedidoItems.reduce((total, item) => total + (parseFloat(item.cantidad.toString()) * (parseFloat(item.precio_unitario.toString()) || 0)), 0);
   }, [editingPedidoItems]);
 
-  /** @brief Deriva la lista de pedidos pendientes a partir de la lista filtrada. */
-  const pedidosPendientes = useMemo(() =>
-    filteredPedidos.filter(pedido => !pedido.entregado),
-    [filteredPedidos]
-  );
-
-  /** @brief Deriva la lista de pedidos entregados. */
-  const pedidosEntregados = useMemo(() =>
-    filteredPedidos.filter(pedido => pedido.entregado),
-    [filteredPedidos]
-  );
+    /** @brief Deriva la lista de pedidos pendientes a partir de la lista filtrada. */
+    const pedidosPendientes = useMemo(() =>
+      filteredPedidos.filter(pedido => pedido.estado === 'PENDIENTE'),
+      [filteredPedidos]
+    );
+  
+    /** @brief Deriva la lista de pedidos listos. */
+    const pedidosListos = useMemo(() =>
+      filteredPedidos.filter(pedido => pedido.estado === 'LISTO'),
+      [filteredPedidos]
+    );
+  
+    /** @brief Deriva la lista de pedidos entregados. */
+    const pedidosEntregados = useMemo(() =>
+      filteredPedidos.filter(pedido => pedido.estado === 'ENTREGADO'),
+      [filteredPedidos]
+    );
 
   /** @brief Deriva la lista de pedidos pagados. */
   const pedidosPagados = useMemo(() =>
@@ -248,7 +252,10 @@ const GestionPedidosPage: React.FC = () => {
     setEditingPedido(pedido);
     setEditFormData({
       para_hora: pedido.para_hora,
+      estado: pedido.estado,
+      //deprecated
       entregado: pedido.entregado,
+      //
       pagado: pedido.pagado,
     });
     setEditingPedidoItems(pedido.productos_detalle.map(item => ({
@@ -336,7 +343,10 @@ const GestionPedidosPage: React.FC = () => {
       fecha_pedido: pedido.fecha_pedido,
       id_cliente: pedido.id_cliente,
       para_hora: updates.para_hora !== undefined ? updates.para_hora : pedido.para_hora,
+      estado: updates.estado !== undefined ? updates.estado : pedido.estado,
+      //deprecated
       entregado: updates.entregado !== undefined ? updates.entregado : pedido.entregado,
+      //
       pagado: updates.pagado !== undefined ? updates.pagado : pedido.pagado,
       productos: productosParaEnviar,
     };
@@ -373,7 +383,6 @@ const GestionPedidosPage: React.FC = () => {
         payload
       );
       console.log('Pedido actualizado exitosamente');
-      console.log('Pedido actualizado exitosamente.');
       closeEditModal();
       fetchInitialData();
     } catch (error) {
@@ -393,7 +402,15 @@ const GestionPedidosPage: React.FC = () => {
    */
   const handleToggleEntregado = useCallback(async (pedido: Pedido) => {
     try {
-      const payload = prepareUpdatePayload(pedido, { entregado: !pedido.entregado }, pedido.productos_detalle.map(item => ({
+      let nuevoEstado: PedidoEstado = pedido.estado as PedidoEstado;
+
+      if (pedido.estado === 'PENDIENTE') {
+        nuevoEstado = 'LISTO';
+      } else if (pedido.estado === 'LISTO') {
+        nuevoEstado = 'ENTREGADO';
+      }
+
+      const payload = prepareUpdatePayload(pedido, {  estado: nuevoEstado }, pedido.productos_detalle.map(item => ({
         id: item.id_producto,
         nombre: item.nombre_producto,
         cantidad: item.cantidad_producto,
@@ -445,7 +462,7 @@ const GestionPedidosPage: React.FC = () => {
 
 
 
-  const [activeTab, setActiveTab] = useState<'todos' | 'pendientes' | 'entregados' | 'pagados' | 'noPagados'>('todos');
+  const [activeTab, setActiveTab] = useState<'todos' | 'pendientes' | 'listos' | 'entregados' | 'pagados' | 'noPagados'>('pendientes');
 
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
@@ -472,7 +489,13 @@ const GestionPedidosPage: React.FC = () => {
       ) : pedidos.length > 0 ? (
         <div className={styles.pedidosGrid}>
           {pedidos.map(pedido => (
-            <div key={pedido.id} className={`${styles.pedidoCard} ${pedido.entregado ? styles.entregado : ''} ${pedido.pagado ? styles.pagado : ''}`}>
+              <div 
+              key={pedido.id} 
+              className={`${styles.pedidoCard} ${
+                pedido.estado === 'ENTREGADO' ? styles.entregado : 
+                pedido.estado === 'LISTO' ? styles.listo : '' 
+              }`}
+              >
               <div className={styles.pedidoHeader}>
                 <div className={styles.pedidoNumero}>Pedido #{pedido.numero_pedido}</div>
                 <div className={styles.pedidoFecha}>
@@ -501,20 +524,32 @@ const GestionPedidosPage: React.FC = () => {
               </div>
 
               <div className={styles.pedidoEstados}>
-                <div
-                  className={`${styles.estadoBadge} ${pedido.entregado ? styles.entregadoBadge : styles.pendienteBadge}`}
-                  onClick={() => handleToggleEntregado(pedido)}
-                >
-                  <i className={`fas ${pedido.entregado ? 'fa-check-circle' : 'fa-clock'}`}></i>
-                  {pedido.entregado ? 'Entregado' : 'Pendiente'}
-                </div>
-                <div
-                  className={`${styles.estadoBadge} ${pedido.pagado ? styles.pagadoBadge : styles.noPagadoBadge}`}
+                <button
+                  className={`${styles.estadoButton} ${
+                    pedido.estado === 'PENDIENTE' ? styles.estadoPendienteButton :
+                    pedido.estado === 'LISTO' ? styles.estadoListoButton :
+                    styles.estadoEntregadoButton
+                  }`}
+                  onClick={() => handleUpdatePedidoEstado(pedido)}
+                  >
+                  <i className={`fas ${
+                    pedido.estado === 'PENDIENTE' ? 'fa-hourglass-half' :
+                    pedido.estado === 'LISTO' ? 'fa-check-circle' :
+                    'fa-truck'
+                  }`}></i>
+                  {pedido.estado === 'PENDIENTE' ? 'Pendiente' :
+                   pedido.estado === 'LISTO' ? 'Listo' : 'Entregado'}
+                </button>
+
+                <button
+                  className={`${styles.estadoButton} ${
+                    pedido.pagado ? styles.estadoPagadoButton : styles.estadoNoPagadoButton
+                  }`}
                   onClick={() => handleTogglePagado(pedido)}
                 >
-                  <i className={`fas ${pedido.pagado ? 'fa-check-circle' : 'fa-exclamation-circle'}`}></i>
-                  {pedido.pagado ? 'Pagado' : 'Pendiente pago'}
-                </div>
+                  <i className={`fas ${pedido.pagado ? 'fa-dollar-sign' : 'fa-hand-holding-usd'}`}></i>
+                  {pedido.pagado ? 'Pagado' : 'No Pagado'}
+                </button>
               </div>
 
               <div className={styles.pedidoAcciones}>
@@ -597,6 +632,12 @@ const GestionPedidosPage: React.FC = () => {
           Pendientes ({pedidosPendientes.length})
         </button>
         <button
+          className={`${styles.tabButton} ${activeTab === 'listos' ? styles.activeTab : ''}`}
+          onClick={() => setActiveTab('listos')}
+        >
+        Listos ({pedidosListos.length})
+        </button>
+        <button
           className={`${styles.tabButton} ${activeTab === 'entregados' ? styles.activeTab : ''}`}
           onClick={() => setActiveTab('entregados')}
         >
@@ -618,6 +659,7 @@ const GestionPedidosPage: React.FC = () => {
 
       {activeTab === 'todos' && renderPedidosList(filteredPedidos)}
       {activeTab === 'pendientes' && renderPedidosList(pedidosPendientes)}
+      {activeTab === 'listos' && renderPedidosList(pedidosListos)}
       {activeTab === 'entregados' && renderPedidosList(pedidosEntregados)}
       {activeTab === 'pagados' && renderPedidosList(pedidosPagados)}
       {activeTab === 'noPagados' && renderPedidosList(pedidosNoPagados)}
@@ -630,8 +672,7 @@ const GestionPedidosPage: React.FC = () => {
               <p><strong>Fecha:</strong> {viewingPedido.fecha_pedido}</p>
               <p><strong>Cliente:</strong> {clienteNombreMap.get(viewingPedido.id_cliente) || `ID: ${viewingPedido.id_cliente}`}</p>
               <p><strong>Hora de Entrega:</strong> {viewingPedido.para_hora || 'No especificada'}</p>
-              <p><strong>Estado Entrega:</strong> {viewingPedido.entregado ? 'Entregado' : 'Pendiente'}</p>
-              <p><strong>Estado Pago:</strong> {viewingPedido.pagado ? 'Pagado' : 'No Pagado'}</p>
+              <p><strong>Estado del Pedido:</strong> {viewingPedido.estado}</p>              <p><strong>Estado Pago:</strong> {viewingPedido.pagado ? 'Pagado' : 'No Pagado'}</p>
               <h3>Productos:</h3>
               <ul className={styles.productListModal}>
                 {viewingPedido.productos_detalle.map((item, index) => (
@@ -699,24 +740,26 @@ const GestionPedidosPage: React.FC = () => {
                   </div>
                   
                   <div className={modalStyles.formGroup}>
-                    <label className={modalStyles.formLabel}>Estado</label>
+                    <label className={modalStyles.formLabel}>Estado del Pedido</label>
                     <div className={modalStyles.checkboxGroupContainer}>
                       <div className={modalStyles.checkboxContainer}>
-                        <input
-                          type="checkbox"
-                          id="entregado"
-                          name="entregado"
-                          checked={editFormData.entregado || false}
-                          onChange={handleEditInputChange}
-                          className={modalStyles.checkboxInput}
-                        />
-                        <label htmlFor="entregado" className={modalStyles.formLabel}>
-                          <span className={`${modalStyles.statusBadge} ${editFormData.entregado ? modalStyles.statusDelivered : modalStyles.statusPending}`}>
-                            <i className={`fas ${editFormData.entregado ? 'fa-check-circle' : 'fa-clock'}`}></i>
-                            {editFormData.entregado ? 'Entregado' : 'Pendiente'}
-                          </span>
+                        <label htmlFor="estado" className={modalStyles.formLabel}>
+                          Estado:
                         </label>
+                        <select
+                          id="estado"
+                          name="estado"
+                          value={editFormData.estado || ''}
+                          onChange={handleEditInputChange}
+                          className={modalStyles.formControl}
+                          style={{width: 'auto', display: 'inline-block', marginLeft: '10px'}}
+                        >
+                          <option value="PENDIENTE">Pendiente</option>
+                          <option value="LISTO">Listo</option>
+                          <option value="ENTREGADO">Entregado</option>
+                        </select>
                       </div>
+
                       
                       <div className={modalStyles.checkboxContainer}>
                         <input type="checkbox" id="pagado" name="pagado" checked={editFormData.pagado || false} onChange={handleEditInputChange} className={modalStyles.checkboxInput}/>
