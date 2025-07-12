@@ -19,7 +19,7 @@ import styles from '../styles/gestionPedidosPage.module.css';
 import crearPedidoStyles from '../styles/crearPedidoPage.module.css';
 import modalStyles from '../styles/modalStyles.module.css';
 
-import { getPedidosByDate, editarPedido, deletePedido } from '../services/pedido_service';
+import { getPedidosByDate, editarPedido, deletePedido, printPedido } from '../services/pedido_service';
 import { getClientes } from '../services/client_service';
 import { getProductos } from '../services/product_service';
 import type { Producto, Cliente, Pedido, PedidoInput, PedidoItem, PedidoEstado } from '../types/models.d.ts';
@@ -344,6 +344,7 @@ const GestionPedidosPage: React.FC = () => {
       id_cliente: pedido.id_cliente,
       para_hora: updates.para_hora !== undefined ? updates.para_hora : pedido.para_hora,
       estado: updates.estado !== undefined ? updates.estado : pedido.estado,
+      avisado: updates.avisado !== undefined ? updates.avisado : pedido.avisado,
       //deprecated
       entregado: updates.entregado !== undefined ? updates.entregado : pedido.entregado,
       //
@@ -400,17 +401,24 @@ const GestionPedidosPage: React.FC = () => {
    * Cambia el estado de entrega de un pedido y actualiza la información
    * en el servidor. Muestra mensajes de éxito/error al usuario.
    */
-  const handleToggleEntregado = useCallback(async (pedido: Pedido) => {
+  const handleUpdatePedidoEstado = useCallback(async (pedido: Pedido) => {
+    let nuevoEstado: PedidoEstado = pedido.estado as PedidoEstado;
+
+    if (pedido.estado === 'PENDIENTE') {
+      nuevoEstado = 'LISTO';
+    } else if (pedido.estado === 'LISTO') {
+      nuevoEstado = 'ENTREGADO';
+    } else if (pedido.estado === 'ENTREGADO') {
+      nuevoEstado = 'PENDIENTE';
+    }
+
     try {
-      let nuevoEstado: PedidoEstado = pedido.estado as PedidoEstado;
-
-      if (pedido.estado === 'PENDIENTE') {
-        nuevoEstado = 'LISTO';
-      } else if (pedido.estado === 'LISTO') {
-        nuevoEstado = 'ENTREGADO';
-      }
-
-      const payload = prepareUpdatePayload(pedido, {  estado: nuevoEstado }, pedido.productos_detalle.map(item => ({
+      const payload = prepareUpdatePayload(
+        pedido, 
+        {  
+          estado: nuevoEstado 
+        }, 
+        pedido.productos_detalle.map(item => ({
         id: item.id_producto,
         nombre: item.nombre_producto,
         cantidad: item.cantidad_producto,
@@ -448,6 +456,26 @@ const GestionPedidosPage: React.FC = () => {
     }
   }, [fetchInitialData, prepareUpdatePayload]);
 
+  const handleToggleAvisado = useCallback(async (pedido: Pedido) => {
+    try {
+      const payload = prepareUpdatePayload(pedido, { avisado: !pedido.avisado }, pedido.productos_detalle.map(item => ({
+        id: item.id_producto,
+        nombre: item.nombre_producto,
+        cantidad: item.cantidad_producto,
+        precio_unitario: parseFloat(item.precio_unitario.toString()) || 0,
+        subtotal: (parseFloat(item.cantidad_producto.toString()) * (parseFloat(item.precio_unitario.toString()) || 0)) || 0,
+      })));
+      await editarPedido(
+        { fecha: pedido.fecha_pedido, numero: pedido.numero_pedido },
+        payload
+      );
+      fetchInitialData();
+    } catch (error) {
+      console.error(`Error al cambiar estado 'pagado' para pedido ${pedido.id}:`, error);
+      console.error('No se pudo actualizar el estado del pedido.');
+    }
+  }, [fetchInitialData, prepareUpdatePayload]);
+
   const handleDeletePedido = useCallback(async (pedido: Pedido) => {
     if (window.confirm(`¿Confirma que desea eliminar el Pedido #${pedido.numero_pedido}? Esta acción es irreversible.`)) {
       try {
@@ -461,8 +489,17 @@ const GestionPedidosPage: React.FC = () => {
   }, [fetchInitialData]);
 
 
+  const handlePrintPedido = useCallback(async (pedido:Pedido) => {
+    try {
+      await printPedido({ fecha: pedido.fecha_pedido, numero: pedido.numero_pedido });
+      fetchInitialData();
+    } catch (error) {
+      console.error(`Error al imprimir pedido ${pedido.id}:`, error);
+      console.error('No se pudo imprimir el pedido.');
+    }
+  }, [fetchInitialData]);
 
-  const [activeTab, setActiveTab] = useState<'todos' | 'pendientes' | 'listos' | 'entregados' | 'pagados' | 'noPagados'>('pendientes');
+  const [activeTab, setActiveTab] = useState< 'PENDIENTE' | 'LISTO' | 'ENTREGADO' | 'pagados' | 'noPagados'>('PENDIENTE');
 
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
@@ -501,6 +538,10 @@ const GestionPedidosPage: React.FC = () => {
                 <div className={styles.pedidoFecha}>
                   {formatDate(pedido.fecha_pedido)}
                 </div>
+                <button className={styles.imprimirButton}
+                onClick={()=>handlePrintPedido(pedido)}>
+                  <svg className={styles.icon} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg> 
+                </button>
               </div>
 
               <div className={styles.pedidoCliente}>
@@ -514,9 +555,14 @@ const GestionPedidosPage: React.FC = () => {
               </div>
 
               <div className={styles.pedidoResumen}>
-                <div className={styles.productosCount}>
-                  <i className="fas fa-box-open"></i>
-                  {pedido.productos_detalle.length} {pedido.productos_detalle.length === 1 ? 'producto' : 'productos'}
+                <div>
+                {
+                  pedido.productos_detalle.map(producto => (
+                    <div key={producto.id_producto} className={styles.pedidoProductos}> 
+                      {parseInt(producto.cantidad_producto)}  {producto.nombre_producto}
+                    </div>
+                  ))
+                }
                 </div>
                 <div className={styles.pedidoTotal}>
                   Total: <span>${typeof pedido.total === 'number' ? pedido.total.toFixed(2) : '0.00'}</span>
@@ -525,10 +571,10 @@ const GestionPedidosPage: React.FC = () => {
 
               <div className={styles.pedidoEstados}>
                 <button
-                  className={`${styles.estadoButton} ${
-                    pedido.estado === 'PENDIENTE' ? styles.estadoPendienteButton :
-                    pedido.estado === 'LISTO' ? styles.estadoListoButton :
-                    styles.estadoEntregadoButton
+                  className={`${styles.estadoBadge} ${
+                    pedido.estado === 'PENDIENTE' ? styles.pendienteBadge :
+                    pedido.estado === 'LISTO' ? styles.listoBadge :
+                    styles.entregadoBadge
                   }`}
                   onClick={() => handleUpdatePedidoEstado(pedido)}
                   >
@@ -542,14 +588,25 @@ const GestionPedidosPage: React.FC = () => {
                 </button>
 
                 <button
-                  className={`${styles.estadoButton} ${
-                    pedido.pagado ? styles.estadoPagadoButton : styles.estadoNoPagadoButton
+                  className={`${styles.estadoBadge} ${
+                    pedido.pagado ? styles.pagadoBadge : styles.noPagadoBadge
                   }`}
                   onClick={() => handleTogglePagado(pedido)}
                 >
                   <i className={`fas ${pedido.pagado ? 'fa-dollar-sign' : 'fa-hand-holding-usd'}`}></i>
                   {pedido.pagado ? 'Pagado' : 'No Pagado'}
                 </button>
+              </div>
+              <div className={styles.pedidoEstados}>
+                    <button 
+                      className={`${styles.estadoBadge} ${
+                      pedido.avisado ? styles.avisadoBadge :
+                      styles.noAvisadoBadge
+                    }`}
+                    onClick={() => handleToggleAvisado(pedido)}
+                    >
+                      {pedido.avisado ? 'Avisado' : 'No avisado'}
+                    </button>
               </div>
 
               <div className={styles.pedidoAcciones}>
@@ -619,30 +676,31 @@ const GestionPedidosPage: React.FC = () => {
       </div>
 
       <div className={styles.tabsContainer}>
-        <button
+      {/**<button
           className={`${styles.tabButton} ${activeTab === 'todos' ? styles.activeTab : ''}`}
           onClick={() => setActiveTab('todos')}
         >
           Todos ({filteredPedidos.length})
-        </button>
+        </button>*/}
         <button
-          className={`${styles.tabButton} ${activeTab === 'pendientes' ? styles.activeTab : ''}`}
-          onClick={() => setActiveTab('pendientes')}
+          className={`${styles.tabButton} ${activeTab === 'PENDIENTE' ? styles.activeTab : ''}`}
+          onClick={() => setActiveTab('PENDIENTE')}
         >
           Pendientes ({pedidosPendientes.length})
         </button>
         <button
-          className={`${styles.tabButton} ${activeTab === 'listos' ? styles.activeTab : ''}`}
-          onClick={() => setActiveTab('listos')}
+          className={`${styles.tabButton} ${activeTab === 'LISTO' ? styles.activeTab : ''}`}
+          onClick={() => setActiveTab('LISTO')}
         >
         Listos ({pedidosListos.length})
         </button>
         <button
-          className={`${styles.tabButton} ${activeTab === 'entregados' ? styles.activeTab : ''}`}
-          onClick={() => setActiveTab('entregados')}
+          className={`${styles.tabButton} ${activeTab === 'ENTREGADO' ? styles.activeTab : ''}`}
+          onClick={() => setActiveTab('ENTREGADO')}
         >
           Entregados ({pedidosEntregados.length})
         </button>
+        {/** 
         <button
           className={`${styles.tabButton} ${activeTab === 'pagados' ? styles.activeTab : ''}`}
           onClick={() => setActiveTab('pagados')}
@@ -655,14 +713,12 @@ const GestionPedidosPage: React.FC = () => {
         >
           No Pagados ({pedidosNoPagados.length})
         </button>
+        */}
       </div>
-
-      {activeTab === 'todos' && renderPedidosList(filteredPedidos)}
-      {activeTab === 'pendientes' && renderPedidosList(pedidosPendientes)}
-      {activeTab === 'listos' && renderPedidosList(pedidosListos)}
-      {activeTab === 'entregados' && renderPedidosList(pedidosEntregados)}
-      {activeTab === 'pagados' && renderPedidosList(pedidosPagados)}
-      {activeTab === 'noPagados' && renderPedidosList(pedidosNoPagados)}
+      
+      {activeTab === 'PENDIENTE' && renderPedidosList(pedidosPendientes)}
+      {activeTab === 'LISTO' && renderPedidosList(pedidosListos)}
+      {activeTab === 'ENTREGADO' && renderPedidosList(pedidosEntregados)}
 
       {isModalOpen && viewingPedido && (
         <div className={styles.modalOverlay}>

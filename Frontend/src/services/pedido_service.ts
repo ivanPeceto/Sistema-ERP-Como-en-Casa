@@ -80,3 +80,8 @@ export const deletePedido = async ({ fecha, numero }: { fecha: string; numero: n
   const response = await pedidoAPICLient.post(`/api/pedidos/eliminar/?fecha=${fecha}&numero=${numero}`);
   return response.data;
 };
+
+export const printPedido = async ({ fecha, numero }: { fecha: string; numero: number }): Promise<any> => {
+  const response = await pedidoAPICLient.post(`/api/pedidos/imprimir/?fecha=${fecha}&numero=${numero}`);
+  return response.data;
+};

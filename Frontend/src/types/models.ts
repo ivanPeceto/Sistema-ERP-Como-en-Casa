@@ -71,6 +71,7 @@ export interface Pedido {
   id_cliente: number;
   para_hora: string | null; 
   estado: string; // 'PENDIENTE', 'LISTO', 'ENTREGADO'
+  avisado: boolean;
   // Deprecated
   entregado: boolean;
   //--
@@ -97,6 +98,7 @@ export interface PedidoInput {
     id_cliente: number;
     para_hora: string | null; 
     estado: string; // 'PENDIENTE', 'LISTO', 'ENTREGADO'
+    avisado: boolean;
     // Deprecated
     entregado: boolean;
     //--

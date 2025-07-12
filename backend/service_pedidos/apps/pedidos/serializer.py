@@ -63,7 +63,9 @@ class PedidoSerializer(serializers.ModelSerializer):
                   'para_hora',
                   'productos',
                   'productos_detalle',
+                  'estado',
                   'entregado',
+                  'avisado',
                   'pagado',
                   'total']
         extra_kwargs = {

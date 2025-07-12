@@ -15,9 +15,9 @@ class Pedido(models.Model):
     ESTADO_ENTREGADO = 'ENTREGADO'
     
     ESTADO_CHOICES = [
-        (ESTADO_PENDIENTE, 'Pendiente'),
-        (ESTADO_LISTO, 'Listo'),
-        (ESTADO_ENTREGADO, 'Entregado'),
+        (ESTADO_PENDIENTE, 'PENDIENTE'),
+        (ESTADO_LISTO, 'LISTO'),
+        (ESTADO_ENTREGADO, 'ENTREGADO'),
     ]
 
     id = models.AutoField(primary_key=True, db_column='id')
@@ -29,6 +29,7 @@ class Pedido(models.Model):
     #Deprecated
     entregado = models.BooleanField(db_column='entregado')
     #--
+    avisado = models.BooleanField(db_column='avisado')
     pagado = models.BooleanField(db_column='pagado')
 
     class Meta:

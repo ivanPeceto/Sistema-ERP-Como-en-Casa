@@ -32,7 +32,7 @@ const LoginPage: React.FC = () => {
    */
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/gestion', { replace: true });
+      navigate('/gestion/pedidos', { replace: true });
     }
   }, [isAuthenticated, navigate]);
 

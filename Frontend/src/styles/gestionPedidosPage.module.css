@@ -417,8 +417,9 @@
 /* Resumen del pedido */
 .pedidoResumen {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
-  align-items: center;
+  align-items: left;
   background-color: #f8f9fa;
   padding: 10px 12px;
   border-radius: 6px;
@@ -429,13 +430,21 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.9rem;
+  font-size: 1.2rem;
+}
+
+.pedidoProductos {
+  display: flex;
+  margin-bottom: 0.8rem;
+  text-align: left;
+  font-weight: 500;
+  font-size: 1.3rem;
 }
 
 .pedidoTotal span {
   font-weight: 700;
   color: #28a745;
-  font-size: 1.1rem;
+  font-size: 1.5rem;
 }
 
 .pedidoEstados {
@@ -447,7 +456,7 @@
 .estadoBadge {
   padding: 6px 10px;
   border-radius: 20px;
-  font-size: 0.8rem;
+  font-size: 1.2rem;
   font-weight: 500;
   display: flex;
   align-items: center;
@@ -455,34 +464,68 @@
   cursor: pointer;
   transition: all 0.2s;
   border: 1px solid transparent;
+
+  width: 50%;
+  justify-content: center;
+  text-align: center;
 }
 
 .estadoBadge i {
   font-size: 0.9em;
 }
 
+
 .entregadoBadge {
+
   background-color: #e8f5e9;
   color: #2e7d32;
   border-color: #c8e6c9;
 }
 
+.listoBadge {
+  background-color: #c3f3ff;
+  color: #066164;
+  border-color: #c9d3f3;
+}
+
 .pendienteBadge {
+
   background-color: #fff3e0;
   color: #e65100;
   border-color: #ffe0b2;
 }
 
 .pagadoBadge {
-  background-color: #e3f2fd;
-  color: #1565c0;
-  border-color: #bbdefb;
+
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border-color: #c8e6c9;
 }
 
 .noPagadoBadge {
+
   background-color: #ffebee;
   color: #c62828;
   border-color: #ffcdd2;
+}
+
+.avisadoBadge {
+  width: 100%;
+  color: white;
+  justify-content: center;
+
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border-color: #c8e6c9;
+}
+
+.noAvisadoBadge{
+  width: 100%;
+  justify-content: center;
+
+  background-color: #fff3e0;
+  color: #e65100;
+  border-color: #ffe0b2;
 }
 
 /* Acciones del pedido */
@@ -526,6 +569,17 @@
 
 .actionButton.deleteButton:hover {
   background-color: #ffebee;
+}
+.icon {
+  width: 1.5em;
+  height: 1.5em;
+  stroke: currentColor;
+  flex-shrink: 0;
+}
+.imprimirButton {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border-color: #c8e6c9;
 }
 
 /* Estado de carga */
