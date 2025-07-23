@@ -171,6 +171,7 @@ const CrearPedidoPage: React.FC = () => {
         id_cliente: clienteSeleccionado.id,
         para_hora: paraHora || null,
         entregado: false,
+        avisado: false,
         estado: 'PENDIENTE',
         pagado: false,
         productos: pedidoItems.map(item => ({
