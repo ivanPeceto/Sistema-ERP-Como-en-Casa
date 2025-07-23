@@ -55,6 +55,7 @@ export interface PedidoItem extends Partial<Producto> {
     id: number;
     nombre: string;
     precio_unitario: number;
+    aclaraciones?: string;
     cantidad: number;
     subtotal: number;
 }
@@ -68,7 +69,10 @@ export interface Pedido {
   id: number;
   numero_pedido: number;
   fecha_pedido: string; 
+  // Deprecated
   id_cliente: number;
+  //--
+  cliente: string;
   para_hora: string | null; 
   estado: string; // 'PENDIENTE', 'LISTO', 'ENTREGADO'
   avisado: boolean;
@@ -81,6 +85,7 @@ export interface Pedido {
       id_producto: number;
       nombre_producto: string;
       cantidad_producto: number;
+      aclaraciones?: string;
       precio_unitario: number;
       subtotal: number;
   }[];
@@ -94,8 +99,11 @@ export interface Pedido {
  */
 export interface PedidoInput {
     numero_pedido: number;
-    fecha_pedido: string; 
+    fecha_pedido: string;
+    // Deprecated 
     id_cliente: number;
+    // --
+    cliente: string;
     para_hora: string | null; 
     estado: string; // 'PENDIENTE', 'LISTO', 'ENTREGADO'
     avisado: boolean;
@@ -108,6 +116,7 @@ export interface PedidoInput {
         nombre_producto: string;
         cantidad_producto: number;
         precio_unitario: number;
+        aclaraciones?: string;
     }[];
 }
 

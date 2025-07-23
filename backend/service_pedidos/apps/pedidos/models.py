@@ -23,7 +23,10 @@ class Pedido(models.Model):
     id = models.AutoField(primary_key=True, db_column='id')
     numero_pedido = models.IntegerField(db_column='numero_pedido')    
     fecha_pedido = models.DateField(db_column='fecha_pedido')
+    #Deprecated
     id_cliente = models.IntegerField(db_column='id_cliente')
+    #--
+    cliente = models.CharField(max_length=100, default="Sin nombre", db_column='cliente')
     para_hora = models.TimeField(db_column='para_hora', null=True)
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default=ESTADO_PENDIENTE, db_column='estado')
     #Deprecated

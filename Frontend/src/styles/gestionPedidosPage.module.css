@@ -441,6 +441,13 @@
   font-size: 1.3rem;
 }
 
+.aclaracionesProducto {
+  display: flex;
+  margin-bottom: 0.4rem;
+  text-align: left;
+  font-weight: 500;
+  font-size: 1.3rem;
+}
 .pedidoTotal span {
   font-weight: 700;
   color: #28a745;

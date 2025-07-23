@@ -20,6 +20,7 @@ class PedidoProductosSerializer(serializers.ModelSerializer):
                   'nombre_producto',
                   'cantidad_producto',
                   'precio_unitario',
+                  'aclaraciones',
                   'subtotal']
         
     def get_subtotal(self, producto):
@@ -59,12 +60,17 @@ class PedidoSerializer(serializers.ModelSerializer):
         fields = ['id',
                   'numero_pedido',
                   'fecha_pedido',
+                  #
                   'id_cliente',
+                  #
+                  'cliente',
                   'para_hora',
                   'productos',
                   'productos_detalle',
                   'estado',
+                  #
                   'entregado',
+                  #
                   'avisado',
                   'pagado',
                   'total']
@@ -88,7 +94,8 @@ class PedidoSerializer(serializers.ModelSerializer):
                 id_producto = producto['id_producto'],
                 nombre_producto= producto['nombre_producto'],
                 cantidad_producto= producto['cantidad_producto'],
-                precio_unitario= producto['precio_unitario']
+                precio_unitario= producto['precio_unitario'],
+                aclaraciones = producto['aclaraciones'],
             )
         return pedido
     
@@ -124,7 +131,8 @@ class PedidoSerializer(serializers.ModelSerializer):
                 id_producto=producto['id_producto'],
                 nombre_producto=producto['nombre_producto'],
                 cantidad_producto=producto['cantidad_producto'],
-                precio_unitario=producto['precio_unitario']
+                precio_unitario=producto['precio_unitario'],
+                aclaraciones=producto['aclaraciones'],
             )
 
         return instance
