@@ -198,7 +198,7 @@ class ImprimirPedidoView(APIView):
             pedidoSerialized = PedidoSerializer(pedido).data
             ip = config('IP_IMPRESORA')
             route = f"http://{ip}/imprimir_comanda"
-            r = requests.post("route", json=pedidoSerialized)
+            r = requests.post("http://192.168.1.26:5000/imprimir_comanda", json=pedidoSerialized)
             r.raise_for_status()
             return r.json()
         except requests.exceptions.RequestException as e:
