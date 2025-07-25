@@ -19,8 +19,8 @@
     padding: 2rem;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-    width: 95%; /* Adapta el ancho */
-    height: 95%;
+    width: 60%; /* Adapta el ancho */
+    height: 80%;
     max-width: 90vw; /* Ancho máximo similar al modal de edición */
     max-height: 95vh; /* Altura máxima */
     overflow-y: auto;
@@ -58,7 +58,7 @@
   
   .createModalGrid {
     display: grid;
-    grid-template-columns: 1fr 1.5fr; /* Panel de productos más grande que panel de cliente/resumen */
+    grid-template-columns: 1fr 1fr; /* Panel de productos más grande que panel de cliente/resumen */
     gap: 20px;
     flex-grow: 1;
   }
@@ -268,7 +268,7 @@
   
   .orderItem {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     padding: 10px 15px;
     border-bottom: 1px solid #f1f3f5;
@@ -280,6 +280,7 @@
   
   .orderItemInfo {
     display: flex;
+    flex-direction: column;
     flex-grow: 1;
   }
   
@@ -298,9 +299,19 @@
     display: flex;
     align-items: center;
     gap: 5px;
-    margin-left: 10px;
+    margin-right: 10px;
   }
   
+  input.quantityInput::-webkit-outer-spin-button,
+  input.quantityInput::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+  }
+
+  input[type=number].quantityInput {
+      -moz-appearance: textfield;
+  }
+
   .quantityButton {
     padding: 5px 10px;
     border: 1px solid #ced4da;
@@ -409,7 +420,8 @@
     margin-top: 5px;
     border: 1px solid #ced4da;
     border-radius: 4px;
-    font-size: 0.9rem;
+    font-size: 0.7rem;
     resize: vertical; /* Permite redimensionar verticalmente */
-    min-height: 40px;
+    min-height: 30px;
+    height: 30px;
   }

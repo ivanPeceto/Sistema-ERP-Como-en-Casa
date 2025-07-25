@@ -186,14 +186,14 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
     <div className={modalStyles.modalOverlay} onClick={onClose}>
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modalHeader}>
-          <h2 className={styles.modalTitle}>
+          {/** <h2 className={styles.modalTitle}>
             <i className={`fas fa-plus-circle ${styles.iconMarginRight}`}></i>
             Armar Nuevo Pedido
-          </h2>
+          </h2>*/}
         </div>
         
         {isLoading && <div className={modalStyles.loadingContainer}><p>Creando pedido...</p></div>}
-        {error && <div className={modalStyles.error}>{error}</div>}
+        {/**{error && <div className={modalStyles.error}>{error}</div>}*/}
 
         <div className={styles.modalBody}>
           <div className={styles.createModalGrid}>
@@ -232,11 +232,7 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
                 ) : (
                   pedidoItems.map(item => (
                     <div key={item.id} className={styles.orderItem}>
-                      <div className={styles.orderItemInfo}>
-                        <strong>{item.nombre}</strong>
-                        <span>${(item.precio_unitario || 0)} c/u</span>
-                        {item.aclaraciones && <p className={styles.aclaracionesProducto}>({item.aclaraciones})</p>}
-                      </div>
+
                       <div className={styles.orderItemControls}>
                         <button onClick={() => actualizarCantidadItem(item.id, item.cantidad - 1)} className={styles.quantityButton}>-</button>
                         <input
@@ -246,17 +242,33 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
                             onChange={(e: ChangeEvent<HTMLInputElement>) => actualizarCantidadItem(item.id, parseInt(e.target.value) || 1)}
                             className={styles.quantityInput}
                         />
+
                         <button onClick={() => actualizarCantidadItem(item.id, item.cantidad + 1)} className={styles.quantityButton}>+</button>
-                        <span className={styles.orderItemSubtotal}>${(item.subtotal || 0)}</span>
-                        <button onClick={() => eliminarItemDelPedido(item.id)} className={styles.deleteItemButton}>×</button>
+                        
                       </div>
-                      {/* Campo para aclaraciones del producto en el pedido de creación */}
-                      <textarea
-                        placeholder="Aclaraciones..."
-                        value={item.aclaraciones || ''}
-                        onChange={(e: ChangeEvent<HTMLTextAreaElement>) => updateItemAclaraciones(item.id, e.target.value)}
-                        className={modalStyles.aclaracionesInput}
-                      ></textarea>
+
+                      <div className={styles.orderItemInfo}>
+
+                        <strong>{item.nombre}</strong>
+                        {item.aclaraciones && <p className={styles.aclaracionesProducto}>({item.aclaraciones})</p>}
+                        
+                        <textarea
+                          placeholder="Aclaraciones..."
+                          value={item.aclaraciones || ''}
+                          onChange={(e: ChangeEvent<HTMLTextAreaElement>) => updateItemAclaraciones(item.id, e.target.value)}
+                          className={styles.aclaracionesInput}
+                        ></textarea>
+
+                      </div>
+
+                      <div>
+                        
+                        <span className={styles.orderItemSubtotal}>${(item.subtotal || 0)}</span>
+                        
+                        <button onClick={() => eliminarItemDelPedido(item.id)} className={styles.deleteItemButton}>×</button>
+
+                      </div>
+
                     </div>
                   ))
                 )}
