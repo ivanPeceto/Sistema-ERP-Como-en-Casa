@@ -716,18 +716,18 @@ const GestionPedidosPage: React.FC = () => {
             onChange={handleSearchTermChange}
             className={styles.searchInput}
           />
+          <button
+          onClick={openCreateModal} // Aquí, ahora abres el modal directamente
+          className={styles.newOrderButton} 
+        >
+          Nuevo Pedido
+        </button>
         </div>
         {/* Botón "Armar Pedido" 
         <button
           onClick={() => navigate('/gestion')} 
           className={styles.newOrderButton} 
         >*/}
-        <button
-          onClick={openCreateModal} // Aquí, ahora abres el modal directamente
-          className={styles.newOrderButton} 
-        >
-          Armar Nuevo Pedido
-        </button>
       </div>
 
       <div className={styles.tabsContainer}>

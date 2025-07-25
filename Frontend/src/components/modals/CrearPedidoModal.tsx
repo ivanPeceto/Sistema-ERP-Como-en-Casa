@@ -303,15 +303,15 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
                   productosFiltradosPorCategoria.map(producto => (
                     <div key={producto.id} className={styles.productItem}>
                       <div className={styles.productInfo}>
+                        <button
+                        onClick={() => agregarProductoAlPedido(producto)}
+                        className={styles.addButtonSmall}
+                        >
+                          Añadir
+                        </button>
                         <strong>{producto.nombre}</strong>
                         <span>${(producto.precio_unitario || 0)}</span>
                       </div>
-                      <button
-                        onClick={() => agregarProductoAlPedido(producto)}
-                        className={styles.addButtonSmall}
-                      >
-                        Añadir
-                      </button>
                     </div>
                   ))
                 ) : (
