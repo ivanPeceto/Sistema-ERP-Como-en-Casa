@@ -211,6 +211,7 @@
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+
 .formControl:focus {
   border-color: #4caf50;
   box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
@@ -221,6 +222,10 @@
 .timeInput {
   width: 150px !important;
   min-width: 120px;
+}
+
+.timeInput::-webkit-datetime-edit-ampm-field {
+  display: none;
 }
 
 /* Campos de información del pedido */

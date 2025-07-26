@@ -26,6 +26,34 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
   const [isLoading, setIsLoading] = useState<boolean>(false); // Carga interna del modal
   const [error, setError] = useState<string | null>(null);
 
+
+  const resetModalState = useCallback(() => {
+    setClienteInput('');
+    setPedidoItems([]);
+    setParaHora('');
+    setError(null);
+    setIsLoading(false); // Asegurar que isLoading también se resetea
+
+    // Re-seleccionar la primera categoría disponible si hay productos
+    if (productos.length > 0) {
+      const categoriasUnicas = [...new Set(productos.map(p => p.categoria?.nombre || 'Sin Categoría'))];
+      if (categoriasUnicas.length > 0) {
+        setCategoriaSeleccionada(categoriasUnicas[0]);
+      } else {
+        setCategoriaSeleccionada('');
+      }
+    } else {
+      setCategoriaSeleccionada('');
+    }
+  }, [productos]); // Depende de productos para re-seleccionar la categoría
+
+  
+  useEffect(() => {
+    if (isOpen) {
+      resetModalState();
+    }
+  }, [isOpen, resetModalState]);
+
   // Efecto para inicializar la categoría seleccionada cuando los productos estén cargados
   useEffect(() => {
     if (productos.length > 0 && !categoriaSeleccionada) {
@@ -186,10 +214,6 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
     <div className={modalStyles.modalOverlay} onClick={onClose}>
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modalHeader}>
-          {/** <h2 className={styles.modalTitle}>
-            <i className={`fas fa-plus-circle ${styles.iconMarginRight}`}></i>
-            Armar Nuevo Pedido
-          </h2>*/}
         </div>
         
         {isLoading && <div className={modalStyles.loadingContainer}><p>Creando pedido...</p></div>}
@@ -201,30 +225,34 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
             <div className={styles.clientSelectionPanel}>
               <h2>Información del Pedido</h2>
               
-              <div className={modalStyles.formGroup}>
-                <label className={modalStyles.formLabel} htmlFor="clienteInput">Cliente</label>
-                <input
-                  type="text"
-                  id="clienteInput"
-                  name="clienteInput"
-                  value={clienteInput}
-                  onChange={(e) => setClienteInput(e.target.value)}
-                  className={modalStyles.formControl}
-                  placeholder="Nombre del cliente"
-                />
+              <div className={[modalStyles.formGroup, styles.clientForm].join(" ")}>
+                <div className={styles.formRowElement}>
+                    <label className={modalStyles.formLabel} htmlFor="clienteInput">Cliente</label>
+                    <input
+                      type="text"
+                      id="clienteInput"
+                      name="clienteInput"
+                      value={clienteInput}
+                      onChange={(e) => setClienteInput(e.target.value)}
+                      className={modalStyles.formControl}
+                      placeholder="Nombre del cliente"
+                    />
+                </div>        
+                <div className={styles.formRowElement}>
+                  <label className={modalStyles.formLabel} htmlFor="para_hora">Hora de Entrega</label>
+                  <input
+                    type="time"
+                    id="para_hora"
+                    name="para_hora"
+                    value={paraHora}
+                    onChange={handleParaHoraChange}
+                    className={`${modalStyles.formControl} ${modalStyles.timeInput}`}
+                  />
+                </div>
+                
               </div>
 
-              <div className={modalStyles.formGroup}>
-                <label className={modalStyles.formLabel} htmlFor="para_hora">Hora de Entrega</label>
-                <input
-                  type="time"
-                  id="para_hora"
-                  name="para_hora"
-                  value={paraHora}
-                  onChange={handleParaHoraChange}
-                  className={`${modalStyles.formControl} ${modalStyles.timeInput}`}
-                />
-              </div>
+
               
               <div className={styles.orderItemsList}>
                 {pedidoItems.length === 0 ? (
