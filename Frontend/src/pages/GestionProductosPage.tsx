@@ -232,17 +232,17 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
             onChange={handleSearchChange}
             className={styles.searchInput}
           />
-        </div>
-        <div className={styles.toolbarButtons}>
-          <button
-            onClick={() => navigate('/gestion/categorias')}
-            className={`${styles.addButton} ${styles.secondaryButton}`}
-          >
-            Gestionar Categorías
-          </button>
-          <button onClick={() => openModal()} className={styles.addButton}>
-            Nuevo Producto
-          </button>
+          <div className={styles.toolbarButtons}>
+            <button
+              onClick={() => navigate('/gestion/categorias')}
+              className={`${styles.addButton} ${styles.secondaryButton}`}
+            >
+              Gestionar Categorías
+            </button>
+            <button onClick={() => openModal()} className={styles.addButton}>
+              Nuevo Producto
+            </button>
+          </div>
         </div>
       </div>
 
@@ -266,14 +266,14 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
 
               className={`${styles.listItem} ${!producto.disponible ? styles.itemNoDisponible : ''}`}
             >
+              <div className={styles.itemActions}>
+                <button onClick={() => openModal(producto)} className={styles.editButton}>Editar</button>
+                <button onClick={() => handleDelete(producto.id)} className={styles.deleteButton}>Eliminar</button>
+              </div>
               <div className={styles.itemInfo}>
                 <strong>{producto.nombre}</strong>
                 <span>Precio: ${(+producto.precio_unitario).toFixed(2)}</span>
                 {producto.categoria && <small>Categoría: {producto.categoria.nombre}</small>}
-              </div>
-              <div className={styles.itemActions}>
-                <button onClick={() => openModal(producto)} className={styles.editButton}>Editar</button>
-                <button onClick={() => handleDelete(producto.id)} className={styles.deleteButton}>Eliminar</button>
               </div>
             </div>
           ))
