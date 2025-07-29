@@ -616,7 +616,7 @@ const GestionPedidosPage: React.FC = () => {
                 }
                 </div>
                 <div className={styles.pedidoTotal}>
-                  Total: <span>${typeof pedido.total === 'number' ? pedido.total.toFixed(2) : '0.00'}</span>
+                  Total: <span>${typeof pedido.total === 'number' ? pedido.total.toFixed(0) : '0.00'}</span>
                 </div>
               </div>
 
@@ -717,7 +717,7 @@ const GestionPedidosPage: React.FC = () => {
             className={styles.searchInput}
           />
           <button
-          onClick={openCreateModal} // Aquí, ahora abres el modal directamente
+          onClick={openCreateModal}
           className={styles.newOrderButton} 
         >
           Nuevo Pedido
@@ -822,55 +822,36 @@ const GestionPedidosPage: React.FC = () => {
             
             <div className={modalStyles.modalBody}>
               <div className={modalStyles.editModalGrid}>
-                {/* Panel de información del pedido */}
                 <div className={modalStyles.editModalInfo}>
                   <h3 className={modalStyles.modalSectionTitle}>
                     <i className={`fas fa-info-circle ${modalStyles.iconMarginRight}`}></i>
                     Información del Pedido
                   </h3>
-                  {/*
-                  <div className={`${modalStyles.formGroup} ${modalStyles.infoField}`}>
-                    <label className={modalStyles.formLabel}>Cliente</label>
-                    <p className={modalStyles.formControl} style={{background: '#fff'}}>
-                      {clienteNombreMap.get(editingPedido.id_cliente) || `ID: ${editingPedido.id_cliente}`}
-                    </p>
-                  </div>
-                  */}
-                  <div className={modalStyles.formGroup}> 
-                    <label className={modalStyles.formLabel} htmlFor="cliente">Cliente</label>
-                    <input
-                      type="text"
-                      id="cliente"
-                      name="cliente"
-                      value={editFormData.cliente || 'asdas'}
-                      onChange={handleEditInputChange}
-                      className={modalStyles.formControl} style={{background: '#fff'}}
-                    />
-                  </div>
+                  <div className={modalStyles.formGroupRow}>
+                    <div className={modalStyles.formGroup}> 
+                      <label className={modalStyles.formLabel} htmlFor="cliente">Cliente</label>
+                      <input
+                        type="text"
+                        id="cliente"
+                        name="cliente"
+                        value={editFormData.cliente || 'asdas'}
+                        onChange={handleEditInputChange}
+                        className={modalStyles.formControl} style={{background: '#fff'}}
+                      />
+                    </div>
 
-                  <div className={`${modalStyles.formGroup} ${modalStyles.infoField}`}>
-                    <label className={modalStyles.formLabel}>Fecha del Pedido</label>
-                    <p className={modalStyles.formControl} style={{background: '#fff'}}>
-                      {new Date(editingPedido.fecha_pedido).toLocaleDateString('es-AR', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
-                    </p>
+                    <div className={modalStyles.formGroup}>
+                      <label className={modalStyles.formLabel} htmlFor="para_hora">Hora de Entrega</label>
+                      <input
+                        type="time"
+                        id="para_hora"
+                        name="para_hora"
+                        value={editFormData.para_hora || ''}
+                        onChange={handleEditInputChange}
+                        className={`${modalStyles.formControl} ${modalStyles.timeInput}`}
+                      />
+                    </div>
                   </div>
-                  
-                  <div className={modalStyles.formGroup}>
-                    <label className={modalStyles.formLabel} htmlFor="para_hora">Hora de Entrega</label>
-                    <input
-                      type="time"
-                      id="para_hora"
-                      name="para_hora"
-                      value={editFormData.para_hora || ''}
-                      onChange={handleEditInputChange}
-                      className={`${modalStyles.formControl} ${modalStyles.timeInput}`}
-                    />
-                  </div>
-                  
                   <div className={modalStyles.formGroup}>
                     <label className={modalStyles.formLabel}>Estado del Pedido</label>
                     <div className={modalStyles.checkboxGroupContainer}>
@@ -891,31 +872,24 @@ const GestionPedidosPage: React.FC = () => {
                           <option value="ENTREGADO">Entregado</option>
                         </select>
                       </div>
-
-                      
-                      <div className={modalStyles.checkboxContainer}>
-                        <input type="checkbox" id="pagado" name="pagado" checked={editFormData.pagado || false} onChange={handleEditInputChange} className={modalStyles.checkboxInput}/>
-                        <label htmlFor="pagado" className={modalStyles.formLabel}>
-                          <span className={`${modalStyles.statusBadge} ${editFormData.pagado ? modalStyles.statusPaid : modalStyles.statusUnpaid}`}>
-                            <i className={`fas ${editFormData.pagado ? 'fa-check-circle' : 'fa-exclamation-circle'}`}></i>
-                            {editFormData.pagado ? 'Pagado' : 'Pendiente de pago'}
-                          </span>
-                        </label>
-                      </div>
                     </div>
-                  </div>
-                  
-                  <div className={modalStyles.formGroup}>
-                    <label className={modalStyles.formLabel}>Productos en el pedido</label>
-                    <p className={modalStyles.emphasizedText} style={{fontSize: '1.1rem'}}>
-                      {editingPedidoItems.length} {editingPedidoItems.length === 1 ? 'producto' : 'productos'}
-                    </p>
+                    <div className={modalStyles.formGroup}>
+                      <div className={modalStyles.checkboxContainer}>
+                          <input type="checkbox" id="pagado" name="pagado" checked={editFormData.pagado || false} onChange={handleEditInputChange} className={modalStyles.checkboxInput}/>
+                          <label htmlFor="pagado" className={modalStyles.formLabel}>
+                            <span className={`${modalStyles.statusBadge} ${editFormData.pagado ? modalStyles.statusPaid : modalStyles.statusUnpaid}`}>
+                              <i className={`fas ${editFormData.pagado ? 'fa-check-circle' : 'fa-exclamation-circle'}`}></i>
+                              {editFormData.pagado ? 'Pagado' : 'Pendiente de pago'}
+                            </span>
+                          </label>
+                        </div>
+                    </div>
                   </div>
                   
                   <div className={modalStyles.totalSection}>
                     <label className={modalStyles.formLabel}>Subtotal</label>
                     <p className={modalStyles.totalAmount}>
-                      ${totalEditingPedido.toFixed(2)}
+                      ${totalEditingPedido.toFixed(0)}
                     </p>
                   </div>
                 </div>
@@ -948,10 +922,6 @@ const GestionPedidosPage: React.FC = () => {
                       {editProductosFiltradosPorCategoria.length > 0 ? (
                         editProductosFiltradosPorCategoria.map(producto => (
                           <div key={producto.id} className={crearPedidoStyles.productItem}>
-                            <div className={crearPedidoStyles.productInfo}>
-                              <strong>{producto.nombre}</strong>
-                              <span>${(parseFloat(producto.precio_unitario.toString()) || 0).toFixed(2)}</span>
-                            </div>
                             <button
                               type="button"
                               onClick={() => addProductToEditingOrder(producto)}
@@ -959,6 +929,10 @@ const GestionPedidosPage: React.FC = () => {
                             >
                               <i className="fas fa-plus"></i> Añadir
                             </button>
+                            <div className={crearPedidoStyles.productInfo}>
+                              <strong>{producto.nombre}</strong>
+                              <span>${(parseFloat(producto.precio_unitario.toString()) || 0).toFixed(2)}</span>
+                            </div>
                           </div>
                         ))
                       ) : (
@@ -967,7 +941,6 @@ const GestionPedidosPage: React.FC = () => {
                     </div>
                   </div>
                   
-                  {/* Lista de productos actuales */}
                   <div className={modalStyles.modalSection} style={{flexGrow: 1}}>
                     <h3 className={modalStyles.modalSectionTitle}>
                       <i className="fas fa-shopping-basket" style={{marginRight: '8px'}}></i>
@@ -986,9 +959,20 @@ const GestionPedidosPage: React.FC = () => {
                           <div key={item.id} className={modalStyles.productCard}>
                             <div className={modalStyles.productHeader}>
                               <h4 className={modalStyles.productName}>{item.nombre}</h4>
-                              <span className={modalStyles.productPrice}>
-                                ${(parseFloat(item.precio_unitario.toString()) || 0).toFixed(2)} c/u
-                              </span>
+                              <div>
+                                <textarea
+                                  placeholder="Aclaraciones..."
+                                  value={item.aclaraciones}
+                                  onChange={(e: ChangeEvent<HTMLTextAreaElement>) => updateEditingItemAclaraciones(item.id, e.target.value)}
+                                  className={modalStyles.aclaracionesInput}
+                                ></textarea>
+                              </div>
+                              <div className={modalStyles.emphasizedText}>
+                                <span className={modalStyles.productPrice}>
+                                  Subtotal:
+                                </span>
+                                ${(parseFloat(item.subtotal.toString()) || 0).toFixed(0)}
+                              </div>
                             </div>
                             
                             <div className={modalStyles.quantityContainer}>
@@ -1022,15 +1006,6 @@ const GestionPedidosPage: React.FC = () => {
                               </div>
                               
                               <div className={modalStyles.textRight}>
-                                <div className={modalStyles.emphasizedText}>
-                                  ${(parseFloat(item.subtotal.toString()) || 0).toFixed(2)}
-                                </div>
-                                <textarea
-                                  placeholder="Aclaraciones..."
-                                  value={item.aclaraciones}
-                                  onChange={(e: ChangeEvent<HTMLTextAreaElement>) => updateEditingItemAclaraciones(item.id, e.target.value)}
-                                  className={modalStyles.aclaracionesInput}
-                                ></textarea>
                                 <button
                                   type="button"
                                   onClick={() => removeProductFromEditingOrder(item.id)}

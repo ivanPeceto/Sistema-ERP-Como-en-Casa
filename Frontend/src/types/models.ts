@@ -39,7 +39,6 @@ export interface Producto {
   nombre: string;
   descripcion: string;
   precio_unitario: number;
-  stock: number;
   disponible: boolean;
   categoria: Categoria | null;
 }
