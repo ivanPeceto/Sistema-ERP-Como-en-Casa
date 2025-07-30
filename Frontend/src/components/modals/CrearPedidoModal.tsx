@@ -278,9 +278,7 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
 
                       <div className={styles.orderItemInfo}>
 
-                        <strong>{item.nombre}</strong>
-                        {item.aclaraciones && <p className={styles.aclaracionesProducto}>({item.aclaraciones})</p>}
-                        
+                        <strong>{item.nombre}</strong>                        
                         <textarea
                           placeholder="Aclaraciones..."
                           value={item.aclaraciones || ''}
