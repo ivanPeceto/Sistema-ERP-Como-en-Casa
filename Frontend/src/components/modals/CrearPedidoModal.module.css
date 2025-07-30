@@ -425,6 +425,7 @@
   /* Estilos de los inputs de edición dentro del modal (aclaraciones) */
   .aclaracionesInput {
     width: 100%;
+    max-width: 400px;
     padding: 8px;
     margin-top: 5px;
     border: 1px solid #ced4da;

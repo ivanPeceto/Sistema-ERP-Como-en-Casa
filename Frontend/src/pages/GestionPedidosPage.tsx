@@ -796,7 +796,7 @@ const GestionPedidosPage: React.FC = () => {
               <ul className={styles.productListModal}>
                 {viewingPedido.productos_detalle.map((item, index) => (
                   <li key={index}>
-                    {item.nombre_producto} - {item.cantidad_producto} x ${ (parseFloat(item.precio_unitario?.toString() || '0')).toFixed(2) } = ${ (parseFloat(item.subtotal?.toString() || '0')).toFixed(2) }
+                    {item.nombre_producto} - {item.cantidad_producto} x ${ (parseFloat(item.precio_unitario?.toString() || '0')).toFixed(1) } = ${ (parseFloat(item.subtotal?.toString() || '0')).toFixed(2) }
                   </li>
                 ))}
               </ul>

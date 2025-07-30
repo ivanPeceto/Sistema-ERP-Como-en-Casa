@@ -13,6 +13,10 @@
   animation: fadeIn 0.3s ease-out;
 }
 
+.aclaracionesInput {
+  max-width: 400px;
+}
+
 .modalContent {
   background: #ffffff;
   border-radius: 12px;

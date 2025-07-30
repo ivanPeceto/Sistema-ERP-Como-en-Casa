@@ -447,6 +447,7 @@
   text-align: left;
   font-weight: 500;
   font-size: 1.3rem;
+  max-width: 400px;
 }
 .pedidoTotal span {
   font-weight: 700;
