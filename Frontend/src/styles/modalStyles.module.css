@@ -1,10 +1,3 @@
-/**
- * @file modalStyles.module.css
- * @brief Estilos reutilizables para modales en la aplicación
- * @description Contiene estilos para diferentes tipos de modales incluyendo overlay, contenido y animaciones
- */
-
-/* Estilos base para el overlay del modal */
 .modalOverlay {
   position: fixed;
   top: 0;
@@ -20,7 +13,6 @@
   animation: fadeIn 0.3s ease-out;
 }
 
-/* Contenido principal del modal */
 .modalContent {
   background: #ffffff;
   border-radius: 12px;
@@ -36,7 +28,6 @@
   animation: slideIn 0.3s ease-out 0.1s forwards;
 }
 
-/* Versión más ancha del modal */
 .modalContentWide {
   background: #ffffff;
   border-radius: 12px;
@@ -52,7 +43,6 @@
   animation: slideIn 0.3s ease-out 0.1s forwards;
 }
 
-/* Cabecera del modal */
 .modalHeader {
   padding: 5px 15px;
   background: linear-gradient(135deg, #4caf50 0%, #81c784 100%);
@@ -124,7 +114,6 @@
   border-bottom: none;
 }
 
-/* Estilos base para todos los botones */
 .pn,
 .modalButtonPrimary,
 .modalButtonSecondary,
@@ -149,7 +138,6 @@
   white-space: nowrap;
 }
 
-/* Botón primario (verde) */
 .modalButtonPrimary {
   background-color: #4caf50;
   color: white;
@@ -160,7 +148,6 @@
   transform: translateY(-1px);
 }
 
-/* Botón secundario (gris) */
 .modalButtonSecondary {
   background-color: #6c757d;
   color: white;
@@ -171,7 +158,6 @@
   transform: translateY(-1px);
 }
 
-/* Botón de peligro (rojo) */
 .modalButtonDanger {
   background-color: #dc3545;
   color: white;
@@ -182,7 +168,6 @@
   transform: translateY(-1px);
 }
 
-/* Campos de formulario en el modal */
 .formGroup {
   margin-bottom: 12px;
 }
@@ -219,7 +204,6 @@
   outline: none;
 }
 
-/* Estilo específico para el input de hora */
 .timeInput {
   width: 150px !important;
   min-width: 120px;
@@ -229,7 +213,6 @@
   display: none;
 }
 
-/* Campos de información del pedido */
 .infoField {
   width: 90% !important;
   max-width: 300px;
@@ -237,23 +220,18 @@
   padding: 0 5px;
 }
 
-/* Separación para los grupos de formulario en la sección de información */
 .editModalInfo > .formGroup {
   margin-bottom: 1.5rem;
 }
 
-/* Ajuste adicional para el último elemento */
 .editModalInfo > .formGroup:last-child {
   margin-bottom: 1rem;
 }
 
-/* Estilo para los textos de información del pedido */
-/* Estilos para iconos */
 .iconMarginRight {
   margin-right: 8px;
 }
 
-/* Estilos para textos */
 .infoText {
   font-weight: 600;
   color: #2c3e50;
@@ -261,7 +239,6 @@
   padding: 6px 0;
 }
 
-/* Controles de cantidad */
 .quantityControlsContainer {
   display: flex;
   justify-content: space-between;
@@ -269,18 +246,15 @@
   margin-top: 10px;
 }
 
-/* Texto centrado */
 .centeredText {
   text-align: center;
   color: #6c757d;
 }
 
-/* Sección de productos */
 .productListSection {
   flex-grow: 1;
 }
 
-/* Mensaje de lista vacía */
 .emptyListMessage {
   text-align: center;
   color: #6c757d;
@@ -288,14 +262,12 @@
   margin-top: 5px;
 }
 
-/* Icono de lista vacía */
 .emptyListIcon {
   font-size: 2.5rem;
   margin-bottom: 10px;
   opacity: 0.5;
 }
 
-/* Botón de añadir producto */
 .addButton {
   padding: 8px 16px;
   font-size: 0.85rem;
@@ -314,7 +286,6 @@
   background-color: #7CB342;
 }
 
-/* Contenedor de mensaje de lista vacía */
 .emptyListContainer {
   display: flex;
   flex-direction: column;
@@ -324,7 +295,6 @@
   color: #6c757d;
 }
 
-/* Contenedor de controles de cantidad */
 .quantityContainer {
   display: flex;
   justify-content: space-between;
@@ -332,7 +302,6 @@
   margin-top: 10px;
 }
 
-/* Botón de eliminar producto */
 .deleteButton {
   background: none;
   border: none;
@@ -351,23 +320,19 @@
   color: #a71d2a;
 }
 
-/* Contenedor de acciones */
 .actionContainer {
   margin-bottom: 15px;
 }
 
-/* Texto alineado a la derecha */
 .textRight {
   text-align: right;
 }
 
-/* Texto con énfasis */
 .emphasizedText {
   font-weight: 600;
   color: #495057;
 }
 
-/* Contenedor flexible */
 .flexContainer {
   display: flex;
   flex-direction: column;
@@ -377,12 +342,10 @@
   text-align: center;
 }
 
-/* Fondo blanco */
 .whiteBackground {
   background: #fff;
 }
 
-/* Estilos para los textos dentro de infoField */
 .infoField p {
   font-weight: 600;
   color: #2c3e50;
@@ -390,7 +353,6 @@
   padding: 6px 0;
 }
 
-/* Contenedor de grupo de checkboxes */
 .checkboxGroupContainer {
   display: flex;
   align-items: left;
@@ -400,7 +362,6 @@
   max-width: 300px;
 }
 
-/* Checkbox personalizado */
 .checkboxContainer {
   display: flex;
   align-items: left;
@@ -422,7 +383,6 @@
   flex-shrink: 0;
 }
 
-/* Asegurar que el label del checkbox no afecte el tamaño */
 .checkboxContainer label {
   margin: 0;
   display: flex;
@@ -430,7 +390,6 @@
   gap: 6px;
 }
 
-/* Animaciones */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -443,7 +402,6 @@
   }
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .modalContent,
   .modalContentWide {
@@ -471,7 +429,6 @@
   }
 }
 
-/* Estilos específicos para el modal de edición de pedidos */
 .editModalGrid {
   display: grid;
   grid-template-columns: 1fr 1.5fr;
@@ -481,7 +438,7 @@
 }
 
 .editModalInfo {
-  background: #f1f3f5; /* Fondo gris más oscuro */
+  background: #f1f3f5;
   padding: 20px;
   border-radius: 8px;
   border-left: none;
@@ -503,7 +460,7 @@
 }
 
 .productCard {
-  background: #f1f3f5; /* Fondo gris más oscuro */
+  background: #f1f3f5; 
   border-radius: 8px;
   padding: 15px;
   margin-bottom: 5px;
@@ -566,8 +523,6 @@
   user-select: none;
 }
 
-/* Se eliminó el efecto hover */
-
 .quantityButton:active {
   transform: translateY(1px);
 }
@@ -587,11 +542,10 @@
   border: 1px solid #dee2e6;
   border-radius: 4px;
   font-size: 0.9rem;
-  -moz-appearance: textfield; /* Firefox */
-  appearance: textfield; /* Estándar */
+  -moz-appearance: textfield; 
+  appearance: textfield; 
 }
 
-/* Ocultar flechas en Chrome, Safari, Edge, Opera */
 .quantityInput::-webkit-outer-spin-button,
 .quantityInput::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -608,7 +562,7 @@
   margin-top: 20px;
   padding: 15px;
   border-top: 2px dashed #dee2e6;
-  text-align: center; /* Centrar el texto del total */
+  text-align: center; 
   background: #f8f9fa;
   border-radius: 8px;
   margin-bottom: 20px;
@@ -620,7 +574,6 @@
   color: #4caf50;
 }
 
-/* Estilos para los badges de estado */
 .statusBadge {
   display: inline-flex;
   align-items: center;

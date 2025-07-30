@@ -87,7 +87,7 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
 
   /** @brief Actualiza la cantidad de un ítem en el pedido. Si la cantidad es < 1, lo elimina. */
   const actualizarCantidadItem = useCallback((productoId: number, cantidad: number) => {
-    if (cantidad < 1) {
+    if (cantidad < 0) {
       eliminarItemDelPedido(productoId);
       return;
     }
@@ -265,9 +265,10 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
                         <button onClick={() => actualizarCantidadItem(item.id, item.cantidad - 1)} className={styles.quantityButton}>-</button>
                         <input
                             type="number"
-                            min="1"
+                            min="0"
+                            step="0.01"
                             value={item.cantidad}
-                            onChange={(e: ChangeEvent<HTMLInputElement>) => actualizarCantidadItem(item.id, parseInt(e.target.value) || 1)}
+                            onChange={(e: ChangeEvent<HTMLInputElement>) => actualizarCantidadItem(item.id, parseFloat(e.target.value))}
                             className={styles.quantityInput}
                         />
 

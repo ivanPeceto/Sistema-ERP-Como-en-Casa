@@ -352,14 +352,14 @@ const GestionPedidosPage: React.FC = () => {
   }, []);
 
   const updateEditingItemQuantity = useCallback((productId: number, quantity: number) => {
-    if (quantity < 1) {
+    if (quantity < 0) {
       removeProductFromEditingOrder(productId);
       return;
     }
     setEditingPedidoItems(prevItems =>
       prevItems.map(item =>
         item.id === productId
-          ? { ...item, cantidad: quantity, subtotal: quantity * (parseFloat(item.precio_unitario.toString()) || 0) } // Aseguramos que sea número
+          ? { ...item, cantidad: quantity, subtotal: quantity * (parseFloat(item.precio_unitario.toString()) || 0) }
           : item
       )
     );
@@ -595,7 +595,6 @@ const GestionPedidosPage: React.FC = () => {
 
               <div className={styles.pedidoCliente}>
                 <i className="fas fa-user"></i>
-                {/*clienteNombreMap.get(pedido.id_cliente) || `Cliente #${pedido.id_cliente}`*/}
                 {pedido.cliente}
               </div>
 
@@ -609,7 +608,7 @@ const GestionPedidosPage: React.FC = () => {
                 {
                   pedido.productos_detalle.map(producto => (
                     <div key={producto.id_producto} className={styles.pedidoProductos}> 
-                      {parseInt(producto.cantidad_producto)}  {producto.nombre_producto}
+                      {producto.cantidad_producto}  {producto.nombre_producto}
                       {producto.aclaraciones && <span className={styles.aclaracionesProducto}> ({producto.aclaraciones})</span>} 
                     </div>
                   ))
@@ -981,17 +980,18 @@ const GestionPedidosPage: React.FC = () => {
                                   type="button"
                                   onClick={() => updateEditingItemQuantity(item.id, item.cantidad - 1)}
                                   className={modalStyles.quantityButton}
-                                  disabled={item.cantidad <= 1}
+                                  disabled={item.cantidad <= 0}
                                 >
                                   −
                                 </button>
                                 
                                 <input
                                   type="number"
-                                  min="1"
+                                  min="0"
+                                  step="0.01"
                                   value={item.cantidad}
                                   onChange={(e: ChangeEvent<HTMLInputElement>) => 
-                                    updateEditingItemQuantity(item.id, Math.max(1, parseInt(e.target.value) || 1))
+                                    updateEditingItemQuantity(item.id, parseFloat(e.target.value))
                                   }
                                   className={modalStyles.quantityInput}
                                 />
