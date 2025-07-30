@@ -404,8 +404,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.95rem;
-  color: #495057;
+  font-size: 1.2rem;
+  color: #000000;
 }
 
 .pedidoCliente i, .pedidoHora i {
