@@ -166,7 +166,11 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
     setError(null);
 
     try {
-      const hoy = new Date().toISOString().split('T')[0];
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = (today.getMonth() + 1).toString().padStart(2, '0'); // Los meses son 0-indexados
+      const day = today.getDate().toString().padStart(2, '0');
+      const hoy = `${year}-${month}-${day}`;
       const pedidosDeHoy = await getPedidosByDate(hoy);
       const nuevoNumeroPedido: number =  (pedidosDeHoy.length === 0)? 1 : pedidosDeHoy[pedidosDeHoy.length-1].numero_pedido + 1;
 
