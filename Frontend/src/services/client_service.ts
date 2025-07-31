@@ -16,7 +16,7 @@ import type { Cliente } from '../types/models.ts';
  * @details Se obtiene de las variables de entorno de Vite, definidas en el archivo `.env`
  * y cargadas en el entorno de Docker.
  */
-const CLIENTES_API_BASE_URL = import.meta.env.VITE_API_CLIENTES_URL;
+const CLIENTES_API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 /**
  * @brief Instancia de cliente API exclusiva para el servicio de clientes.
@@ -32,7 +32,7 @@ const clientAPIClient = createAuthApiClient(CLIENTES_API_BASE_URL);
  * @throws {Error} Relanza el error si la petición a la API falla.
  */
 export const getClientes = async (): Promise<Cliente[]> => {
-    const response = await clientAPIClient.get<Cliente[]>('/listar/');
+    const response = await clientAPIClient.get<Cliente[]>('/api/clientes/listar/');
     return response.data;
 };
 
@@ -45,7 +45,7 @@ export const getClientes = async (): Promise<Cliente[]> => {
  * @throws {Error} Relanza el error si la petición a la API falla.
  */
 export const createCliente = async (clienteData: Omit<Cliente, 'id'>): Promise<Cliente> => {
-    const response = await clientAPIClient.post<Cliente>('/crear/', clienteData);
+    const response = await clientAPIClient.post<Cliente>('/api/clientes/crear/', clienteData);
     return response.data;
 };
 
@@ -59,7 +59,7 @@ export const createCliente = async (clienteData: Omit<Cliente, 'id'>): Promise<C
  * @throws {Error} Relanza el error si la petición a la API falla.
  */
 export const updateCliente = async (id: number, clienteData: Omit<Cliente, 'id'>): Promise<any> => {
-    const response = await clientAPIClient.put(`/editar/?id=${id}`, clienteData);
+    const response = await clientAPIClient.put(`/api/clientes/editar/?id=${id}`, clienteData);
     return response.data;
 };
 
@@ -72,6 +72,6 @@ export const updateCliente = async (id: number, clienteData: Omit<Cliente, 'id'>
  * @throws {Error} Relanza el error si la petición a la API falla.
  */
 export const deleteCliente = async (id: number): Promise<any> => {
-    const response = await clientAPIClient.post(`/eliminar/?id=${id}`);
+    const response = await clientAPIClient.post(`/api/clientes/eliminar/?id=${id}`);
     return response.data;
 };

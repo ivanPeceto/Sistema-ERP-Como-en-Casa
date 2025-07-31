@@ -1,0 +1,437 @@
+
+/* src/components/CrearPedidoModal/CrearPedidoModal.module.css */
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modalContent {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    width: 50%; 
+    height: 80%;
+    max-width: 90vw; 
+    max-height: 95vh; 
+    position: relative;
+    display: flex; 
+    flex-direction: column;
+  }
+  
+  .modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .modalTitle {
+    margin: 0;
+    font-size: 1.8rem;
+    color: #333;
+    display: flex;
+    align-items: center;
+  }
+  
+  .iconMarginRight {
+    margin-right: 10px;
+  }
+  
+  .modalBody {
+    flex-grow: 1; /* Permite que el cuerpo ocupe el espacio disponible */
+    display: flex;
+    flex-direction: column; /* Por defecto, si hay solo un panel */
+  }
+  
+  .createModalGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Panel de productos más grande que panel de cliente/resumen */
+    gap: 20px;
+    flex-grow: 1;
+  }
+  
+  /* Estilos de los paneles */
+  .clientSelectionPanel,
+  .productSelectionPanel,
+  .currentOrderPanel {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+  }
+  
+  .clientSelectionPanel {
+    grid-column: 1 / 2; /* Ocupa la primera columna */
+  }
+  
+  .productSelectionPanel {
+    grid-column: 2 / 3; /* Ocupa la segunda columna */
+    height: 100%;
+    overflow-x: auto;
+  }
+  
+  .currentOrderPanel {
+    grid-column: 1 / 2; /* Ocupa la primera columna debajo del de cliente */
+  }
+  
+  /* Encabezados de panel */
+  .clientSelectionPanel h2,
+  .productSelectionPanel h2,
+  .currentOrderPanel h2 {
+    font-size: 1.4rem;
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  .clientSearch {
+    margin-bottom: 15px;
+  }
+
+  .clientForm {
+    display: flex;
+    max-width: 100%;
+  }
+
+  .formRowElement {
+    margin-right: 1rem;
+  }
+  
+  .clientSearch input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    font-size: 1rem;
+  }
+  
+  .clientList {
+    flex-grow: 1;
+    overflow-y: auto;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+    background-color: white;
+    min-height: 150px; /* Altura mínima para la lista de clientes */
+    max-height: 250px; /* Altura máxima para la lista de clientes */
+  }
+  
+  .clientItem {
+    padding: 10px 15px;
+    border-bottom: 1px solid #f1f3f5;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .clientItem:hover {
+    background-color: #e9ecef;
+  }
+  
+  .clientItem.selectedClient {
+    background-color: #d1ecf1;
+    border-left: 3px solid #007bff;
+    color: #004085;
+    font-weight: bold;
+  }
+  
+  .clientItem span, .clientItem small {
+    display: block;
+    font-size: 0.9em;
+    color: #6c757d;
+  }
+  
+  /* Selección de productos */
+  .categoryTabs {
+    display: flex;
+    overflow-x: auto;
+    margin-bottom: 15px;
+    padding-bottom: 5px; 
+    border-bottom: 1px solid #e9ecef;
+    flex-wrap: nowrap; 
+  }
+  
+  .categoryTab {
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-bottom: none; /* Se quita el borde inferior para el efecto de pestaña */
+    border-radius: 5px 5px 0 0;
+    background-color: #e9ecef;
+    cursor: pointer;
+    white-space: nowrap; /* Evita saltos de línea */
+    margin-right: 5px;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+    flex-shrink: 0; /* Evita que se encojan */
+  }
+  
+  .categoryTab:hover {
+    background-color: #dee2e6;
+  }
+  
+  .categoryTab.activeTab {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+    font-weight: bold;
+  }
+  
+  .productList {
+    flex-grow: 1;
+    overflow-y: auto;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+    background-color: white;
+    height: 300px; /* Altura fija para la lista de productos */
+  }
+  
+  .productItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    border-bottom: 1px solid #f1f3f5;
+  }
+  
+  .productItem:last-child {
+    border-bottom: none;
+  }
+  
+  .productInfo strong {
+    font-size: 1.1rem;
+    color: #333;
+  }
+  
+  .productInfo span {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-left: 10px;
+  }
+  
+  .addButtonSmall {
+    padding: 6px 12px;
+    margin-right: 1rem;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+  }
+  
+  .addButtonSmall:hover {
+    background-color: #218838;
+  }
+  
+  /* Panel de pedido actual */
+  .deliveryTimeSection {
+    margin-bottom: 15px;
+  }
+  
+  .deliveryTimeSection label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+  }
+  
+  .timeInput {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    font-size: 1rem;
+  }
+  
+  .orderItemsList {
+    flex-grow: 1;
+    overflow-y: auto;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+    background-color: white;
+    min-height: 150px; /* Altura mínima para la lista de productos en el pedido */
+    max-height: 285px; /* Altura máxima */
+    /*height: max-content;*/
+  }
+  
+  .emptyOrderText {
+    text-align: center;
+    padding: 20px;
+    color: #6c757d;
+  }
+  
+  .orderItem {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px 15px;
+    border-bottom: 1px solid #f1f3f5;
+  }
+  
+  .orderItem:last-child {
+    border-bottom: none;
+  }
+  
+  .orderItemInfo {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+  
+  .orderItemInfo strong {
+    font-size: 1.1rem;
+    color: #333;
+  }
+  
+  .orderItemInfo span {
+    font-size: 0.9em;
+    color: #6c757d;
+    margin-left: 10px;
+  }
+  
+  .orderItemControls {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-right: 10px;
+  }
+  
+  input.quantityInput::-webkit-outer-spin-button,
+  input.quantityInput::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+  }
+
+  input[type=number].quantityInput {
+      -moz-appearance: textfield;
+  }
+
+  .quantityButton {
+    padding: 5px 1px;
+    border: 1px solid #ced4da;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    width: 15px;
+  }
+  
+  .quantityButton:hover {
+    background-color: #e9ecef;
+  }
+  
+  .quantityInput {
+    width: 30px;
+    text-align: center;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 5px;
+  }
+  
+  .orderItemSubtotal {
+    font-weight: bold;
+    margin-left: 15px;
+    color: #28a745;
+  }
+  
+  .deleteItemButton {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: background-color 0.2s;
+  }
+  
+  .deleteItemButton:hover {
+    background-color: #c82333;
+  }
+  
+  .orderSummary {
+    padding: 15px;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .totalDisplay strong {
+    font-size: 1.5rem;
+    color: #333;
+  }
+  
+  .confirmOrderButton {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .confirmOrderButton:hover {
+    background-color: #0056b3;
+  }
+  
+  .confirmOrderButton:disabled {
+    background-color: #a0cffc;
+    cursor: not-allowed;
+  }
+  
+  /* Mensajes de error y carga */
+  .error {
+    color: #dc3545;
+    text-align: center;
+    padding: 10px;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+    margin-bottom: 15px;
+  }
+  
+  @media (max-width: 992px) {
+    .createModalGrid {
+      grid-template-columns: 1fr;
+    }
+    .productSelectionPanel {
+      grid-row: 2 / 3; 
+      grid-column: 1 / 2;
+    }
+    .currentOrderPanel {
+      grid-row: 1 / 2; /* Resumen arriba */
+      grid-column: 1 / 2;
+    }
+  }
+  
+  /* Estilos de los inputs de edición dentro del modal (aclaraciones) */
+  .aclaracionesInput {
+    width: 100%;
+    max-width: 150px;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    resize: vertical; /* Permite redimensionar verticalmente */
+    min-height: 30px;
+    height: 30px;
+  }

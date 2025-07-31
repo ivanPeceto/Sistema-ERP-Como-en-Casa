@@ -216,23 +216,28 @@
 
 .productItem {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 10px;
+  padding: 5px;
   border-bottom: 1px solid #f0f0f0;
 }
 .productItem:last-child {
   border-bottom: none;
 }
 
+.productInfo {
+  margin-left: 1rem;
+  display: flex;
+  flex-direction: row;
+}
+
 .productInfo strong {
-  display: block;
   font-size: 1rem;
   color: #333;
 }
 .productInfo span {
-  font-size: 0.9rem;
-  color: #555;
+  font-size: 1rem;
+  color: #161616;
+  margin-left: 1rem;
 }
 
 .addButtonSmall {

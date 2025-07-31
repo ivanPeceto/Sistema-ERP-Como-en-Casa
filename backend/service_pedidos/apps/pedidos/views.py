@@ -7,6 +7,9 @@ from rest_framework import status
 from apps.pedidos.models import Pedido
 from apps.pedidos.serializer import PedidoSerializer
 from datetime import datetime
+import requests
+from decouple import config 
+
 
 class PedidoListView(ListAPIView):
     """!
@@ -186,3 +189,49 @@ class EditarPedidoView(APIView):
                 return Response(pedidoSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except:
             return Response({'detail':'Pedido a editar no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+        
+class ImprimirPedidoView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def imprimirComanda(self, pedido):
+        try:
+            pedidoSerialized = PedidoSerializer(pedido).data
+            ip = config('IP_IMPRESORA')
+            route = f"http://{ip}/imprimir_comanda"
+            r = requests.post("http://192.168.1.26:5000/imprimir_comanda", json=pedidoSerialized)
+            r.raise_for_status()
+            return r.json()
+        except requests.exceptions.RequestException as e:
+            return {'detail': f'Error al intentar enviar la solicitud a la impresora: {e}'}
+        except Exception as e:
+            return {'detail': f'Fallo inesperado al imprimir comanda: {e}'}
+
+
+    def post(self, request):
+
+        fecha = request.query_params.get('fecha')
+        numero_pedido = request.query_params.get('numero')
+        id_pedido = request.query_params.get('id')
+
+        if not fecha:
+            return Response({'detail':'Falta proporcionar fecha de pedido a editar'}, status=status.HTTP_400_BAD_REQUEST)
+        if not numero_pedido:
+            return Response({'detail':'Falta proporcionar número de pedido a editar'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            fecha_sanitized = datetime.strptime(fecha, "%Y-%m-%d").date()
+        except:
+            return Response({'detail':'Formato de fecha inválido'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            if not id_pedido:
+                pedido = Pedido.objects.get(fecha_pedido=fecha_sanitized, numero_pedido=numero_pedido)
+            else:
+                pedido = Pedido.objects.get(id=id_pedido, fecha_pedido=fecha_sanitized, numero_pedido=numero_pedido)
+
+            resp = self.imprimirComanda(pedido)
+            return Response(resp, status=status.HTTP_200_OK)
+        except Pedido.DoesNotExist:
+            return Response({'detail':'Pedido a imprimir no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'detail': f'Error interno al procesar la solicitud de impresión: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

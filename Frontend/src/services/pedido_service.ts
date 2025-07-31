@@ -14,7 +14,7 @@ import type { PedidoInput, Pedido } from '../types/models.d.ts';
  * @details Se obtiene de las variables de entorno de Vite, definidas en el archivo `.env`
  * y cargadas en el entorno de Docker.
  */
-const PEDIDOS_API_BASE_URL = import.meta.env.VITE_API_PEDIDOS_URL;
+const PEDIDOS_API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 /**
  * @brief Instancia de cliente API exclusiva para el servicio de pedidos.
@@ -31,7 +31,7 @@ const pedidoAPICLient = createAuthApiClient(PEDIDOS_API_BASE_URL);
  * @throws {Error} Relanza el error si la petición a la API falla.
  */
 export const createPedido = async (pedidoData: PedidoInput): Promise<any> => {
-  const response = await pedidoAPICLient.post('/crear/', pedidoData);
+  const response = await pedidoAPICLient.post('/api/pedidos/crear/', pedidoData);
   return response.data;
 };
 
@@ -43,7 +43,7 @@ export const createPedido = async (pedidoData: PedidoInput): Promise<any> => {
  * @throws {Error} Relanza el error si la petición a la API falla.
  */
 export const getPedidosByDate = async (fecha: string): Promise<any[]> => {
-  const response = await pedidoAPICLient.get(`/buscar/?fecha=${fecha}`);
+  const response = await pedidoAPICLient.get(`/api/pedidos/buscar/?fecha=${fecha}`);
   return response.data;
 };
 
@@ -62,7 +62,7 @@ export const editarPedido = async (
   { fecha, numero }: { fecha: string; numero: number },
   data: Partial<Pedido>
 ): Promise<any> => {
-  const response = await pedidoAPICLient.put(`/editar/?fecha=${fecha}&numero=${numero}`, data);
+  const response = await pedidoAPICLient.put(`/api/pedidos/editar/?fecha=${fecha}&numero=${numero}`, data);
   return response.data;
 };
 
@@ -77,6 +77,11 @@ export const editarPedido = async (
 * @throws {Error} Relanza el error si la petición a la API falla.
 */
 export const deletePedido = async ({ fecha, numero }: { fecha: string; numero: number }): Promise<any> => {
-  const response = await pedidoAPICLient.post(`/eliminar/?fecha=${fecha}&numero=${numero}`);
+  const response = await pedidoAPICLient.post(`/api/pedidos/eliminar/?fecha=${fecha}&numero=${numero}`);
+  return response.data;
+};
+
+export const printPedido = async ({ fecha, numero }: { fecha: string; numero: number }): Promise<any> => {
+  const response = await pedidoAPICLient.post(`/api/pedidos/imprimir/?fecha=${fecha}&numero=${numero}`);
   return response.data;
 };

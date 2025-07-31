@@ -14,17 +14,16 @@
  */
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { ChangeEvent } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom'; 
 import styles from '../styles/gestionPedidosPage.module.css';
 import crearPedidoStyles from '../styles/crearPedidoPage.module.css';
 import modalStyles from '../styles/modalStyles.module.css';
+import CrearPedidoModal from '../components/modals/CrearPedidoModal'; 
 
-import { getPedidosByDate, editarPedido, deletePedido } from '../services/pedido_service';
+import { getPedidosByDate, editarPedido, deletePedido, printPedido } from '../services/pedido_service';
 import { getClientes } from '../services/client_service';
-import type { Cliente } from '../types/models';
 import { getProductos } from '../services/product_service';
-import type { Producto } from '../types/models.d.ts';
-import type { Pedido, PedidoInput, PedidoItem } from '../types/models.d.ts';
+import type { Producto, Cliente, Pedido, PedidoInput, PedidoItem, PedidoEstado } from '../types/models.d.ts';
 
 
 /**
@@ -51,8 +50,15 @@ import type { Pedido, PedidoInput, PedidoItem } from '../types/models.d.ts';
  * @see Producto
  */
 const GestionPedidosPage: React.FC = () => {
-  /** Hook para navegación entre rutas */
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
+
+  // Nuevo estado para controlar la visibilidad del modal de creación de pedido
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
+
+  // Funciones para abrir y cerrar el nuevo modal
+  const openCreateModal = useCallback(() => {
+    setIsCreateModalOpen(true);
+  }, []);
 
   // Estados principales
   /** @brief Lista completa de pedidos */
@@ -68,7 +74,12 @@ const GestionPedidosPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   
   /** @brief Fecha para filtrar los pedidos (formato YYYY-MM-DD) */
-  const [searchDate, setSearchDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = (today.getMonth() + 1).toString().padStart(2, '0'); 
+  const day = today.getDate().toString().padStart(2, '0');
+  const hoy = `${year}-${month}-${day}`;
+  const [searchDate, setSearchDate] = useState<string>(hoy);
   
   // Estados de los modales
   /** @brief Controla la visibilidad del modal de visualización */
@@ -111,11 +122,15 @@ const GestionPedidosPage: React.FC = () => {
     try {
       const [pedidosData, clientesData, productosData] = await Promise.all([
         getPedidosByDate(searchDate),
+        //Deprecated
         getClientes(),
+        //--
         getProductos()
       ]);
       setPedidos(pedidosData);
+      //Deprecated
       setClientes(clientesData);
+      //
       setProductos(productosData);
       if (productosData.length > 0) {
         const categoriasUnicas = [...new Set(productosData.map(p => p.categoria?.nombre || 'Sin Categoría'))];
@@ -136,10 +151,18 @@ const GestionPedidosPage: React.FC = () => {
     fetchInitialData();
   }, [fetchInitialData]);
 
+  const closeCreateModal = useCallback(() => {
+    setIsCreateModalOpen(false);
+    fetchInitialData(); // Opcional: Volver a cargar los pedidos cuando se cierre el modal
+  }, [fetchInitialData]);
+
+
+  //Deprecated
   /** @brief Crea un mapa de ID de cliente a nombre para una búsqueda eficiente en el renderizado. */
   const clienteNombreMap = useMemo(() => {
     return new Map(clientes.map(cliente => [cliente.id, cliente.nombre]));
   }, [clientes]);
+  //--
 
   /** @brief Filtra los pedidos por texto después de haber sido filtrados por fecha. */
   const filteredPedidos = useMemo(() => {
@@ -147,7 +170,8 @@ const GestionPedidosPage: React.FC = () => {
     return pedidos.filter(pedido => {
       const matchesSearchTerm =
         pedido.numero_pedido.toString().includes(lowercasedSearchTerm) ||
-        (clienteNombreMap.get(pedido.id_cliente) || '').toLowerCase().includes(lowercasedSearchTerm) ||
+        //(clienteNombreMap.get(pedido.id_cliente) || '').toLowerCase().includes(lowercasedSearchTerm) ||
+        pedido.cliente.toLowerCase().includes(lowercasedSearchTerm) ||
         pedido.productos_detalle.some(item => item.nombre_producto.toLowerCase().includes(lowercasedSearchTerm));
       return matchesSearchTerm;
     });
@@ -170,18 +194,25 @@ const GestionPedidosPage: React.FC = () => {
     return editingPedidoItems.reduce((total, item) => total + (parseFloat(item.cantidad.toString()) * (parseFloat(item.precio_unitario.toString()) || 0)), 0);
   }, [editingPedidoItems]);
 
-  /** @brief Deriva la lista de pedidos pendientes a partir de la lista filtrada. */
-  const pedidosPendientes = useMemo(() =>
-    filteredPedidos.filter(pedido => !pedido.entregado),
-    [filteredPedidos]
-  );
+    /** @brief Deriva la lista de pedidos pendientes a partir de la lista filtrada. */
+    const pedidosPendientes = useMemo(() =>
+      filteredPedidos.filter(pedido => pedido.estado === 'PENDIENTE'),
+      [filteredPedidos]
+    );
+  
+    /** @brief Deriva la lista de pedidos listos. */
+    const pedidosListos = useMemo(() =>
+      filteredPedidos.filter(pedido => pedido.estado === 'LISTO'),
+      [filteredPedidos]
+    );
+  
+    /** @brief Deriva la lista de pedidos entregados. */
+    const pedidosEntregados = useMemo(() =>
+      filteredPedidos.filter(pedido => pedido.estado === 'ENTREGADO'),
+      [filteredPedidos]
+    );
 
-  /** @brief Deriva la lista de pedidos entregados. */
-  const pedidosEntregados = useMemo(() =>
-    filteredPedidos.filter(pedido => pedido.entregado),
-    [filteredPedidos]
-  );
-
+    // Deprecated 
   /** @brief Deriva la lista de pedidos pagados. */
   const pedidosPagados = useMemo(() =>
     filteredPedidos.filter(pedido => pedido.pagado),
@@ -193,6 +224,7 @@ const GestionPedidosPage: React.FC = () => {
     filteredPedidos.filter(pedido => !pedido.pagado),
     [filteredPedidos]
   );
+  //--
 
   /**
    * @brief Maneja el cambio en el término de búsqueda
@@ -249,7 +281,11 @@ const GestionPedidosPage: React.FC = () => {
     setEditingPedido(pedido);
     setEditFormData({
       para_hora: pedido.para_hora,
+      estado: pedido.estado,
+      //deprecated
       entregado: pedido.entregado,
+      //
+      avisado: pedido.avisado,
       pagado: pedido.pagado,
     });
     setEditingPedidoItems(pedido.productos_detalle.map(item => ({
@@ -258,6 +294,7 @@ const GestionPedidosPage: React.FC = () => {
       precio_unitario: parseFloat(item.precio_unitario.toString()) || 0,
       cantidad: parseFloat(item.cantidad_producto.toString()) || 0,
       subtotal: (parseFloat(item.cantidad_producto.toString()) * (parseFloat(item.precio_unitario.toString()) || 0)) || 0,
+      aclaraciones: item.aclaraciones || '',
     })));
     setIsEditModalOpen(true);
   }, []);
@@ -277,6 +314,21 @@ const GestionPedidosPage: React.FC = () => {
     }));
   };
 
+  /**
+   * @brief Actualiza la aclaración de un ítem de producto en el pedido de edición.
+   * @param {number} productId - ID del producto a actualizar.
+   * @param {string} aclaracion - Nueva cadena de aclaración.
+   */
+  const updateEditingItemAclaraciones = useCallback((productId: number, aclaracion: string) => {
+    setEditingPedidoItems(prevItems =>
+      prevItems.map(item =>
+        item.id === productId
+          ? { ...item, aclaraciones: aclaracion }
+          : item
+      )
+    );
+  }, []);
+
   const addProductToEditingOrder = useCallback((product: Producto) => {
     setEditingPedidoItems(prevItems => {
       const existingItem = prevItems.find(item => item.id === product.id);
@@ -293,7 +345,8 @@ const GestionPedidosPage: React.FC = () => {
           nombre: product.nombre,
           cantidad: 1,
           precio_unitario: productPrice,
-          subtotal: productPrice
+          subtotal: productPrice,
+          aclaraciones: '',
         }];
       }
     });
@@ -304,14 +357,14 @@ const GestionPedidosPage: React.FC = () => {
   }, []);
 
   const updateEditingItemQuantity = useCallback((productId: number, quantity: number) => {
-    if (quantity < 1) {
+    if (quantity < 0) {
       removeProductFromEditingOrder(productId);
       return;
     }
     setEditingPedidoItems(prevItems =>
       prevItems.map(item =>
         item.id === productId
-          ? { ...item, cantidad: quantity, subtotal: quantity * (parseFloat(item.precio_unitario.toString()) || 0) } // Aseguramos que sea número
+          ? { ...item, cantidad: quantity, subtotal: quantity * (parseFloat(item.precio_unitario.toString()) || 0) }
           : item
       )
     );
@@ -330,14 +383,22 @@ const GestionPedidosPage: React.FC = () => {
       nombre_producto: item.nombre,
       cantidad_producto: item.cantidad,
       precio_unitario: parseFloat(item.precio_unitario.toString()) || 0,
+      aclaraciones: item.aclaraciones || '',
     }));
 
     return {
       numero_pedido: pedido.numero_pedido,
       fecha_pedido: pedido.fecha_pedido,
+    // Deprecated 
       id_cliente: pedido.id_cliente,
+      //--
+      cliente: updates.cliente !== undefined ? updates.cliente : pedido.cliente,
       para_hora: updates.para_hora !== undefined ? updates.para_hora : pedido.para_hora,
+      estado: updates.estado !== undefined ? updates.estado : pedido.estado,
+      avisado: updates.avisado !== undefined ? updates.avisado : pedido.avisado,
+      //deprecated
       entregado: updates.entregado !== undefined ? updates.entregado : pedido.entregado,
+      //
       pagado: updates.pagado !== undefined ? updates.pagado : pedido.pagado,
       productos: productosParaEnviar,
     };
@@ -374,7 +435,6 @@ const GestionPedidosPage: React.FC = () => {
         payload
       );
       console.log('Pedido actualizado exitosamente');
-      console.log('Pedido actualizado exitosamente.');
       closeEditModal();
       fetchInitialData();
     } catch (error) {
@@ -392,14 +452,30 @@ const GestionPedidosPage: React.FC = () => {
    * Cambia el estado de entrega de un pedido y actualiza la información
    * en el servidor. Muestra mensajes de éxito/error al usuario.
    */
-  const handleToggleEntregado = useCallback(async (pedido: Pedido) => {
+  const handleUpdatePedidoEstado = useCallback(async (pedido: Pedido) => {
+    let nuevoEstado: PedidoEstado = pedido.estado as PedidoEstado;
+
+    if (pedido.estado === 'PENDIENTE') {
+      nuevoEstado = 'LISTO';
+    } else if (pedido.estado === 'LISTO') {
+      nuevoEstado = 'ENTREGADO';
+    } else if (pedido.estado === 'ENTREGADO') {
+      nuevoEstado = 'PENDIENTE';
+    }
+
     try {
-      const payload = prepareUpdatePayload(pedido, { entregado: !pedido.entregado }, pedido.productos_detalle.map(item => ({
+      const payload = prepareUpdatePayload(
+        pedido, 
+        {  
+          estado: nuevoEstado 
+        }, 
+        pedido.productos_detalle.map(item => ({
         id: item.id_producto,
         nombre: item.nombre_producto,
         cantidad: item.cantidad_producto,
         precio_unitario: parseFloat(item.precio_unitario.toString()) || 0,
         subtotal: (parseFloat(item.cantidad_producto.toString()) * (parseFloat(item.precio_unitario.toString()) || 0)) || 0,
+        aclaraciones: item.aclaraciones || '',
       })));
       await editarPedido(
         { fecha: pedido.fecha_pedido, numero: pedido.numero_pedido },
@@ -420,6 +496,28 @@ const GestionPedidosPage: React.FC = () => {
         cantidad: item.cantidad_producto,
         precio_unitario: parseFloat(item.precio_unitario.toString()) || 0,
         subtotal: (parseFloat(item.cantidad_producto.toString()) * (parseFloat(item.precio_unitario.toString()) || 0)) || 0,
+        aclaraciones: item.aclaraciones || '',
+      })));
+      await editarPedido(
+        { fecha: pedido.fecha_pedido, numero: pedido.numero_pedido },
+        payload
+      );
+      fetchInitialData();
+    } catch (error) {
+      console.error(`Error al cambiar estado 'pagado' para pedido ${pedido.id}:`, error);
+      console.error('No se pudo actualizar el estado del pedido.');
+    }
+  }, [fetchInitialData, prepareUpdatePayload]);
+
+  const handleToggleAvisado = useCallback(async (pedido: Pedido) => {
+    try {
+      const payload = prepareUpdatePayload(pedido, { avisado: !pedido.avisado }, pedido.productos_detalle.map(item => ({
+        id: item.id_producto,
+        nombre: item.nombre_producto,
+        cantidad: item.cantidad_producto,
+        precio_unitario: parseFloat(item.precio_unitario.toString()) || 0,
+        subtotal: (parseFloat(item.cantidad_producto.toString()) * (parseFloat(item.precio_unitario.toString()) || 0)) || 0,
+        aclaraciones: item.aclaraciones || '',
       })));
       await editarPedido(
         { fecha: pedido.fecha_pedido, numero: pedido.numero_pedido },
@@ -445,8 +543,17 @@ const GestionPedidosPage: React.FC = () => {
   }, [fetchInitialData]);
 
 
+  const handlePrintPedido = useCallback(async (pedido:Pedido) => {
+    try {
+      await printPedido({ fecha: pedido.fecha_pedido, numero: pedido.numero_pedido });
+      fetchInitialData();
+    } catch (error) {
+      console.error(`Error al imprimir pedido ${pedido.id}:`, error);
+      console.error('No se pudo imprimir el pedido.');
+    }
+  }, [fetchInitialData]);
 
-  const [activeTab, setActiveTab] = useState<'todos' | 'pendientes' | 'entregados' | 'pagados' | 'noPagados'>('todos');
+  const [activeTab, setActiveTab] = useState< 'PENDIENTE' | 'LISTO' | 'ENTREGADO' | 'pagados' | 'noPagados'>('PENDIENTE');
 
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
@@ -473,17 +580,27 @@ const GestionPedidosPage: React.FC = () => {
       ) : pedidos.length > 0 ? (
         <div className={styles.pedidosGrid}>
           {pedidos.map(pedido => (
-            <div key={pedido.id} className={`${styles.pedidoCard} ${pedido.entregado ? styles.entregado : ''} ${pedido.pagado ? styles.pagado : ''}`}>
+              <div 
+              key={pedido.id} 
+              className={`${styles.pedidoCard} ${
+                pedido.estado === 'ENTREGADO' ? styles.entregado : 
+                pedido.estado === 'LISTO' ? styles.listo : '' 
+              }`}
+              >
               <div className={styles.pedidoHeader}>
                 <div className={styles.pedidoNumero}>Pedido #{pedido.numero_pedido}</div>
                 <div className={styles.pedidoFecha}>
                   {formatDate(pedido.fecha_pedido)}
                 </div>
+                <button className={styles.imprimirButton}
+                onClick={()=>handlePrintPedido(pedido)}>
+                  <svg className={styles.icon} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg> 
+                </button>
               </div>
 
               <div className={styles.pedidoCliente}>
                 <i className="fas fa-user"></i>
-                {clienteNombreMap.get(pedido.id_cliente) || `Cliente #${pedido.id_cliente}`}
+                {pedido.cliente}
               </div>
 
               <div className={styles.pedidoHora}>
@@ -492,30 +609,59 @@ const GestionPedidosPage: React.FC = () => {
               </div>
 
               <div className={styles.pedidoResumen}>
-                <div className={styles.productosCount}>
-                  <i className="fas fa-box-open"></i>
-                  {pedido.productos_detalle.length} {pedido.productos_detalle.length === 1 ? 'producto' : 'productos'}
+                <div>
+                {
+                  pedido.productos_detalle.map(producto => (
+                    <div key={producto.id_producto} className={styles.pedidoProductos}> 
+                      {producto.cantidad_producto}  {producto.nombre_producto}
+                      {producto.aclaraciones && <span className={styles.aclaracionesProducto}> ({producto.aclaraciones})</span>} 
+                    </div>
+                  ))
+                }
                 </div>
                 <div className={styles.pedidoTotal}>
-                  Total: <span>${typeof pedido.total === 'number' ? pedido.total.toFixed(2) : '0.00'}</span>
+                  Total: <span>${typeof pedido.total === 'number' ? pedido.total.toFixed(0) : '0.00'}</span>
                 </div>
               </div>
 
               <div className={styles.pedidoEstados}>
-                <div
-                  className={`${styles.estadoBadge} ${pedido.entregado ? styles.entregadoBadge : styles.pendienteBadge}`}
-                  onClick={() => handleToggleEntregado(pedido)}
-                >
-                  <i className={`fas ${pedido.entregado ? 'fa-check-circle' : 'fa-clock'}`}></i>
-                  {pedido.entregado ? 'Entregado' : 'Pendiente'}
-                </div>
-                <div
-                  className={`${styles.estadoBadge} ${pedido.pagado ? styles.pagadoBadge : styles.noPagadoBadge}`}
+                <button
+                  className={`${styles.estadoBadge} ${
+                    pedido.estado === 'PENDIENTE' ? styles.pendienteBadge :
+                    pedido.estado === 'LISTO' ? styles.listoBadge :
+                    styles.entregadoBadge
+                  }`}
+                  onClick={() => handleUpdatePedidoEstado(pedido)}
+                  >
+                  <i className={`fas ${
+                    pedido.estado === 'PENDIENTE' ? 'fa-hourglass-half' :
+                    pedido.estado === 'LISTO' ? 'fa-check-circle' :
+                    'fa-truck'
+                  }`}></i>
+                  {pedido.estado === 'PENDIENTE' ? 'Pendiente' :
+                   pedido.estado === 'LISTO' ? 'Listo' : 'Entregado'}
+                </button>
+
+                <button
+                  className={`${styles.estadoBadge} ${
+                    pedido.pagado ? styles.pagadoBadge : styles.noPagadoBadge
+                  }`}
                   onClick={() => handleTogglePagado(pedido)}
                 >
-                  <i className={`fas ${pedido.pagado ? 'fa-check-circle' : 'fa-exclamation-circle'}`}></i>
-                  {pedido.pagado ? 'Pagado' : 'Pendiente pago'}
-                </div>
+                  <i className={`fas ${pedido.pagado ? 'fa-dollar-sign' : 'fa-hand-holding-usd'}`}></i>
+                  {pedido.pagado ? 'Pagado' : 'No Pagado'}
+                </button>
+              </div>
+              <div className={styles.pedidoEstados}>
+                    <button 
+                      className={`${styles.estadoBadge} ${
+                      pedido.avisado ? styles.avisadoBadge :
+                      styles.noAvisadoBadge
+                    }`}
+                    onClick={() => handleToggleAvisado(pedido)}
+                    >
+                      {pedido.avisado ? 'Avisado' : 'No avisado'}
+                    </button>
               </div>
 
               <div className={styles.pedidoAcciones}>
@@ -574,35 +720,46 @@ const GestionPedidosPage: React.FC = () => {
             onChange={handleSearchTermChange}
             className={styles.searchInput}
           />
+          <button
+          onClick={openCreateModal}
+          className={styles.newOrderButton} 
+        >
+          Nuevo Pedido
+        </button>
         </div>
-        {/* Botón "Armar Pedido" */}
+        {/* Botón "Armar Pedido" 
         <button
           onClick={() => navigate('/gestion')} 
           className={styles.newOrderButton} 
-        >
-          Armar Nuevo Pedido
-        </button>
+        >*/}
       </div>
 
       <div className={styles.tabsContainer}>
-        <button
+      {/**<button
           className={`${styles.tabButton} ${activeTab === 'todos' ? styles.activeTab : ''}`}
           onClick={() => setActiveTab('todos')}
         >
           Todos ({filteredPedidos.length})
-        </button>
+        </button>*/}
         <button
-          className={`${styles.tabButton} ${activeTab === 'pendientes' ? styles.activeTab : ''}`}
-          onClick={() => setActiveTab('pendientes')}
+          className={`${styles.tabButton} ${activeTab === 'PENDIENTE' ? styles.activeTab : ''}`}
+          onClick={() => setActiveTab('PENDIENTE')}
         >
           Pendientes ({pedidosPendientes.length})
         </button>
         <button
-          className={`${styles.tabButton} ${activeTab === 'entregados' ? styles.activeTab : ''}`}
-          onClick={() => setActiveTab('entregados')}
+          className={`${styles.tabButton} ${activeTab === 'LISTO' ? styles.activeTab : ''}`}
+          onClick={() => setActiveTab('LISTO')}
+        >
+        Listos ({pedidosListos.length})
+        </button>
+        <button
+          className={`${styles.tabButton} ${activeTab === 'ENTREGADO' ? styles.activeTab : ''}`}
+          onClick={() => setActiveTab('ENTREGADO')}
         >
           Entregados ({pedidosEntregados.length})
         </button>
+        {/** 
         <button
           className={`${styles.tabButton} ${activeTab === 'pagados' ? styles.activeTab : ''}`}
           onClick={() => setActiveTab('pagados')}
@@ -615,13 +772,21 @@ const GestionPedidosPage: React.FC = () => {
         >
           No Pagados ({pedidosNoPagados.length})
         </button>
+        */}
       </div>
+      
+      {activeTab === 'PENDIENTE' && renderPedidosList(pedidosPendientes)}
+      {activeTab === 'LISTO' && renderPedidosList(pedidosListos)}
+      {activeTab === 'ENTREGADO' && renderPedidosList(pedidosEntregados)}
 
-      {activeTab === 'todos' && renderPedidosList(filteredPedidos)}
-      {activeTab === 'pendientes' && renderPedidosList(pedidosPendientes)}
-      {activeTab === 'entregados' && renderPedidosList(pedidosEntregados)}
-      {activeTab === 'pagados' && renderPedidosList(pedidosPagados)}
-      {activeTab === 'noPagados' && renderPedidosList(pedidosNoPagados)}
+      <CrearPedidoModal 
+        isOpen={isCreateModalOpen} 
+        onClose={closeCreateModal} 
+        // Pasa las props necesarias, por ejemplo:
+        productos={productos}
+        // clientes={clientes} // Si decides mantener la lista de clientes en el padre
+        // onPedidoCreated={handlePedidoCreated} // Una función si necesitas hacer algo específico cuando el modal cree un pedido
+      />
 
       {isModalOpen && viewingPedido && (
         <div className={styles.modalOverlay}>
@@ -629,15 +794,14 @@ const GestionPedidosPage: React.FC = () => {
             <h2>Detalles del Pedido #{viewingPedido.numero_pedido}</h2>
             <div className={styles.detailSection}>
               <p><strong>Fecha:</strong> {viewingPedido.fecha_pedido}</p>
-              <p><strong>Cliente:</strong> {clienteNombreMap.get(viewingPedido.id_cliente) || `ID: ${viewingPedido.id_cliente}`}</p>
+              <p><strong>Cliente:</strong> {viewingPedido.cliente }</p>
               <p><strong>Hora de Entrega:</strong> {viewingPedido.para_hora || 'No especificada'}</p>
-              <p><strong>Estado Entrega:</strong> {viewingPedido.entregado ? 'Entregado' : 'Pendiente'}</p>
-              <p><strong>Estado Pago:</strong> {viewingPedido.pagado ? 'Pagado' : 'No Pagado'}</p>
+              <p><strong>Estado del Pedido:</strong> {viewingPedido.estado}</p>              <p><strong>Estado Pago:</strong> {viewingPedido.pagado ? 'Pagado' : 'No Pagado'}</p>
               <h3>Productos:</h3>
               <ul className={styles.productListModal}>
                 {viewingPedido.productos_detalle.map((item, index) => (
                   <li key={index}>
-                    {item.nombre_producto} - {item.cantidad_producto} x ${ (parseFloat(item.precio_unitario?.toString() || '0')).toFixed(2) } = ${ (parseFloat(item.subtotal?.toString() || '0')).toFixed(2) }
+                    {item.nombre_producto} - {item.cantidad_producto} x ${ (parseFloat(item.precio_unitario?.toString() || '0')).toFixed(1) } = ${ (parseFloat(item.subtotal?.toString() || '0')).toFixed(2) }
                   </li>
                 ))}
               </ul>
@@ -662,86 +826,74 @@ const GestionPedidosPage: React.FC = () => {
             
             <div className={modalStyles.modalBody}>
               <div className={modalStyles.editModalGrid}>
-                {/* Panel de información del pedido */}
                 <div className={modalStyles.editModalInfo}>
                   <h3 className={modalStyles.modalSectionTitle}>
                     <i className={`fas fa-info-circle ${modalStyles.iconMarginRight}`}></i>
                     Información del Pedido
                   </h3>
-                  
-                  <div className={`${modalStyles.formGroup} ${modalStyles.infoField}`}>
-                    <label className={modalStyles.formLabel}>Cliente</label>
-                    <p className={modalStyles.formControl} style={{background: '#fff'}}>
-                      {clienteNombreMap.get(editingPedido.id_cliente) || `ID: ${editingPedido.id_cliente}`}
-                    </p>
-                  </div>
-                  
-                  <div className={`${modalStyles.formGroup} ${modalStyles.infoField}`}>
-                    <label className={modalStyles.formLabel}>Fecha del Pedido</label>
-                    <p className={modalStyles.formControl} style={{background: '#fff'}}>
-                      {new Date(editingPedido.fecha_pedido).toLocaleDateString('es-AR', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
-                    </p>
-                  </div>
-                  
-                  <div className={modalStyles.formGroup}>
-                    <label className={modalStyles.formLabel} htmlFor="para_hora">Hora de Entrega</label>
-                    <input
-                      type="time"
-                      id="para_hora"
-                      name="para_hora"
-                      value={editFormData.para_hora || ''}
-                      onChange={handleEditInputChange}
-                      className={`${modalStyles.formControl} ${modalStyles.timeInput}`}
-                    />
-                  </div>
-                  
-                  <div className={modalStyles.formGroup}>
-                    <label className={modalStyles.formLabel}>Estado</label>
-                    <div className={modalStyles.checkboxGroupContainer}>
-                      <div className={modalStyles.checkboxContainer}>
-                        <input
-                          type="checkbox"
-                          id="entregado"
-                          name="entregado"
-                          checked={editFormData.entregado || false}
-                          onChange={handleEditInputChange}
-                          className={modalStyles.checkboxInput}
-                        />
-                        <label htmlFor="entregado" className={modalStyles.formLabel}>
-                          <span className={`${modalStyles.statusBadge} ${editFormData.entregado ? modalStyles.statusDelivered : modalStyles.statusPending}`}>
-                            <i className={`fas ${editFormData.entregado ? 'fa-check-circle' : 'fa-clock'}`}></i>
-                            {editFormData.entregado ? 'Entregado' : 'Pendiente'}
-                          </span>
-                        </label>
-                      </div>
-                      
-                      <div className={modalStyles.checkboxContainer}>
-                        <input type="checkbox" id="pagado" name="pagado" checked={editFormData.pagado || false} onChange={handleEditInputChange} className={modalStyles.checkboxInput}/>
-                        <label htmlFor="pagado" className={modalStyles.formLabel}>
-                          <span className={`${modalStyles.statusBadge} ${editFormData.pagado ? modalStyles.statusPaid : modalStyles.statusUnpaid}`}>
-                            <i className={`fas ${editFormData.pagado ? 'fa-check-circle' : 'fa-exclamation-circle'}`}></i>
-                            {editFormData.pagado ? 'Pagado' : 'Pendiente de pago'}
-                          </span>
-                        </label>
-                      </div>
+                  <div className={modalStyles.formGroupRow}>
+                    <div className={modalStyles.formGroup}> 
+                      <label className={modalStyles.formLabel} htmlFor="cliente">Cliente</label>
+                      <input
+                        type="text"
+                        id="cliente"
+                        name="cliente"
+                        value={editFormData.cliente || 'asdas'}
+                        onChange={handleEditInputChange}
+                        className={modalStyles.formControl} style={{background: '#fff'}}
+                      />
+                    </div>
+
+                    <div className={modalStyles.formGroup}>
+                      <label className={modalStyles.formLabel} htmlFor="para_hora">Hora de Entrega</label>
+                      <input
+                        type="time"
+                        id="para_hora"
+                        name="para_hora"
+                        value={editFormData.para_hora || ''}
+                        onChange={handleEditInputChange}
+                        className={`${modalStyles.formControl} ${modalStyles.timeInput}`}
+                      />
                     </div>
                   </div>
-                  
                   <div className={modalStyles.formGroup}>
-                    <label className={modalStyles.formLabel}>Productos en el pedido</label>
-                    <p className={modalStyles.emphasizedText} style={{fontSize: '1.1rem'}}>
-                      {editingPedidoItems.length} {editingPedidoItems.length === 1 ? 'producto' : 'productos'}
-                    </p>
+                    <label className={modalStyles.formLabel}>Estado del Pedido</label>
+                    <div className={modalStyles.checkboxGroupContainer}>
+                      <div className={modalStyles.checkboxContainer}>
+                        <label htmlFor="estado" className={modalStyles.formLabel}>
+                          Estado:
+                        </label>
+                        <select
+                          id="estado"
+                          name="estado"
+                          value={editFormData.estado || ''}
+                          onChange={handleEditInputChange}
+                          className={modalStyles.formControl}
+                          style={{width: 'auto', display: 'inline-block', marginLeft: '10px'}}
+                        >
+                          <option value="PENDIENTE">Pendiente</option>
+                          <option value="LISTO">Listo</option>
+                          <option value="ENTREGADO">Entregado</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className={modalStyles.formGroup}>
+                      <div className={modalStyles.checkboxContainer}>
+                          <input type="checkbox" id="pagado" name="pagado" checked={editFormData.pagado || false} onChange={handleEditInputChange} className={modalStyles.checkboxInput}/>
+                          <label htmlFor="pagado" className={modalStyles.formLabel}>
+                            <span className={`${modalStyles.statusBadge} ${editFormData.pagado ? modalStyles.statusPaid : modalStyles.statusUnpaid}`}>
+                              <i className={`fas ${editFormData.pagado ? 'fa-check-circle' : 'fa-exclamation-circle'}`}></i>
+                              {editFormData.pagado ? 'Pagado' : 'Pendiente de pago'}
+                            </span>
+                          </label>
+                        </div>
+                    </div>
                   </div>
                   
                   <div className={modalStyles.totalSection}>
                     <label className={modalStyles.formLabel}>Subtotal</label>
                     <p className={modalStyles.totalAmount}>
-                      ${totalEditingPedido.toFixed(2)}
+                      ${totalEditingPedido.toFixed(0)}
                     </p>
                   </div>
                 </div>
@@ -774,10 +926,6 @@ const GestionPedidosPage: React.FC = () => {
                       {editProductosFiltradosPorCategoria.length > 0 ? (
                         editProductosFiltradosPorCategoria.map(producto => (
                           <div key={producto.id} className={crearPedidoStyles.productItem}>
-                            <div className={crearPedidoStyles.productInfo}>
-                              <strong>{producto.nombre}</strong>
-                              <span>${(parseFloat(producto.precio_unitario.toString()) || 0).toFixed(2)}</span>
-                            </div>
                             <button
                               type="button"
                               onClick={() => addProductToEditingOrder(producto)}
@@ -785,6 +933,10 @@ const GestionPedidosPage: React.FC = () => {
                             >
                               <i className="fas fa-plus"></i> Añadir
                             </button>
+                            <div className={crearPedidoStyles.productInfo}>
+                              <strong>{producto.nombre}</strong>
+                              <span>${(parseFloat(producto.precio_unitario.toString()) || 0).toFixed(2)}</span>
+                            </div>
                           </div>
                         ))
                       ) : (
@@ -793,7 +945,6 @@ const GestionPedidosPage: React.FC = () => {
                     </div>
                   </div>
                   
-                  {/* Lista de productos actuales */}
                   <div className={modalStyles.modalSection} style={{flexGrow: 1}}>
                     <h3 className={modalStyles.modalSectionTitle}>
                       <i className="fas fa-shopping-basket" style={{marginRight: '8px'}}></i>
@@ -812,9 +963,20 @@ const GestionPedidosPage: React.FC = () => {
                           <div key={item.id} className={modalStyles.productCard}>
                             <div className={modalStyles.productHeader}>
                               <h4 className={modalStyles.productName}>{item.nombre}</h4>
-                              <span className={modalStyles.productPrice}>
-                                ${(parseFloat(item.precio_unitario.toString()) || 0).toFixed(2)} c/u
-                              </span>
+                              <div>
+                                <textarea
+                                  placeholder="Aclaraciones..."
+                                  value={item.aclaraciones}
+                                  onChange={(e: ChangeEvent<HTMLTextAreaElement>) => updateEditingItemAclaraciones(item.id, e.target.value)}
+                                  className={modalStyles.aclaracionesInput}
+                                ></textarea>
+                              </div>
+                              <div className={modalStyles.emphasizedText}>
+                                <span className={modalStyles.productPrice}>
+                                  Subtotal:
+                                </span>
+                                ${(parseFloat(item.subtotal.toString()) || 0).toFixed(0)}
+                              </div>
                             </div>
                             
                             <div className={modalStyles.quantityContainer}>
@@ -823,17 +985,18 @@ const GestionPedidosPage: React.FC = () => {
                                   type="button"
                                   onClick={() => updateEditingItemQuantity(item.id, item.cantidad - 1)}
                                   className={modalStyles.quantityButton}
-                                  disabled={item.cantidad <= 1}
+                                  disabled={item.cantidad <= 0}
                                 >
                                   −
                                 </button>
                                 
                                 <input
                                   type="number"
-                                  min="1"
+                                  min="0"
+                                  step="0.01"
                                   value={item.cantidad}
                                   onChange={(e: ChangeEvent<HTMLInputElement>) => 
-                                    updateEditingItemQuantity(item.id, Math.max(1, parseInt(e.target.value) || 1))
+                                    updateEditingItemQuantity(item.id, parseFloat(e.target.value))
                                   }
                                   className={modalStyles.quantityInput}
                                 />
@@ -848,9 +1011,6 @@ const GestionPedidosPage: React.FC = () => {
                               </div>
                               
                               <div className={modalStyles.textRight}>
-                                <div className={modalStyles.emphasizedText}>
-                                  ${(parseFloat(item.subtotal.toString()) || 0).toFixed(2)}
-                                </div>
                                 <button
                                   type="button"
                                   onClick={() => removeProductFromEditingOrder(item.id)}

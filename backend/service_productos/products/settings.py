@@ -17,15 +17,11 @@ SECRET_KEY = config('DJANGO_SECRET_KEY', default='unsafe-default-key')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
 
 
-CORS_ALLOWED_ORIGINS = [
-     "http://localhost:5173", 
-     "http://localhost:5174", # Si cambiaste el puerto
-     "http://127.0.0.1:5173",
-     "http://172.19.0.10:5174",
-]
+CORS_ALLOW_ALL_ORIGINS = True
+
 
 
 # Application definition

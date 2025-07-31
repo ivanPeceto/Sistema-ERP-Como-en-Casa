@@ -15,6 +15,7 @@ import { getClientes } from '../services/client_service';
 import { getProductos } from '../services/product_service';
 import { createPedido, getPedidosByDate } from '../services/pedido_service';
 import type { PedidoItem, PedidoInput, Producto, Cliente } from '../types/models.d.ts';
+import { useNavigate } from 'react-router-dom'; 
 
 const CrearPedidoPage: React.FC = () => {
   const [clientes, setClientes] = useState<Cliente[]>([]);
@@ -28,7 +29,8 @@ const CrearPedidoPage: React.FC = () => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const navigate = useNavigate();
+  
     /**
    * @brief Carga los datos iniciales de clientes y productos en paralelo.
    */
@@ -169,6 +171,8 @@ const CrearPedidoPage: React.FC = () => {
         id_cliente: clienteSeleccionado.id,
         para_hora: paraHora || null,
         entregado: false,
+        avisado: false,
+        estado: 'PENDIENTE',
         pagado: false,
         productos: pedidoItems.map(item => ({
           id_producto: item.id,
@@ -180,11 +184,7 @@ const CrearPedidoPage: React.FC = () => {
 
       await createPedido(pedidoData);
 
-      setPedidoItems([]);
-      setClienteSeleccionado(null);
-      setClienteSearchTerm('');
-      setParaHora(''); 
-
+      navigate('/gestion/pedidos', { replace: true });
     } catch (err) {
       console.error("Error al confirmar el pedido:", err);
     }

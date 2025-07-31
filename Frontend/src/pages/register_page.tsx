@@ -42,7 +42,7 @@ const RegisterPage: React.FC = () => {
 
     try{
       await register(email, password, username);
-      navigate('/gestion');
+      navigate('/gestion/pedidos');
 
     } catch (err: any){
       console.error('Error de registro: ', err);

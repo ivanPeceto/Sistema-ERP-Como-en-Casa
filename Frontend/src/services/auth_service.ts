@@ -33,7 +33,7 @@ import { setTokens, removeTokens } from '../api/apiClient';
  * durante el proceso de construcción. En producción, estas variables son
  * proporcionadas por Docker Compose.
  */
-const USERS_API_BASE_URL = import.meta.env.VITE_API_USUARIOS_URL;
+const USERS_API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 /**
  * @var userAPIClient
@@ -73,7 +73,7 @@ const userAPIClient = createAuthApiClient(USERS_API_BASE_URL);
  * }
  */
 export const login = async (email: string, password: string): Promise<AuthResponse> => {
-  const response = await userAPIClient.post<AuthResponse>('/login/', {
+  const response = await userAPIClient.post<AuthResponse>('/api/usuarios/login/', {
     email,
     password,
   });
@@ -120,8 +120,8 @@ export const logout = (): void => {
  * 
  * @throws {AxiosError} Si el correo ya está registrado o hay un error de validación
  */
-export const register = async (email: string, password: string, nombre: string): Promise<AuthResponse> => {
-  const response = await userAPIClient.post<AuthResponse>('/signup/', {
+export const register = async ( email: string, password: string, nombre: string): Promise<AuthResponse> => {
+  const response = await userAPIClient.post<AuthResponse>('/api/usuarios/signup/', {
     nombre,
     email,
     password,

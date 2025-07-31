@@ -39,7 +39,6 @@ export interface Producto {
   nombre: string;
   descripcion: string;
   precio_unitario: number;
-  stock: number;
   disponible: boolean;
   categoria: Categoria | null;
 }
@@ -55,6 +54,7 @@ export interface PedidoItem extends Partial<Producto> {
     id: number;
     nombre: string;
     precio_unitario: number;
+    aclaraciones?: string;
     cantidad: number;
     subtotal: number;
 }
@@ -68,15 +68,23 @@ export interface Pedido {
   id: number;
   numero_pedido: number;
   fecha_pedido: string; 
+  // Deprecated
   id_cliente: number;
+  //--
+  cliente: string;
   para_hora: string | null; 
+  estado: string; // 'PENDIENTE', 'LISTO', 'ENTREGADO'
+  avisado: boolean;
+  // Deprecated
   entregado: boolean;
+  //--
   pagado: boolean;
   total: number;
   productos_detalle: {
       id_producto: number;
       nombre_producto: string;
       cantidad_producto: number;
+      aclaraciones?: string;
       precio_unitario: number;
       subtotal: number;
   }[];
@@ -90,18 +98,29 @@ export interface Pedido {
  */
 export interface PedidoInput {
     numero_pedido: number;
-    fecha_pedido: string; 
+    fecha_pedido: string;
+    // Deprecated 
     id_cliente: number;
+    // --
+    cliente: string;
     para_hora: string | null; 
+    estado: string; // 'PENDIENTE', 'LISTO', 'ENTREGADO'
+    avisado: boolean;
+    // Deprecated
     entregado: boolean;
+    //--
     pagado: boolean;
     productos: {
         id_producto: number;
         nombre_producto: string;
         cantidad_producto: number;
         precio_unitario: number;
+        aclaraciones?: string;
     }[];
 }
+
+// Unión de tipos para los estados de pedido para mayor seguridad de tipo
+export type PedidoEstado = 'PENDIENTE' | 'LISTO' | 'ENTREGADO';
 
 
 // --- Tipos de Autenticación ---

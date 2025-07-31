@@ -182,7 +182,7 @@
   padding: 25px;
   border-radius: 8px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  width: 100%;
+  width: 60vw;
   max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
@@ -193,7 +193,7 @@
   padding: 25px;
   border-radius: 8px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  width: 95%;
+  width: 60vw;
   max-width: 1200px;
   max-height: 95vh;
   overflow-y: auto;
@@ -399,13 +399,17 @@
   color: #6c757d;
 }
 
+.pedidoCliente {
+  font-weight: 800;
+}
+
 /* Información del cliente */
 .pedidoCliente, .pedidoHora {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.95rem;
-  color: #495057;
+  font-size: 1.2rem;
+  color: #000000;
 }
 
 .pedidoCliente i, .pedidoHora i {
@@ -417,8 +421,9 @@
 /* Resumen del pedido */
 .pedidoResumen {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
-  align-items: center;
+  align-items: left;
   background-color: #f8f9fa;
   padding: 10px 12px;
   border-radius: 6px;
@@ -429,13 +434,29 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.9rem;
+  font-size: 1.2rem;
 }
 
+.pedidoProductos {
+  display: flex;
+  margin-bottom: 0.8rem;
+  text-align: left;
+  font-weight: 500;
+  font-size: 1.3rem;
+}
+
+.aclaracionesProducto {
+  display: flex;
+  margin-bottom: 0.4rem;
+  text-align: left;
+  font-weight: 500;
+  font-size: 1.3rem;
+  max-width: 150px;
+}
 .pedidoTotal span {
   font-weight: 700;
   color: #28a745;
-  font-size: 1.1rem;
+  font-size: 1.5rem;
 }
 
 .pedidoEstados {
@@ -447,7 +468,7 @@
 .estadoBadge {
   padding: 6px 10px;
   border-radius: 20px;
-  font-size: 0.8rem;
+  font-size: 1.2rem;
   font-weight: 500;
   display: flex;
   align-items: center;
@@ -455,34 +476,68 @@
   cursor: pointer;
   transition: all 0.2s;
   border: 1px solid transparent;
+
+  width: 50%;
+  justify-content: center;
+  text-align: center;
 }
 
 .estadoBadge i {
   font-size: 0.9em;
 }
 
+
 .entregadoBadge {
+
   background-color: #e8f5e9;
   color: #2e7d32;
   border-color: #c8e6c9;
 }
 
+.listoBadge {
+  background-color: #c3f3ff;
+  color: #066164;
+  border-color: #c9d3f3;
+}
+
 .pendienteBadge {
+
   background-color: #fff3e0;
   color: #e65100;
   border-color: #ffe0b2;
 }
 
 .pagadoBadge {
-  background-color: #e3f2fd;
-  color: #1565c0;
-  border-color: #bbdefb;
+
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border-color: #c8e6c9;
 }
 
 .noPagadoBadge {
+
   background-color: #ffebee;
   color: #c62828;
   border-color: #ffcdd2;
+}
+
+.avisadoBadge {
+  width: 100%;
+  color: white;
+  justify-content: center;
+
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border-color: #c8e6c9;
+}
+
+.noAvisadoBadge{
+  width: 100%;
+  justify-content: center;
+
+  background-color: #fff3e0;
+  color: #e65100;
+  border-color: #ffe0b2;
 }
 
 /* Acciones del pedido */
@@ -526,6 +581,17 @@
 
 .actionButton.deleteButton:hover {
   background-color: #ffebee;
+}
+.icon {
+  width: 1.5em;
+  height: 1.5em;
+  stroke: currentColor;
+  flex-shrink: 0;
+}
+.imprimirButton {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border-color: #c8e6c9;
 }
 
 /* Estado de carga */

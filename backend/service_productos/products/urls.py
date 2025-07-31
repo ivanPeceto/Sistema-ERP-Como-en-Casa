@@ -16,15 +16,15 @@ from apps.categorias.views import (
 
 
 urlpatterns = [
-    path('crear/', ProductoCrearView.as_view(), name='producto_crear'),
-    path('editar/', ProductoEditarView.as_view(), name='producto_editar'),
-    path('eliminar/', ProductoEliminarView.as_view(), name='producto_eliminar'),
-    path('listar/', ProductoListarView.as_view(), name='producto_listar'),
-    path('buscar/', ProductoBuscarView.as_view(), name='producto_buscar'),
+    path('api/productos/crear/', ProductoCrearView.as_view(), name='producto_crear'),
+    path('api/productos/editar/', ProductoEditarView.as_view(), name='producto_editar'),
+    path('api/productos/eliminar/', ProductoEliminarView.as_view(), name='producto_eliminar'),
+    path('api/productos/listar/', ProductoListarView.as_view(), name='producto_listar'),
+    path('api/productos/buscar/', ProductoBuscarView.as_view(), name='producto_buscar'),
     
-    path('categoria/crear/', CategoriaCrearView.as_view(), name='categoria_crear'),
-    path('categoria/editar/', CategoriaEditarView.as_view(), name='categoria_editar'),
-    path('categoria/eliminar/', CategoriaEliminarView.as_view(), name='categoria_eliminar'),
-    path('categoria/listar/', CategoriaListarView.as_view(), name='categoria_listar'),
-    path('categoria/buscar/', CategoriaBuscarView.as_view(), name='categoria_buscar'),    
+    path('api/productos/categoria/crear/', CategoriaCrearView.as_view(), name='categoria_crear'),
+    path('api/productos/categoria/editar/', CategoriaEditarView.as_view(), name='categoria_editar'),
+    path('api/productos/categoria/eliminar/', CategoriaEliminarView.as_view(), name='categoria_eliminar'),
+    path('api/productos/categoria/listar/', CategoriaListarView.as_view(), name='categoria_listar'),
+    path('api/productos/categoria/buscar/', CategoriaBuscarView.as_view(), name='categoria_buscar'),    
 ]

@@ -1,7 +1,6 @@
 /**
  * @file apiClient.ts
  * @brief Módulo cliente API con autenticación JWT
- * @date 2025-06-21
  * 
  * @details
  * Este módulo implementa un cliente HTTP basado en Axios con manejo automático de autenticación JWT.
@@ -14,31 +13,16 @@
 
 import axios from 'axios';
 import type { RefreshTokenResponse, User } from '../types/models';
-/**
-/**
- * @brief Crea y configura una instancia de Axios con interceptores para manejar la autenticación JWT.
- * @details
- * Esta función factoría toma una URL base y devuelve una instancia de Axios.
- * Dicha instancia tiene dos interceptores configurados:
- *    1.Interceptor de Petición (Request): Se ejecuta antes de cada petición para inyectar
- * automáticamente el 'access token' en la cabecera 'Authorization'.
- *    2.Interceptor de Respuesta (Response): Se ejecuta al recibir una respuesta. Si detecta
- * un error 401 (Unauthorized), intenta renovar el 'access token' usando el 'refresh token'
- * y reintenta la petición original de forma transparente.
- * 
- * @param {string} baseURL La URL base del microservicio al que esta instancia se conectará.
- * @returns {import('axios').AxiosInstance} Una instancia de Axios configurada y lista para usar.
- */
+
 /**
  * @brief Crea una instancia de Axios configurada con autenticación JWT
- * @param baseURL URL base del servicio API
- * @return {axios.AxiosInstance} Instancia de Axios configurada
- * 
  * @details
  * La instancia incluye interceptores para:
  * - Inyectar automáticamente el token de acceso en las cabeceras
  * - Manejar la renovación de tokens vencidos
  * - Reintentar peticiones fallidas por token expirado
+ * * @param baseURL La URL base del microservicio al que esta instancia se conectará.
+ * @return {axios.AxiosInstance} Instancia de Axios configurada
  */
 const createAuthApiClient = (baseURL: string) => { 
   // Crea una instancia base de Axios con la configuración inicial
@@ -49,17 +33,14 @@ const createAuthApiClient = (baseURL: string) => {
     },
   });
 
-  // Interceptor para inyectar el token de acceso en cada petición
+  /**
+   * @brief Interceptor de petición para inyectar el token de acceso
+   * @private
+   */
   instance.interceptors.request.use(
-    /**
-     * @brief Interceptor de petición para inyectar el token de acceso
-     * @private
-     * @param config Configuración de la petición
-     * @returns Configuración modificada con el token de acceso
-     */
     (config) => {
       const token = getAccessToken();
-      const publicUrls = ['/login/', '/signup/', '/refresh_token/'];
+      const publicUrls = ['/api/usuarios/login/', '/api/usuarios/signup/', '/api/usuarios/refresh_token/'];
 
       if (token && !publicUrls.some(url => config.url?.includes(url))) {
         config.headers = config.headers || {};
@@ -70,9 +51,6 @@ const createAuthApiClient = (baseURL: string) => {
     (error) => Promise.reject(error)
   );
 
-  // Interceptor para manejar respuestas con error 401 (No autorizado)
-  instance.interceptors.response.use(
-    (response) => response,
     /**
      * @brief Maneja errores de autenticación y renueva tokens expirados
      * @private
@@ -86,10 +64,13 @@ const createAuthApiClient = (baseURL: string) => {
      * 2. Obtener un nuevo token de acceso usando el refresh token
      * 3. Reintentar la petición original con el nuevo token
      * 4. Redirigir al login si el refresh token también es inválido
-     */
+     */  
+  instance.interceptors.response.use(
+    (response) => response,
+
     async (error) => {
       const originalRequest = error.config;
-      const refreshUrl = `${import.meta.env.VITE_API_USUARIOS_URL}/refresh_token/`;
+      const refreshUrl = `${import.meta.env.VITE_API_USUARIOS_URL}/api/usuarios/refresh_token/`;
 
       if (error.response?.status === 401 && !originalRequest._retry && originalRequest.url !== refreshUrl) {        
         
