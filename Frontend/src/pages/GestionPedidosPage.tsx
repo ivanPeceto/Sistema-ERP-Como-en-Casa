@@ -704,7 +704,6 @@ const GestionPedidosPage: React.FC = () => {
 
   return (
     <div className={styles.pageContainer}>
-      <h1>Gestión de Pedidos</h1>
       <div className={styles.toolbar}>
         <div className={styles.searchInputs}>
           <input

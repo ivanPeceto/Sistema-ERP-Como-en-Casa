@@ -5,14 +5,16 @@
   overflow: hidden;
   box-sizing: border-box;
   background-color: #1a202c;
+  flex-direction: column;
 }
 
 .contentArea {
   flex-grow: 1;
-  padding: 1.5rem; /* Padding general */
-  overflow-y: auto; /* Scroll principal si el contenido es muy alto */
+  padding: 1.5rem; 
+  overflow-y: auto; 
   box-sizing: border-box;
-  background-color: rgb(224, 224, 224);
+  background-color: #2d3748; 
+  color: #e2e8f0; 
   display: flex;
   flex-direction: column;
    overflow-x: hidden;

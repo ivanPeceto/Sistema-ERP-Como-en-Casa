@@ -33,8 +33,7 @@ interface MenuItem {
  * - Menú de navegación principal
  * - Información de la cuenta de usuario
  * - Botón de cierre de sesión
- * 
- * Utiliza el contexto de autenticación para:
+ * * Utiliza el contexto de autenticación para:
  * - Mostrar el nombre del usuario autenticado
  * - Proporcionar funcionalidad de cierre de sesión
  */
@@ -75,16 +74,17 @@ const Sidebar: React.FC = () => {
    * 1. Logo de la aplicación
    * 2. Sección de menú con navegación
    * 3. Sección de cuenta con información de usuario y botón de cierre de sesión
-   * 
-   * Estilizado con módulos CSS para un diseño responsivo y temático
+   * * Estilizado con módulos CSS para un diseño responsivo y temático
    */
   return (
-    <div className={`${styles.sidebarContainer} ${styles.expanded} ${styles.darkTheme}`}>
+    // MODIFICADO: Se cambió la clase base para la barra horizontal
+    <div className={`${styles.horizontalBarContainer} ${styles.darkTheme}`}>
       <div className={styles.logoLink}>
         <svg className={styles.logoIcon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M11 17a1 1 0 001.447.894l4-2A1 1 0 0017 15V9.236a1 1 0 00-1.447-.894l-4 2a1 1 0 00-.553.894V17zM15.211 6.276a1 1 0 000-1.788l-4.764-2.382a1 1 0 00-.894 0L4.789 4.488a1 1 0 000 1.788l4.764 2.382a1 1 0 00.894 0l4.764-2.382zM4.447 8.342A1 1 0 003 9.236V15a1 1 0 00.553.894l4 2A1 1 0 009 17v-5.764a1 1 0 00-.553-.894l-4-2z" /></svg>
         <span className={styles.logoText}>GESTOR DE PEDIDOS</span>
       </div>
 
+      {/* MODIFICADO: El menú de navegación se mantiene */}
       <div className={styles.menuSection}>
         {menuItems.map((item) => (
           <NavLink
@@ -99,6 +99,7 @@ const Sidebar: React.FC = () => {
         ))}
       </div>
       
+      {/* MODIFICADO: La sección de cuenta y logout se mueve a la derecha */}
       <div className={styles.accountSection}>
         <div className={styles.accountLink} style={{ cursor: 'default' }}>
           {accountItem.icon}
