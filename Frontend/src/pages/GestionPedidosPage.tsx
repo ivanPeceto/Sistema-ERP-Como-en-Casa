@@ -74,7 +74,12 @@ const GestionPedidosPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   
   /** @brief Fecha para filtrar los pedidos (formato YYYY-MM-DD) */
-  const [searchDate, setSearchDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = (today.getMonth() + 1).toString().padStart(2, '0'); 
+  const day = today.getDate().toString().padStart(2, '0');
+  const hoy = `${year}-${month}-${day}`;
+  const [searchDate, setSearchDate] = useState<string>(hoy);
   
   // Estados de los modales
   /** @brief Controla la visibilidad del modal de visualización */
