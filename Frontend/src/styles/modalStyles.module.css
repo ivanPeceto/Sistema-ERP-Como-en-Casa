@@ -74,8 +74,8 @@
 /* Pie del modal */
 .modalFooter {
   padding: 15px 25px;
-  background: #f8f9fa;
-  border-top: 1px solid #e9ecef;
+  background: #343638;
+  border-top: 1px solid #5d6166;
   display: flex;
   justify-content: flex-end;
   gap: 10px;
@@ -186,7 +186,7 @@
   display: block;
   margin-bottom: .5rem;
   font-weight: 500;
-  color: #495057;
+  color: #ffffff;
   line-height: 1;
 }
 

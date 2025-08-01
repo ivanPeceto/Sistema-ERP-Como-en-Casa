@@ -19,6 +19,7 @@ import styles from '../styles/gestionPedidosPage.module.css';
 import crearPedidoStyles from '../styles/crearPedidoPage.module.css';
 import modalStyles from '../styles/modalStyles.module.css';
 import CrearPedidoModal from '../components/modals/CrearPedidoModal'; 
+import EditarPedidoModal from '../components/modals/EditarPedidoModal'; 
 
 import { getPedidosByDate, editarPedido, deletePedido, printPedido } from '../services/pedido_service';
 import { getClientes } from '../services/client_service';
@@ -269,6 +270,7 @@ const GestionPedidosPage: React.FC = () => {
     setEditingPedidoItems([]);
     setEditFormData({});
   }, []);
+
 
   /**
    * @brief Abre el modal de edición de un pedido
@@ -813,246 +815,13 @@ const GestionPedidosPage: React.FC = () => {
         </div>
       )}
 
-      {isEditModalOpen && editingPedido && (
-        <div className={modalStyles.modalOverlay}>
-          <div className={modalStyles.modalContentWide}>
-            <div className={modalStyles.modalHeader}>
-              <h2 className={modalStyles.modalTitle}>
-                <i className={`fas fa-edit ${modalStyles.iconMarginRight}`}></i>
-                Editar Pedido #{editingPedido.numero_pedido}
-              </h2>
-            </div>
-            
-            <div className={modalStyles.modalBody}>
-              <div className={modalStyles.editModalGrid}>
-                <div className={modalStyles.editModalInfo}>
-                  <h3 className={modalStyles.modalSectionTitle}>
-                    <i className={`fas fa-info-circle ${modalStyles.iconMarginRight}`}></i>
-                    Información del Pedido
-                  </h3>
-                  <div className={modalStyles.formGroupRow}>
-                    <div className={modalStyles.formGroup}> 
-                      <label className={modalStyles.formLabel} htmlFor="cliente">Cliente</label>
-                      <input
-                        type="text"
-                        id="cliente"
-                        name="cliente"
-                        value={editFormData.cliente || 'asdas'}
-                        onChange={handleEditInputChange}
-                        className={modalStyles.formControl} style={{background: '#fff'}}
-                      />
-                    </div>
-
-                    <div className={modalStyles.formGroup}>
-                      <label className={modalStyles.formLabel} htmlFor="para_hora">Hora de Entrega</label>
-                      <input
-                        type="time"
-                        id="para_hora"
-                        name="para_hora"
-                        value={editFormData.para_hora || ''}
-                        onChange={handleEditInputChange}
-                        className={`${modalStyles.formControl} ${modalStyles.timeInput}`}
-                      />
-                    </div>
-                  </div>
-                  <div className={modalStyles.formGroup}>
-                    <label className={modalStyles.formLabel}>Estado del Pedido</label>
-                    <div className={modalStyles.checkboxGroupContainer}>
-                      <div className={modalStyles.checkboxContainer}>
-                        <label htmlFor="estado" className={modalStyles.formLabel}>
-                          Estado:
-                        </label>
-                        <select
-                          id="estado"
-                          name="estado"
-                          value={editFormData.estado || ''}
-                          onChange={handleEditInputChange}
-                          className={modalStyles.formControl}
-                          style={{width: 'auto', display: 'inline-block', marginLeft: '10px'}}
-                        >
-                          <option value="PENDIENTE">Pendiente</option>
-                          <option value="LISTO">Listo</option>
-                          <option value="ENTREGADO">Entregado</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div className={modalStyles.formGroup}>
-                      <div className={modalStyles.checkboxContainer}>
-                          <input type="checkbox" id="pagado" name="pagado" checked={editFormData.pagado || false} onChange={handleEditInputChange} className={modalStyles.checkboxInput}/>
-                          <label htmlFor="pagado" className={modalStyles.formLabel}>
-                            <span className={`${modalStyles.statusBadge} ${editFormData.pagado ? modalStyles.statusPaid : modalStyles.statusUnpaid}`}>
-                              <i className={`fas ${editFormData.pagado ? 'fa-check-circle' : 'fa-exclamation-circle'}`}></i>
-                              {editFormData.pagado ? 'Pagado' : 'Pendiente de pago'}
-                            </span>
-                          </label>
-                        </div>
-                    </div>
-                  </div>
-                  
-                  <div className={modalStyles.totalSection}>
-                    <label className={modalStyles.formLabel}>Subtotal</label>
-                    <p className={modalStyles.totalAmount}>
-                      ${totalEditingPedido.toFixed(0)}
-                    </p>
-                  </div>
-                </div>
-                
-                {/* Panel de gestión de productos */}
-                <div className={modalStyles.editModalProducts}>
-                  {/* Sección para agregar productos */}
-                  <div className={modalStyles.modalSection}>
-                    <h3 className={modalStyles.modalSectionTitle}>
-                      <i className={`fas fa-plus-circle ${modalStyles.iconMarginRight}`}></i>
-                      Añadir Productos
-                    </h3>
-                    
-                    <div className={modalStyles.actionContainer}>
-                      <div className={crearPedidoStyles.categoryTabs}>
-                        {(editCategoriasUnicas || []).map(cat => (
-                          <button
-                            key={cat}
-                            type="button"
-                            className={`${crearPedidoStyles.categoryTab} ${editCategoriaSeleccionada === cat ? crearPedidoStyles.activeTab : ''}`}
-                            onClick={() => setEditCategoriaSeleccionada(cat)}
-                          >
-                            {cat}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <div className={crearPedidoStyles.productList} style={{maxHeight: '200px', overflowY: 'auto'}}>
-                      {editProductosFiltradosPorCategoria.length > 0 ? (
-                        editProductosFiltradosPorCategoria.map(producto => (
-                          <div key={producto.id} className={crearPedidoStyles.productItem}>
-                            <button
-                              type="button"
-                              onClick={() => addProductToEditingOrder(producto)}
-                              className={`${modalStyles.addButton} ${modalStyles.modalButtonPrimary}`}
-                            >
-                              <i className="fas fa-plus"></i> Añadir
-                            </button>
-                            <div className={crearPedidoStyles.productInfo}>
-                              <strong>{producto.nombre}</strong>
-                              <span>${(parseFloat(producto.precio_unitario.toString()) || 0).toFixed(2)}</span>
-                            </div>
-                          </div>
-                        ))
-                      ) : (
-                        <p className={modalStyles.centeredText}>No hay productos en esta categoría</p>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div className={modalStyles.modalSection} style={{flexGrow: 1}}>
-                    <h3 className={modalStyles.modalSectionTitle}>
-                      <i className="fas fa-shopping-basket" style={{marginRight: '8px'}}></i>
-                      Productos del Pedido
-                    </h3>
-                    
-                    <div className={modalStyles.productsList}>
-                      {editingPedidoItems.length === 0 ? (
-                        <div className={modalStyles.emptyListContainer}>
-                          <i className={`fas fa-inbox ${modalStyles.emptyListIcon}`}></i>
-                          <p>No hay productos en el pedido</p>
-                          <p className={modalStyles.emptyListMessage}>Agrega productos desde el panel superior</p>
-                        </div>
-                      ) : (
-                        editingPedidoItems.map(item => (
-                          <div key={item.id} className={modalStyles.productCard}>
-                            <div className={modalStyles.productHeader}>
-                              <h4 className={modalStyles.productName}>{item.nombre}</h4>
-                              <div>
-                                <textarea
-                                  placeholder="Aclaraciones..."
-                                  value={item.aclaraciones}
-                                  onChange={(e: ChangeEvent<HTMLTextAreaElement>) => updateEditingItemAclaraciones(item.id, e.target.value)}
-                                  className={modalStyles.aclaracionesInput}
-                                ></textarea>
-                              </div>
-                              <div className={modalStyles.emphasizedText}>
-                                <span className={modalStyles.productPrice}>
-                                  Subtotal:
-                                </span>
-                                ${(parseFloat(item.subtotal.toString()) || 0).toFixed(0)}
-                              </div>
-                            </div>
-                            
-                            <div className={modalStyles.quantityContainer}>
-                              <div className={modalStyles.quantityControls}>
-                                <button
-                                  type="button"
-                                  onClick={() => updateEditingItemQuantity(item.id, item.cantidad - 1)}
-                                  className={modalStyles.quantityButton}
-                                  disabled={item.cantidad <= 0}
-                                >
-                                  −
-                                </button>
-                                
-                                <input
-                                  type="number"
-                                  min="0"
-                                  step="0.01"
-                                  value={item.cantidad}
-                                  onChange={(e: ChangeEvent<HTMLInputElement>) => 
-                                    updateEditingItemQuantity(item.id, parseFloat(e.target.value))
-                                  }
-                                  className={modalStyles.quantityInput}
-                                />
-                                
-                                <button
-                                  type="button"
-                                  onClick={() => updateEditingItemQuantity(item.id, item.cantidad + 1)}
-                                  className={modalStyles.quantityButton}
-                                >
-                                  +
-                                </button>
-                              </div>
-                              
-                              <div className={modalStyles.textRight}>
-                                <button
-                                  type="button"
-                                  onClick={() => removeProductFromEditingOrder(item.id)}
-                                  className={modalStyles.deleteButton}
-                                >
-                                  <i className="fas fa-trash-alt" style={{fontSize: '0.8rem'}}></i>
-                                  <span>Eliminar</span>
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                    
-                    {/* Sección de total eliminada según solicitud */}
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className={modalStyles.modalFooter}>
-              <button
-                type="button"
-                onClick={closeEditModal}
-                className={`${modalStyles.modalButton} ${modalStyles.modalButtonSecondary}`}
-              >
-                <i className={`fas fa-times ${modalStyles.iconMarginRight}`}></i>
-                Cancelar
-              </button>
-              <button
-                type="button"
-                onClick={handleEditSubmit}
-                className={`${modalStyles.modalButton} ${modalStyles.modalButtonPrimary}`}
-                disabled={editingPedidoItems.length === 0}
-              >
-                <i className={`fas fa-save ${modalStyles.iconMarginRight}`}></i>
-                Guardar Cambios
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+    <EditarPedidoModal
+            isOpen={isEditModalOpen}
+            onClose={closeEditModal}
+            editingPedido={editingPedido}
+            productos={productos}
+            fetchInitialDataParent={fetchInitialData}
+          />
     </div>
   );
 };
