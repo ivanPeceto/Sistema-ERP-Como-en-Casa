@@ -754,15 +754,15 @@ const GestionPedidosPage: React.FC = () => {
         >
           Nuevo Pedido
         </button>
-        <button
+        </div>
+          <button
           onClick={handleCalcularTotalVentas}
-          className={`${styles.actionButton} ${styles.newOrderButton}`} 
-          title="Total ventas"
-        >
+          className={`${styles.actionButton} ${styles.newOrderButton}`} // Puedes crear un estilo nuevo o reutilizar uno existente
+          title="Calcular total de ventas del día"
+          >
           <i className="fas fa-calculator" style={{ marginRight: '8px' }}></i>
           Calcular Ventas
-      </button>
-        </div>
+        </button>
         {/* Botón "Armar Pedido" 
         <button
           onClick={() => navigate('/gestion')} 
@@ -857,7 +857,27 @@ const GestionPedidosPage: React.FC = () => {
             productos={productos}
             fetchInitialDataParent={fetchInitialData}
           />
-
+       {isTotalVentasModalOpen && (
+         <div className={styles.modalOverlay}>
+           <div className={styles.modalContent}>
+             <h2 className={styles.modalTitle}>
+                <i className="fas fa-chart-bar" style={{ marginRight: '10px' }}></i>
+                Total de Ventas del Día
+             </h2>
+             <div className={styles.detailSection}>
+               <p><strong>Fecha:</strong> {new Date(searchDate + 'T00:00:00').toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
+               <p className={styles.modalTotal} style={{ fontSize: '1.8rem', marginTop: '20px' }}>
+                 <strong>Total: ${totalVentasDia.toFixed(2)}</strong>
+               </p>
+             </div>
+             <div className={styles.modalActions}>
+               <button type="button" onClick={closeTotalVentasModal} className={`${modalStyles.modalButton} ${modalStyles.modalButtonPrimary}`}>
+                 Cerrar
+               </button>
+             </div>
+           </div>
+         </div>
+       )}
     </div>
   );
 };
