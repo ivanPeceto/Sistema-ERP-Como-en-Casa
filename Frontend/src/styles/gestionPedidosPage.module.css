@@ -186,7 +186,7 @@
 }
 
 .modalContent {
-  background-color: white;
+  background-color: rgb(40, 43, 46);
   padding: 25px;
   border-radius: 8px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
@@ -221,7 +221,7 @@
 }
 .detailSection p {
   margin-bottom: 8px;
-  color: #444;
+  color: #ffffff;
 }
 .detailSection h3 {
   margin-top: 15px;
