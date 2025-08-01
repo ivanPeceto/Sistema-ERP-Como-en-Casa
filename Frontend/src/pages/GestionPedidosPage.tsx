@@ -107,6 +107,12 @@ const GestionPedidosPage: React.FC = () => {
   /** @brief Estado de carga inicial de datos */
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  /** @brief Controla la visibilidad del modal de total de ventas */
+  const [isTotalVentasModalOpen, setIsTotalVentasModalOpen] = useState<boolean>(false);
+
+  /** @brief Almacena el total de ventas calculado para el día */
+  const [totalVentasDia, setTotalVentasDia] = useState<number>(0);
+
    /**
    * @brief Carga todos los datos iniciales necesarios para la página en paralelo.
    * @details
@@ -568,6 +574,27 @@ const GestionPedidosPage: React.FC = () => {
     return new Date(dateString).toLocaleDateString('es-AR', options);
   };
 
+/**
+ * @brief Calcula el total de ventas del día, lo guarda en el estado y abre el modal.
+ * @details Suma el campo 'total' de todos los pedidos cargados para la fecha seleccionada.
+ */
+  const handleCalcularTotalVentas = useCallback(() => {
+    const totalDelDia = pedidos.reduce((acumulador, pedido) => {
+      // Aseguramos que el total es un número antes de sumarlo
+      return acumulador + (Number(pedido.total) || 0);
+    }, 0);
+
+    setTotalVentasDia(totalDelDia);
+    setIsTotalVentasModalOpen(true);
+  }, [pedidos]); // Se recalcula si la lista de pedidos cambia
+
+  /**
+   * @brief Cierra el modal de total de ventas.
+   */
+  const closeTotalVentasModal = useCallback(() => {
+    setIsTotalVentasModalOpen(false);
+  }, []);
+
   /**
    * @brief Función de renderizado que genera la lista de pedidos en formato de tarjetas.
    * @param {Pedido[]} pedidosToList La lista de pedidos a renderizar.
@@ -727,6 +754,14 @@ const GestionPedidosPage: React.FC = () => {
         >
           Nuevo Pedido
         </button>
+        <button
+          onClick={handleCalcularTotalVentas}
+          className={`${styles.actionButton} ${styles.newOrderButton}`} 
+          title="Total ventas"
+        >
+          <i className="fas fa-calculator" style={{ marginRight: '8px' }}></i>
+          Calcular Ventas
+      </button>
         </div>
         {/* Botón "Armar Pedido" 
         <button
@@ -822,6 +857,7 @@ const GestionPedidosPage: React.FC = () => {
             productos={productos}
             fetchInitialDataParent={fetchInitialData}
           />
+
     </div>
   );
 };
