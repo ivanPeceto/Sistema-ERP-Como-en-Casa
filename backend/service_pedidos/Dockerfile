@@ -1,13 +1,11 @@
 FROM python:3.11-slim
 
-WORKDIR /pedidos
-
-COPY . /pedidos/
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
 RUN apt-get update && \
-    apt-get install -y \
-    default-libmysqlclient-dev gcc\
-    pkg-config
+    apt-get install -y default-libmysqlclient-dev gcc pkg-config && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -17,14 +15,16 @@ RUN pip install --no-cache-dir python-decouple
 
 RUN pip install --no-cache-dir -r requirements.txt
 
+RUN pip install channels
+RUN pip install channels_redis
+
 COPY . .
 
 COPY utils/wait-for-it.sh /usr/local/bin/wait-for-it.sh
-
 RUN chmod +x /usr/local/bin/wait-for-it.sh
 
-ENTRYPOINT ["wait-for-it.sh", "db_pedidos:3306", "--timeout=60","--"]
+EXPOSE 8004
 
-EXPOSE 8002
+ENTRYPOINT ["wait-for-it.sh", "db_pedidos:3306", "--timeout=60", "--"]
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8004"]
+CMD ["daphne", "-b", "0.0.0.0", "-p", "8004", "orders.asgi:application"]

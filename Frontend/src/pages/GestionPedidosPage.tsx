@@ -24,7 +24,7 @@ import { getPedidosByDate, editarPedido, deletePedido, printPedido } from '../se
 import { getClientes } from '../services/client_service';
 import { getProductos } from '../services/product_service';
 import type { Producto, Cliente, Pedido, PedidoInput, PedidoItem, PedidoEstado } from '../types/models.d.ts';
-
+import { usePedidosSocket } from '../hooks/usePedidosSocket';
 
 /**
  * @class GestionPedidosPage
@@ -111,6 +111,36 @@ const GestionPedidosPage: React.FC = () => {
 
   /** @brief Almacena el total de ventas calculado para el día */
   const [totalVentasDia, setTotalVentasDia] = useState<number>(0);
+
+
+  const handleSocketMessage = useCallback((data: { action: string; pedido: Pedido }) => {
+    setPedidos(currentPedidos => {
+        const index = currentPedidos.findIndex(p => p.id === data.pedido.id);
+
+        if (data.action === 'create') {
+            // Si ya existe por alguna razón, lo actualizamos. Si no, lo añadimos.
+            if (index !== -1) {
+                const newPedidos = [...currentPedidos];
+                newPedidos[index] = data.pedido;
+                return newPedidos;
+            } else {
+                return [...currentPedidos, data.pedido];
+            }
+        } else if (data.action === 'update') {
+            if (index !== -1) {
+                const newPedidos = [...currentPedidos];
+                newPedidos[index] = data.pedido;
+                return newPedidos;
+            }
+            // Si no lo encuentra, podría ser un pedido de otra fecha, así que no hacemos nada
+            return currentPedidos;
+        }
+        // Podrías implementar la acción 'delete' también
+        return currentPedidos;
+    });
+    }, []);
+
+    usePedidosSocket(handleSocketMessage);
 
    /**
    * @brief Carga todos los datos iniciales necesarios para la página en paralelo.

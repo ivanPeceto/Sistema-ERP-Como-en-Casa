@@ -101,6 +101,14 @@ services:
     depends_on:
       - db_pedidos
 
+  # --- MESSAGE BROKER --- #
+  redis:
+    image: "redis:alpine"
+    container_name: redis
+    ports:
+      - "6379:6379"
+    restart: always
+
   # --- FRONTEND --- #
   frontend:
     container_name: frontend

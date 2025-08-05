@@ -9,6 +9,8 @@ from apps.pedidos.serializer import PedidoSerializer
 from datetime import datetime
 import requests
 from decouple import config 
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 
 class PedidoListView(ListAPIView):
@@ -81,6 +83,18 @@ class CrearPedidoView(APIView):
 
         if pedidoSerializer.is_valid():
             pedido = pedidoSerializer.save()
+
+            channel_layer = get_channel_layer()
+            message_payload = {
+                'type': 'send.notification',
+                'message': {
+                    'source':'pedidos',
+                    'action': 'create',
+                    'pedido': PedidoSerializer(pedido).data
+                }
+            }
+            async_to_sync(channel_layer.group_send)('app_notifications', message_payload)
+
             return Response(PedidoSerializer(pedido).data, status=status.HTTP_200_OK)
         else:
             return Response(pedidoSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -128,10 +142,24 @@ class EliminarPedidoView(APIView):
         try:
             if not id_pedido:
                 pedido = Pedido.objects.get(fecha_pedido=fecha_sanitized, numero_pedido=numero_pedido)
+
             else:
                 pedido = Pedido.objects.get(id=id_pedido, fecha_pedido=fecha_sanitized, numero_pedido=numero_pedido)
             
+            pedido_id = pedido.id
             pedido.delete()
+
+            channel_layer = get_channel_layer()
+            message_payload = {
+                'type': 'send.notification',
+                'message': {
+                    'source':'pedidos',
+                    'action': 'delete',
+                    'id': pedido_id,
+                }
+            }
+            async_to_sync(channel_layer.group_send)('app_notifications', message_payload)
+
             return Response({'detail':'Pedido eliminado exitosamente'}, status=status.HTTP_200_OK)
         except:
             return Response({'detail':'Pedido a eliminar no encontrado'}, status=status.HTTP_404_NOT_FOUND)
@@ -182,8 +210,20 @@ class EditarPedidoView(APIView):
                 pedido = Pedido.objects.get(id=id_pedido, fecha_pedido=fecha_sanitized, numero_pedido=numero_pedido)
 
             pedidoSerializer = PedidoSerializer(pedido, data=request.data)
+
             if(pedidoSerializer.is_valid()):
-                pedidoSerializer.save()
+                pedido_actualizado = pedidoSerializer.save()
+
+                channel_layer = get_channel_layer()
+                message_payload = {
+                    'type': 'send.notification', 
+                    'message': {
+                        'source': 'pedidos', 
+                        'action': 'update',
+                        'pedido': PedidoSerializer(pedido_actualizado).data
+                    }
+                }
+                async_to_sync(channel_layer.group_send)('app_notifications', message_payload)
                 return Response({'detail':'Pedido editado exitosamente'}, status=status.HTTP_200_OK)
             else:
                 return Response(pedidoSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
