@@ -5,12 +5,12 @@
  * Este componente implementa una interfaz de usuario avanzada para la gestión de pedidos.
  * Sus funcionalidades principales incluyen:
  * - Carga de pedidos filtrados por fecha.
- * - Búsqueda por texto (N° de pedido, cliente, producto).
+ * - Búsqueda por texto (N° de pedido, producto).
  * - Visualización de pedidos en pestañas por estado (Todos, Pendientes, Entregados, etc.).
  * - Un modal para ver los detalles de un pedido.
  * - Un modal para la edición completa de un pedido, incluyendo sus productos.
  * - Acciones rápidas para cambiar estados y eliminar pedidos desde la vista principal.
- * Orquesta la comunicación con múltiples servicios del backend (pedidos, clientes, productos).
+ * Orquesta la comunicación con múltiples servicios del backend (pedidos, productos).
  */
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { ChangeEvent } from 'react';
@@ -21,9 +21,10 @@ import CrearPedidoModal from '../components/modals/CrearPedidoModal';
 import EditarPedidoModal from '../components/modals/EditarPedidoModal'; 
 
 import { getPedidosByDate, editarPedido, deletePedido, printPedido } from '../services/pedido_service';
-import { getClientes } from '../services/client_service';
 import { getProductos } from '../services/product_service';
-import type { Producto, Cliente, Pedido, PedidoInput, PedidoItem, PedidoEstado } from '../types/models.d.ts';
+import type { Producto,
+               Pedido, PedidoInput, PedidoItem, PedidoEstado,
+               SocketMessage} from '../types/models.d.ts';
 import { usePedidosSocket } from '../hooks/usePedidosSocket';
 
 /**
@@ -40,13 +41,11 @@ import { usePedidosSocket } from '../hooks/usePedidosSocket';
  * 
  * @note Este componente utiliza múltiples estados para manejar la información de:
  * - Lista de pedidos
- * - Clientes
  * - Productos
  * - Filtros de búsqueda
  * - Estados de los modales
  * 
  * @see Pedido
- * @see Cliente
  * @see Producto
  */
 const GestionPedidosPage: React.FC = () => {
@@ -63,9 +62,6 @@ const GestionPedidosPage: React.FC = () => {
   // Estados principales
   /** @brief Lista completa de pedidos */
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
-  
-  /** @brief Lista de clientes para búsqueda y visualización */
-  const [clientes, setClientes] = useState<Cliente[]>([]);
   
   /** @brief Lista de productos disponibles */
   const [productos, setProductos] = useState<Producto[]>([]);
@@ -113,42 +109,40 @@ const GestionPedidosPage: React.FC = () => {
   const [totalVentasDia, setTotalVentasDia] = useState<number>(0);
 
 
-  const handleSocketMessage = useCallback((data: { action: string; pedido: Pedido }) => {
-    setPedidos(currentPedidos => {
-        const index = currentPedidos.findIndex(p => p.id === data.pedido.id);
+  const handleSocketMessage = useCallback((data: SocketMessage) => {
+      if (data.source === 'pedidos') {
+          if (data.action === 'delete' && data.id) {
+              console.log("Eliminación de PEDIDO recibida para el ID:", data.id);
+              setPedidos(currentPedidos =>
+                  currentPedidos.filter(p => p.id !== data.id)
+              );
+              return; 
+          }
+          if ((data.action === 'create' || data.action === 'update') && data.pedido) {
+              console.log("Actualización/Creación de PEDIDO recibida:", data.pedido);
+              setPedidos(currentPedidos => {
+                  const index = currentPedidos.findIndex(p => p.id === data.pedido!.id);
+                  const newPedidos = [...currentPedidos];
 
-        if (data.action === 'create') {
-            // Si ya existe por alguna razón, lo actualizamos. Si no, lo añadimos.
-            if (index !== -1) {
-                const newPedidos = [...currentPedidos];
-                newPedidos[index] = data.pedido;
-                return newPedidos;
-            } else {
-                return [...currentPedidos, data.pedido];
-            }
-        } else if (data.action === 'update') {
-            if (index !== -1) {
-                const newPedidos = [...currentPedidos];
-                newPedidos[index] = data.pedido;
-                return newPedidos;
-            }
-            // Si no lo encuentra, podría ser un pedido de otra fecha, así que no hacemos nada
-            return currentPedidos;
-        }
-        // Podrías implementar la acción 'delete' también
-        return currentPedidos;
-    });
-    }, []);
+                  if (index !== -1) {
+                      newPedidos[index] = data.pedido!;
+                  } else {
+                      newPedidos.push(data.pedido!);
+                  }
+                  return newPedidos.sort((a, b) => a.numero_pedido - b.numero_pedido);
+              });
+          }
+      }
+  }, []);
 
-    usePedidosSocket(handleSocketMessage);
+  usePedidosSocket(handleSocketMessage);
 
    /**
    * @brief Carga todos los datos iniciales necesarios para la página en paralelo.
    * @details
    * Realiza las siguientes operaciones de forma paralela:
    * 1. Obtiene los pedidos para la fecha seleccionada
-   * 2. Obtiene la lista de clientes
-   * 3. Obtiene la lista de productos
+   * 2. Obtiene la lista de productos
    * 
    * @throws {Error} Si ocurre un error al cargar los datos
    * @async
@@ -156,17 +150,11 @@ const GestionPedidosPage: React.FC = () => {
   const fetchInitialData = useCallback(async () => {
     setIsLoading(true);
     try {
-      const [pedidosData, clientesData, productosData] = await Promise.all([
+      const [pedidosData, productosData] = await Promise.all([
         getPedidosByDate(searchDate),
-        //Deprecated
-        getClientes(),
-        //--
         getProductos()
       ]);
       setPedidos(pedidosData);
-      //Deprecated
-      setClientes(clientesData);
-      //
       setProductos(productosData);
       if (productosData.length > 0) {
         const categoriasUnicas = [...new Set(productosData.map(p => p.categoria?.nombre || 'Sin Categoría'))];
@@ -189,16 +177,8 @@ const GestionPedidosPage: React.FC = () => {
 
   const closeCreateModal = useCallback(() => {
     setIsCreateModalOpen(false);
-    fetchInitialData(); // Opcional: Volver a cargar los pedidos cuando se cierre el modal
+    fetchInitialData();
   }, [fetchInitialData]);
-
-
-  //Deprecated
-  /** @brief Crea un mapa de ID de cliente a nombre para una búsqueda eficiente en el renderizado. */
-  const clienteNombreMap = useMemo(() => {
-    return new Map(clientes.map(cliente => [cliente.id, cliente.nombre]));
-  }, [clientes]);
-  //--
 
   /** @brief Filtra los pedidos por texto después de haber sido filtrados por fecha. */
   const filteredPedidos = useMemo(() => {
@@ -206,12 +186,11 @@ const GestionPedidosPage: React.FC = () => {
     return pedidos.filter(pedido => {
       const matchesSearchTerm =
         pedido.numero_pedido.toString().includes(lowercasedSearchTerm) ||
-        //(clienteNombreMap.get(pedido.id_cliente) || '').toLowerCase().includes(lowercasedSearchTerm) ||
         pedido.cliente.toLowerCase().includes(lowercasedSearchTerm) ||
         pedido.productos_detalle.some(item => item.nombre_producto.toLowerCase().includes(lowercasedSearchTerm));
       return matchesSearchTerm;
     });
-  }, [searchTerm, pedidos, clienteNombreMap]);
+  }, [searchTerm, pedidos]);
 
   /** @brief Extrae las categorías únicas para el selector de productos en el modal de edición. */
   const editCategoriasUnicas = useMemo(() =>
