@@ -192,23 +192,6 @@ const GestionPedidosPage: React.FC = () => {
     });
   }, [searchTerm, pedidos]);
 
-  /** @brief Extrae las categorías únicas para el selector de productos en el modal de edición. */
-  const editCategoriasUnicas = useMemo(() =>
-    [...new Set(productos.map(p => p.categoria?.nombre || 'Sin Categoría'))],
-    [productos]
-  );
-
-    /** @brief Filtra los productos en el modal de edición por la categoría seleccionada. */
-  const editProductosFiltradosPorCategoria = useMemo(() => {
-    if (!editCategoriaSeleccionada) return [];
-    return productos.filter(p => (p.categoria?.nombre || 'Sin Categoría') === editCategoriaSeleccionada && p.disponible);
-  }, [editCategoriaSeleccionada, productos]);
-
-  /** @brief Calcula el total del pedido que se está editando. */
-  const totalEditingPedido = useMemo(() => {
-    return editingPedidoItems.reduce((total, item) => total + (parseFloat(item.cantidad.toString()) * (parseFloat(item.precio_unitario.toString()) || 0)), 0);
-  }, [editingPedidoItems]);
-
     /** @brief Deriva la lista de pedidos pendientes a partir de la lista filtrada. */
     const pedidosPendientes = useMemo(() =>
       filteredPedidos.filter(pedido => pedido.estado === 'PENDIENTE'),
@@ -315,76 +298,9 @@ const GestionPedidosPage: React.FC = () => {
     setIsEditModalOpen(true);
   }, []);
 
-  /**
-   * @brief Maneja los cambios en los campos del formulario de edición
-   * @param {ChangeEvent<HTMLInputElement>} event - Evento del input que cambió
-   * @description
-   * Actualiza el estado del formulario con los nuevos valores,
-   * manejando correctamente los diferentes tipos de inputs (checkbox, text, etc.)
-   */
-  const handleEditInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = event.target;
-    setEditFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
-  };
-
-  /**
-   * @brief Actualiza la aclaración de un ítem de producto en el pedido de edición.
-   * @param {number} productId - ID del producto a actualizar.
-   * @param {string} aclaracion - Nueva cadena de aclaración.
-   */
-  const updateEditingItemAclaraciones = useCallback((productId: number, aclaracion: string) => {
-    setEditingPedidoItems(prevItems =>
-      prevItems.map(item =>
-        item.id === productId
-          ? { ...item, aclaraciones: aclaracion }
-          : item
-      )
-    );
-  }, []);
-
-  const addProductToEditingOrder = useCallback((product: Producto) => {
-    setEditingPedidoItems(prevItems => {
-      const existingItem = prevItems.find(item => item.id === product.id);
-      const productPrice = parseFloat(product.precio_unitario.toString()) || 0;
-      if (existingItem) {
-        return prevItems.map(item =>
-          item.id === product.id
-            ? { ...item, cantidad: item.cantidad + 1, subtotal: (item.cantidad + 1) * productPrice }
-            : item
-        );
-      } else {
-        return [...prevItems, {
-          id: product.id,
-          nombre: product.nombre,
-          cantidad: 1,
-          precio_unitario: productPrice,
-          subtotal: productPrice,
-          aclaraciones: '',
-        }];
-      }
-    });
-  }, []);
-
   const removeProductFromEditingOrder = useCallback((productId: number) => {
     setEditingPedidoItems(prevItems => prevItems.filter(item => item.id !== productId));
   }, []);
-
-  const updateEditingItemQuantity = useCallback((productId: number, quantity: number) => {
-    if (quantity < 0) {
-      removeProductFromEditingOrder(productId);
-      return;
-    }
-    setEditingPedidoItems(prevItems =>
-      prevItems.map(item =>
-        item.id === productId
-          ? { ...item, cantidad: quantity, subtotal: quantity * (parseFloat(item.precio_unitario.toString()) || 0) }
-          : item
-      )
-    );
-  }, [removeProductFromEditingOrder]);
 
   /**
    * @brief Prepara el payload completo necesario para la actualización (PUT).
@@ -419,46 +335,6 @@ const GestionPedidosPage: React.FC = () => {
       productos: productosParaEnviar,
     };
   }, []);
-
-
-  /**
-   * @brief Maneja el envío del formulario de edición de un pedido
-   * @param {React.MouseEvent<HTMLButtonElement>} [e] - Evento opcional del botón de envío
-   * @returns {Promise<void>}
-   * @description
-   * Esta función se encarga de:
-   * 1. Validar que el pedido tenga al menos un producto
-   * 2. Preparar los datos para el envío
-   * 3. Enviar la actualización al servidor
-   * 4. Manejar la respuesta y actualizar la UI
-   * @throws {Error} Si ocurre un error durante la actualización
-   */
-  const handleEditSubmit = useCallback(async (e?: React.MouseEvent<HTMLButtonElement>) => {
-    e?.preventDefault();
-    if (!editingPedido) return;
-
-    if (editingPedidoItems.length === 0) {
-      console.error('El pedido no puede estar vacío. Añada al menos un producto.');
-      console.log('El pedido no puede estar vacío. Por favor, añada al menos un producto.');
-      return;
-    }
-
-    try {
-      const payload = prepareUpdatePayload(editingPedido, editFormData, editingPedidoItems);
-
-      await editarPedido(
-        { fecha: editingPedido.fecha_pedido, numero: editingPedido.numero_pedido },
-        payload
-      );
-      console.log('Pedido actualizado exitosamente');
-      closeEditModal();
-      fetchInitialData();
-    } catch (error) {
-      console.error('Error al actualizar pedido:', error);
-      console.error('Error al actualizar el pedido:', error);
-    }
-  }, [editingPedido, editFormData, editingPedidoItems, prepareUpdatePayload, closeEditModal, fetchInitialData]);
-
 
   /**
    * @brief Alterna el estado de 'entregado' de un pedido
@@ -670,13 +546,8 @@ const GestionPedidosPage: React.FC = () => {
                   }`}
                   onClick={() => handleUpdatePedidoEstado(pedido)}
                   >
-                  <i className={`fas ${
-                    pedido.estado === 'PENDIENTE' ? 'fa-hourglass-half' :
-                    pedido.estado === 'LISTO' ? 'fa-check-circle' :
-                    'fa-truck'
-                  }`}></i>
-                  {pedido.estado === 'PENDIENTE' ? 'Pendiente' :
-                   pedido.estado === 'LISTO' ? 'Listo' : 'Entregado'}
+                  {pedido.estado === 'PENDIENTE' ? 'Listo' :
+                   pedido.estado === 'LISTO' ? 'Entregado ' : 'Entregado'}
                 </button>
 
                 <button
