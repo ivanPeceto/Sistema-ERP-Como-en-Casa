@@ -464,7 +464,6 @@ const GestionPedidosPage: React.FC = () => {
  */
   const handleCalcularTotalVentas = useCallback(() => {
     const totalDelDia = pedidos.reduce((acumulador, pedido) => {
-      // Aseguramos que el total es un número antes de sumarlo
       return acumulador + (Number(pedido.total) || 0);
     }, 0);
 
