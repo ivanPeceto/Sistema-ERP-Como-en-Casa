@@ -1,17 +1,14 @@
-.sidebarContainer {
+.horizontalBarContainer {
   display: flex;
-  flex-direction: column;
-  height: 100vh;
-  width: 100%;
-  box-shadow: 0px 15px 20px rgba(0, 0, 0, 0.1);
-  flex-shrink: 0;
-}
-
-.expanded {
-  width: 13rem;
+  flex-direction: row;
   align-items: center;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
+  justify-content: space-between; 
+  height: 4rem;
+  width: 100%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 0 1rem;
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .darkTheme {
@@ -22,11 +19,9 @@
 .logoLink {
   display: flex;
   align-items: center;
-  width: 100%;
-  margin-top: 1.25rem;
   text-decoration: none;
   color: inherit;
-  justify-content: center;
+  flex-shrink: 0;
 }
 
 .logoIcon {
@@ -36,7 +31,7 @@
 }
 
 .logoText {
-  margin-top: .6rem;
+  margin-top: 0;
   margin-left: 0.5rem;
   font-size: 0.875rem;
   font-weight: 700;
@@ -45,42 +40,34 @@
 
 .menuSection {
   display: flex;
-  flex-direction: column;
+  flex-direction: row; 
   align-items: center;
-  width: 100%;
-  margin-top: 2.85rem;
-  border-top-width: 1px;
-  border-color: #2d3748;
+  flex-grow: 1; 
+  justify-content: center; 
+  gap: 1.5rem;
+  margin-top: 0;
+  border-top-width: 0; 
 }
 
 .menuItem {
   display: flex;
   align-items: center;
   height: 3rem;
-  margin-top: 0.5rem;
   text-decoration: none;
   color: inherit;
   transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
   position: relative;
-  width: 100%;
   padding: 0 1rem;
-  justify-content: flex-start; /* Alineamos todo a la izquierda para consistencia */
   border-radius: 6px;
   box-sizing: border-box;
+  width: auto;
 }
 
-/* CORRECCIÓN: Estilos unificados para hover y active */
 .menuItem:hover {
   background-color: #2d3748;
   color: #cbd5e0;
 }
 
-/* Eliminamos el hover para accountLink */
-.accountLink {
-  cursor: default;
-}
-
-/* Esta es la clase que se aplicará dinámicamente */
 .activeDark {
   background-color: #2d3748;
   color: #cbd5e0;
@@ -93,31 +80,26 @@
   flex-shrink: 0;
 }
 
-.menuItemText,
-.accountText {
-  margin-left: 0.75rem; /* Aumentamos un poco el margen para que no esté tan pegado */
+.menuItemText {
+  margin-left: 0.75rem;
   font-size: 0.875rem;
   font-weight: 500;
   white-space: nowrap;
 }
 
-/* --- Sección Inferior (Perfil y Logout) --- */
-
 .accountSection {
   display: flex;
   flex-direction: row;
   align-items: center;
-  width: 100%;
-  margin-top: auto;
-  border-top: 1px solid #2d3748;
-  padding: 0.5rem;
   gap: 0.5rem;
+  margin-top: 0;
+  border-top-width: 0;
+  flex-shrink: 0;
 }
 
 .accountLink {
   display: flex;
   align-items: center;
-  flex-grow: 1;
   height: 2.5rem;
   padding: 0 0.75rem;
   border-radius: 6px;

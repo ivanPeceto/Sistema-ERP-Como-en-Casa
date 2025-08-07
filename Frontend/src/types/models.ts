@@ -20,6 +20,14 @@ export interface Cliente {
   direccion: string;
 }
 
+export type SocketMessage = {
+    source: 'pedidos' | 'productos';
+    action: 'create' | 'update' | 'delete';
+    id?: number; 
+    pedido?: Pedido;
+    producto?: Producto;
+}
+
 /**
  * @interface Categoria
  * @brief Define la estructura de una categoría de productos.

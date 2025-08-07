@@ -11,13 +11,13 @@
   flex-grow: 1;
   padding: 20px;
   box-sizing: border-box;
-  background-color: #f4f6f8;
+  background-color: #272f3f;
 }
 
 .pageContainer h1 {
   text-align: center;
   margin-bottom: 20px;
-  color: #333;
+  color: #ffffff;
 }
 
 .toolbar {
@@ -40,7 +40,7 @@
   width: 100%;
   padding: 10px 15px;
   margin-right: 1rem;
-  border: 1px solid #ccc;
+  border: 1px solid #807575;
   border-radius: 4px;
   font-size: 1rem;
 }
@@ -60,17 +60,17 @@
 }
 
 .addButton {
-  background-color: #28a745;
+  background-color: #09c935;
   color: white;
 }
 .addButton:hover {
-  background-color: #218838;
+  background-color: #09c935;
 }
 
 .listContainer {
   flex-grow: 1;
   overflow-y: auto;
-  background-color: #fff;
+  background-color: #3b4353;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
@@ -79,7 +79,8 @@
   display: flex;
   align-items: center;
   padding: 15px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #777171;
+  background-color: #3b4353;
 }
 .listItem:last-child {
   border-bottom: none;
@@ -99,10 +100,10 @@
 .itemInfo span,
 .itemInfo small {
   font-size: 0.9rem;
-  color: #555;
+  color: #ffffff;
 }
 .itemInfo small {
-    color: #777;
+    color: #ffffff;
 }
 
 
@@ -131,7 +132,7 @@
 .noResults {
     text-align: center;
     padding: 20px;
-    color: #777;
+    color: #ffffff;
 }
 
 .modalOverlay {
@@ -221,7 +222,6 @@
   padding-bottom: 15px;
   margin-bottom: 20px;
   border-bottom: 1px solid #e0e0e0;
-  
   scrollbar-width: thin;
   scrollbar-color: #a0a0a0 #f0f0f0;
 }

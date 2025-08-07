@@ -7,10 +7,10 @@ import styles from './MainLayout.module.css';
 const MainLayout: React.FC = () => {
   return (
     <div className={styles.mainLayoutContainer}>
-      <Sidebar />
       <main className={styles.contentArea}>
         <Outlet /> 
       </main>
+      <Sidebar />
     </div>
   );
 };

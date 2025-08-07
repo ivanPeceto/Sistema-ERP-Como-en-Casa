@@ -35,5 +35,9 @@ class Pedido(models.Model):
     avisado = models.BooleanField(db_column='avisado')
     pagado = models.BooleanField(db_column='pagado')
 
+    def save(self, *args, **kwargs):
+        self.cliente = self.cliente.upper()
+        super().save(*args, **kwargs)
+
     class Meta:
         db_table = 'pedidos'

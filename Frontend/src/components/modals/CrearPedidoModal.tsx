@@ -1,29 +1,26 @@
-// src/components/CrearPedidoModal/CrearPedidoModal.tsx
-import React, { useState, useEffect, useCallback, useMemo } from 'react'; // Correcta ubicación de importación
+import React, { useState, useEffect, useCallback, useMemo } from 'react'; 
 import type { ChangeEvent } from 'react';
-import styles from './CrearPedidoModal.module.css'; // Estilos del modal
-import modalStyles from '../../styles/modalStyles.module.css'; // Estilos generales de modal
+import styles from './CrearPedidoModal.module.css';
+import modalStyles from '../../styles/modalStyles.module.css'; 
 
 import { createPedido, getPedidosByDate } from '../../services/pedido_service';
 import { getProductos } from '../../services/product_service';
 import type { Producto, PedidoItem, PedidoInput, PedidoEstado } from '../../types/models.d.ts';
 
-// Define las props que el modal va a recibir de su componente padre (GestionPedidosPage)
 interface CrearPedidoModalProps {
-  isOpen: boolean; // Controla si el modal está abierto o cerrado
-  onClose: () => void; // Función para cerrar el modal
-  productos: Producto[]; // La lista de productos disponibles, pasada desde el padre
-  fetchInitialDataParent: () => void; // Función para que el padre recargue los pedidos
+  isOpen: boolean; 
+  onClose: () => void; 
+  productos: Producto[];
+  fetchInitialDataParent: () => void; 
 }
 
 const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, productos, fetchInitialDataParent }) => {
-  // Estados internos del modal
-  const [clienteInput, setClienteInput] = useState<string>(''); // Para el nombre del cliente (texto libre)
+  const [clienteInput, setClienteInput] = useState<string>(''); 
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<string>('');
   const [pedidoItems, setPedidoItems] = useState<PedidoItem[]>([]);
-  const [paraHora, setParaHora] = useState<string>(''); // Hora de entrega
+  const [paraHora, setParaHora] = useState<string>(''); 
   
-  const [isLoading, setIsLoading] = useState<boolean>(false); // Carga interna del modal
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
 
@@ -32,9 +29,8 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
     setPedidoItems([]);
     setParaHora('');
     setError(null);
-    setIsLoading(false); // Asegurar que isLoading también se resetea
+    setIsLoading(false);
 
-    // Re-seleccionar la primera categoría disponible si hay productos
     if (productos.length > 0) {
       const categoriasUnicas = [...new Set(productos.map(p => p.categoria?.nombre || 'Sin Categoría'))];
       if (categoriasUnicas.length > 0) {
@@ -45,8 +41,7 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
     } else {
       setCategoriaSeleccionada('');
     }
-  }, [productos]); // Depende de productos para re-seleccionar la categoría
-
+  }, [productos]);
   
   useEffect(() => {
     if (isOpen) {
@@ -54,7 +49,6 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
     }
   }, [isOpen, resetModalState]);
 
-  // Efecto para inicializar la categoría seleccionada cuando los productos estén cargados
   useEffect(() => {
     if (productos.length > 0 && !categoriaSeleccionada) {
       const categoriasUnicas = [...new Set(productos.map(p => p.categoria?.nombre || 'Sin Categoría'))];
@@ -215,7 +209,7 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
   if (!isOpen) return null;
 
   return (
-    <div className={modalStyles.modalOverlay} onClick={onClose}>
+    <div className={modalStyles.modalOverlay}>
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modalHeader}>
         </div>
