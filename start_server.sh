@@ -30,16 +30,17 @@ update_files() {
     [ ! -f "$DOCKER_COMPOSE_FILE" ] && cp "$DOCKER_COMPOSE_TEMPLATE" "$DOCKER_COMPOSE_FILE"
     [ ! -f "$NGINX_CONF_FILE" ] && cp "$NGINX_CONF_TEMPLATE" "$NGINX_CONF_FILE"
 
+    # --- Reemplazar marcadores de posición con la IP actual en los archivos locales ---
     # .env
-    sed -i "s/ALLOWED_HOSTS=.*/ALLOWED_HOSTS=${IP_ADDRESS}/" "$ENV_FILE"
+    sed -i "s/ALLOWED_HOSTS=.*/ALLOWED_HOSTS=${IP_ADDRESS}/" $ENV_FILE
     echo "ALLOWED_HOSTS actualizado en $ENV_FILE"
 
-    # docker-compose.yml
-    sed -i "s/VITE_API_BASE_URL=http:\/\/[A-Z_]*/VITE_API_BASE_URL=http:\/\/${IP_ADDRESS}/" "$DOCKER_COMPOSE_FILE"
+    # docker compose.yml
+    sed -i "s/VITE_API_BASE_URL=http:\/\/[0-9.]*/VITE_API_BASE_URL=http:\/\/$IP_ADDRESS/" $DOCKER_COMPOSE_FILE
     echo "VITE_API_BASE_URL actualizado en $DOCKER_COMPOSE_FILE"
 
     # nginx.conf
-    sed -i "s/server_name [A-Z_]*;/server_name ${IP_ADDRESS};/" "$NGINX_CONF_FILE"
+    sed -i "s/server_name [0-9.]*;/server_name $IP_ADDRESS;/" $NGINX_CONF_FILE
     echo "server_name actualizado en $NGINX_CONF_FILE"
 }
 
