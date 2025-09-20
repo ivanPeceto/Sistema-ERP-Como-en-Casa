@@ -123,7 +123,7 @@ services:
     environment:
       # variables de entorno
       #Host
-      - VITE_API_BASE_URL=http://192.168.1.17:80
+      - VITE_API_BASE_URL=http://192.168.1.30
     depends_on:
       - usuarios
       #- clientes
@@ -135,7 +135,7 @@ services:
     image: nginx:latest
     container_name: reverse_proxy
     ports:
-      - "8080:80"
+      - "80:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf 
     depends_on:
