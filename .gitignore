@@ -9,9 +9,9 @@ __pycache__/
 # C extensions
 *.so
 
-./docker-compose.yml
+docker-compose.yml
 
-./nginx/nginx.conf 
+/nginx/nginx.conf 
 
 # Distribution / packaging
 .Python
