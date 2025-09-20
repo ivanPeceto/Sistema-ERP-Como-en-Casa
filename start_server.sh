@@ -108,7 +108,7 @@ echo "/n⠀⠀⠀⠀⠹⠛⠛⠛⠓⠿⠦⠷⠦⢷⣤⣷⣄⣳⣄⣱⣄⣘⣦⣀
 if [ "$1" == "--build" ]; then
     echo "Reconstruyendo los contenedores..."
     docker compose down
-    docker compose up --build
+    docker compose up -d --build
     echo "Servidor disponible en: http://${IP_ADDRESS}/"
 
 elif [ "$1" == "--migrate" ]; then
