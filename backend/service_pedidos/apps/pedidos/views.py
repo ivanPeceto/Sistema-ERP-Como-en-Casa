@@ -9,9 +9,7 @@ from apps.pedidos.serializer import PedidoSerializer
 from datetime import datetime
 import requests
 from decouple import config 
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
-
+from utils.channels_helper import send_channel_message
 
 class PedidoListView(ListAPIView):
     """!
@@ -84,7 +82,6 @@ class CrearPedidoView(APIView):
         if pedidoSerializer.is_valid():
             pedido = pedidoSerializer.save()
 
-            channel_layer = get_channel_layer()
             message_payload = {
                 'type': 'send.notification',
                 'message': {
@@ -93,7 +90,7 @@ class CrearPedidoView(APIView):
                     'pedido': PedidoSerializer(pedido).data
                 }
             }
-            async_to_sync(channel_layer.group_send)('app_notifications', message_payload)
+            send_channel_message('app_notifications', message_payload, 10, 0,5)
 
             return Response(PedidoSerializer(pedido).data, status=status.HTTP_200_OK)
         else:
@@ -149,7 +146,6 @@ class EliminarPedidoView(APIView):
             pedido_id = pedido.id
             pedido.delete()
 
-            channel_layer = get_channel_layer()
             message_payload = {
                 'type': 'send.notification',
                 'message': {
@@ -158,7 +154,7 @@ class EliminarPedidoView(APIView):
                     'id': pedido_id,
                 }
             }
-            async_to_sync(channel_layer.group_send)('app_notifications', message_payload)
+            send_channel_message('app_notifications', message_payload, 10, 0,5)
 
             return Response({'detail':'Pedido eliminado exitosamente'}, status=status.HTTP_200_OK)
         except:
@@ -214,7 +210,6 @@ class EditarPedidoView(APIView):
             if(pedidoSerializer.is_valid()):
                 pedido_actualizado = pedidoSerializer.save()
 
-                channel_layer = get_channel_layer()
                 message_payload = {
                     'type': 'send.notification', 
                     'message': {
@@ -223,7 +218,7 @@ class EditarPedidoView(APIView):
                         'pedido': PedidoSerializer(pedido_actualizado).data
                     }
                 }
-                async_to_sync(channel_layer.group_send)('app_notifications', message_payload)
+                send_channel_message('app_notifications', message_payload, 10, 0,5)
                 return Response({'detail':'Pedido editado exitosamente'}, status=status.HTTP_200_OK)
             else:
                 return Response(pedidoSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
