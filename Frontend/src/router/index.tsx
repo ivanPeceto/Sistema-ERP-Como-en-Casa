@@ -15,6 +15,8 @@ import GestionProductosPage from '../pages/GestionProductosPage';
 import GestionClientesPage from '../pages/GestionClientesPage';
 import GestionPedidosPage from '../pages/GestionPedidosPage';
 import GestionCategoriasPage from '../pages/GestionCategoriasPage';
+import GestionRecetasPage from '../pages/GestionRecetasPage';
+import GestionInsumosPage from '../pages/GestionInsumosPage';
 import MainLayout from '../Layouts/MainLayout';
 import ProtectedRoute from './protected_route'; 
 
@@ -57,6 +59,14 @@ const router = createBrowserRouter([
           {
             path: 'categorias',
             element: <GestionCategoriasPage />,
+          },
+          {
+            path: 'recetas',
+            element: <GestionRecetasPage />,
+          },
+          {
+            path: 'insumos',
+            element: <GestionInsumosPage />,
           },
         ],
       },
