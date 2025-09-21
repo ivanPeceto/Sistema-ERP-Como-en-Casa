@@ -176,3 +176,50 @@ export interface ProductoInput {
   disponible: boolean;
   categoria_id: number | null;
 }
+
+
+/**
+ * @interface Insumo
+ * @brief Define la estructura de un insumo.
+ */
+export interface Insumo {
+    id: number;
+    nombre: string;
+    unidad_medida: string;
+    stock_actual: number;
+    costo_unitario: number;
+}
+
+/**
+ * @interface RecetaInsumo
+ * @brief Modelo intermedio que detalla un insumo dentro de una receta.
+ */
+export interface RecetaInsumo {
+    insumo: Insumo;
+    cantidad: number;
+
+}
+
+/**
+ * @interface Receta
+ * @brief Define la estructura de un objeto Receta tal como se recibe del backend (lectura).
+ */
+export interface Receta {
+    id: number;
+    nombre: string;
+    descripcion: string;
+    insumos: RecetaInsumo[];
+}
+
+/**
+ * @interface RecetaInput
+ * @brief Define la estructura para el input de una nueva receta, usado en formularios (escritura).
+ */
+export interface RecetaInput {
+    nombre: string;
+    descripcion: string;
+    insumos_data: {
+        insumo_id: number;
+        cantidad: number;
+    }[];
+}
