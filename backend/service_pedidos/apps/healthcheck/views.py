@@ -3,6 +3,8 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from redis.exceptions import ConnectionError, TimeoutError
 import asyncio
+from rest_framework.views import APIView
+
 
 class HealthCheckView(APIView):
     """!
