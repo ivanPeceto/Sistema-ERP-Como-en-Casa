@@ -32,7 +32,7 @@ update_files() {
 
     # --- Reemplazar marcadores de posición con la IP actual en los archivos locales ---
     # .env
-    sed -i "s/ALLOWED_HOSTS=.*/ALLOWED_HOSTS=${IP_ADDRESS}/" $ENV_FILE
+    sed -i "s/ALLOWED_HOSTS=.*/ALLOWED_HOSTS=${IP_ADDRESS},localhost/" $ENV_FILE
     echo "ALLOWED_HOSTS actualizado en $ENV_FILE"
 
     # docker compose.yml
