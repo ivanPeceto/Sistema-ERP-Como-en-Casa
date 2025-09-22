@@ -10,9 +10,10 @@ export const usePedidosSocket = (
     onMessageReceived: (data: MessagePayload) => void
 ) => {
     const socket = useRef<WebSocket | null>(null);
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
     useEffect(() => {
-        const socketURL = `ws://192.168.1.25/api/pedidos/ws/notifications/`;
+        const socketURL = `ws://${API_BASE_URL.slice(7)}/api/pedidos/ws/notifications/`;
 
         socket.current = new WebSocket(socketURL);
 

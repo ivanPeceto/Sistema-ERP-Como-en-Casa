@@ -23,7 +23,7 @@ RUN apt-get update && apt-get install -y curl
 
 # Define el Health Check
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=5 \
-  CMD curl -f http://localhost:8004/api/pedidos/healthcheck/ || exit 1
+  CMD curl -f http://localhost:8004/healthcheck/ || exit 1
 
 COPY . .
 

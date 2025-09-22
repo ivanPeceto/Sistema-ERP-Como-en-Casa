@@ -10,7 +10,7 @@ from apps.pedidos.views import (
 from apps.healthcheck.views import HealthCheckView
 
 urlpatterns = [
-    path('api/pedidos/healthcheck', HealthCheckView.as_view(), name='healthcheck'),
+    path('healthcheck/', HealthCheckView.as_view(), name='healthcheck'),
     path('api/pedidos/buscar/', PedidoListView.as_view(), name='pedidos'),
     path('api/pedidos/crear/', CrearPedidoView.as_view(), name='crear_pedido'),
     path('api/pedidos/eliminar/', EliminarPedidoView.as_view(), name='eliminar_pedido'),
