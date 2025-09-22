@@ -90,7 +90,7 @@ class CrearPedidoView(APIView):
                     'pedido': PedidoSerializer(pedido).data
                 }
             }
-            send_channel_message('app_notifications', message_payload, 10, 0,5)
+            send_channel_message('app_notifications', message_payload, 10, 0.5)
 
             return Response(PedidoSerializer(pedido).data, status=status.HTTP_200_OK)
         else:
@@ -154,7 +154,7 @@ class EliminarPedidoView(APIView):
                     'id': pedido_id,
                 }
             }
-            send_channel_message('app_notifications', message_payload, 10, 0,5)
+            send_channel_message('app_notifications', message_payload, 10, 0.5)
 
             return Response({'detail':'Pedido eliminado exitosamente'}, status=status.HTTP_200_OK)
         except:
@@ -218,7 +218,7 @@ class EditarPedidoView(APIView):
                         'pedido': PedidoSerializer(pedido_actualizado).data
                     }
                 }
-                send_channel_message('app_notifications', message_payload, 10, 0,5)
+                send_channel_message('app_notifications', message_payload, 10, 0.5)
                 return Response({'detail':'Pedido editado exitosamente'}, status=status.HTTP_200_OK)
             else:
                 return Response(pedidoSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
