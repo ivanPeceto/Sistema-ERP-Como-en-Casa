@@ -92,6 +92,7 @@ services:
   pedidos:
     build: ./backend/service_pedidos
     container_name: pedidos
+    restart: unless-stopped
     env_file:
       - ./.env 
     volumes:
@@ -100,6 +101,7 @@ services:
       - "8004:8004"
     depends_on:
       - db_pedidos
+      - redis
 
   # --- MESSAGE BROKER --- #
   redis:

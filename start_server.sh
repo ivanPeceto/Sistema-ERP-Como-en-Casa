@@ -32,7 +32,7 @@ update_files() {
 
     # --- Reemplazar marcadores de posición con la IP actual en los archivos locales ---
     # .env
-    sed -i "s/ALLOWED_HOSTS=.*/ALLOWED_HOSTS=${IP_ADDRESS}/" $ENV_FILE
+    sed -i "s/ALLOWED_HOSTS=.*/ALLOWED_HOSTS=${IP_ADDRESS},localhost/" $ENV_FILE
     echo "ALLOWED_HOSTS actualizado en $ENV_FILE"
 
     # docker compose.yml
@@ -109,13 +109,13 @@ if [ "$1" == "--build" ]; then
     echo "Reconstruyendo los contenedores..."
     docker compose down
     docker compose up -d --build
-    echo "Servidor disponible en: http://${IP_ADDRESS}/"
+    echo "Servidor disponible en: http://${IP_ADDRESS}/login"
 
 elif [ "$1" == "--migrate" ]; then
     docker compose up -d
     wait_for_services
     run_migrations
-    echo "Servidor disponible en: http://${IP_ADDRESS}/"
+    echo "Servidor disponible en: http://${IP_ADDRESS}/login"
 
 elif [ "$1" == "--clean" ] && [ "$2" == "--migrate" ]; then
     echo "Limpiando contenedores y volúmenes..."
@@ -124,7 +124,7 @@ elif [ "$1" == "--clean" ] && [ "$2" == "--migrate" ]; then
     wait_for_services
     run_migrations
     create_superuser
-    echo "Servidor disponible en: http://${IP_ADDRESS}/"
+    echo "Servidor disponible en: http://${IP_ADDRESS}/login"
 
 elif [ "$1" == "--clean" ]; then
     echo "Limpiando contenedores y volúmenes..."
@@ -137,6 +137,6 @@ elif [ "$1" == "--stop" ]; then
 else
     echo "Iniciando los servicios..."
     docker compose up -d
-    echo "Servidor disponible en: http://${IP_ADDRESS}/"
+    echo "Servidor disponible en: http://${IP_ADDRESS}/login"
 fi
 
