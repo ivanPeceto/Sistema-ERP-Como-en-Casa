@@ -234,6 +234,7 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
                       onChange={(e) => setClienteInput(e.target.value)}
                       className={modalStyles.formControl}
                       placeholder="Nombre del cliente"
+                      autoFocus
                     />
                 </div>        
                 <div className={styles.formRowElement}>
