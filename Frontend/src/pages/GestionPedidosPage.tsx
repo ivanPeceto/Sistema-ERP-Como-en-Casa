@@ -336,6 +336,10 @@ const GestionPedidosPage: React.FC = () => {
     };
   }, []);
 
+  const getFechaISO = (dateString: string) => {
+    return dateString.split('T')[0];
+  };
+
   /**
    * @brief Alterna el estado de 'entregado' de un pedido
    * @param {Pedido} pedido - El pedido cuyo estado se va a modificar
@@ -370,7 +374,7 @@ const GestionPedidosPage: React.FC = () => {
         aclaraciones: item.aclaraciones || '',
       })));
       await editarPedido(
-        { fecha: pedido.fecha_pedido, numero: pedido.numero_pedido },
+        { fecha: getFechaISO(pedido.fecha_pedido), numero: pedido.numero_pedido },
         payload
       );
       fetchInitialData();
@@ -391,7 +395,7 @@ const GestionPedidosPage: React.FC = () => {
         aclaraciones: item.aclaraciones || '',
       })));
       await editarPedido(
-        { fecha: pedido.fecha_pedido, numero: pedido.numero_pedido },
+        { fecha: getFechaISO(pedido.fecha_pedido), numero: pedido.numero_pedido },
         payload
       );
       fetchInitialData();
@@ -412,7 +416,7 @@ const GestionPedidosPage: React.FC = () => {
         aclaraciones: item.aclaraciones || '',
       })));
       await editarPedido(
-        { fecha: pedido.fecha_pedido, numero: pedido.numero_pedido },
+        { fecha: getFechaISO(pedido.fecha_pedido), numero: pedido.numero_pedido },
         payload
       );
       fetchInitialData();
@@ -425,7 +429,7 @@ const GestionPedidosPage: React.FC = () => {
   const handleDeletePedido = useCallback(async (pedido: Pedido) => {
     if (window.confirm(`¿Confirma que desea eliminar el Pedido #${pedido.numero_pedido}? Esta acción es irreversible.`)) {
       try {
-        await deletePedido({ fecha: pedido.fecha_pedido, numero: pedido.numero_pedido });
+        await deletePedido({ fecha: getFechaISO(pedido.fecha_pedido), numero: pedido.numero_pedido });
         fetchInitialData();
       } catch (error) {
         console.error(`Error al eliminar pedido ${pedido.id}:`, error);
@@ -437,7 +441,7 @@ const GestionPedidosPage: React.FC = () => {
 
   const handlePrintPedido = useCallback(async (pedido:Pedido) => {
     try {
-      await printPedido({ fecha: pedido.fecha_pedido, numero: pedido.numero_pedido });
+      await printPedido({ fecha: getFechaISO(pedido.fecha_pedido), numero: pedido.numero_pedido });
       fetchInitialData();
     } catch (error) {
       console.error(`Error al imprimir pedido ${pedido.id}:`, error);
