@@ -335,7 +335,7 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
                   type="text"
                   placeholder="Buscar producto en esta categoría..."
                   value={productSearchTerm}
-                  onChange={handleProductSearchChange}
+                  onChange={handleProductSearchTerm}
                   className={styles.productSearchInput}
                 />
               </div>

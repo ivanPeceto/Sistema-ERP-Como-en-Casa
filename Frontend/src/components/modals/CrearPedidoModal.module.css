@@ -190,6 +190,32 @@
     font-weight: bold;
   }
   
+  .productSearchContainer {
+    margin-bottom: 15px;
+    padding: 0 5px;
+  }
+
+  .productSearchInput {
+    width: 100%; 
+    padding: 10px 12px;
+    border: 1px solid #40464d;
+    border-radius: 5px;
+    background-color: #1d1e2c;
+    color: #ced4da;
+    font-size: 1rem;
+    box-sizing: border-box;
+  }
+
+  .productSearchInput::placeholder {
+    color: #868e96;
+  }
+
+  .productSearchInput:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  }
+
   .productList {
     flex-grow: 1;
     overflow-y: auto;
