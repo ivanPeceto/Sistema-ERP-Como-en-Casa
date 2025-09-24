@@ -4,7 +4,6 @@ import styles from './CrearPedidoModal.module.css';
 import modalStyles from '../../styles/modalStyles.module.css'; 
 
 import { createPedido, getPedidosByDate } from '../../services/pedido_service';
-import { getProductos } from '../../services/product_service';
 import type { Producto, PedidoItem, PedidoInput, PedidoEstado } from '../../types/models.d.ts';
 
 interface CrearPedidoModalProps {
@@ -19,7 +18,8 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<string>('');
   const [pedidoItems, setPedidoItems] = useState<PedidoItem[]>([]);
   const [paraHora, setParaHora] = useState<string>(''); 
-  
+  const [productSearchTerm, setPruductSearchTerm] = useState<string>('');
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,6 +30,7 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
     setParaHora('');
     setError(null);
     setIsLoading(false);
+    setPruductSearchTerm('');
 
     if (productos.length > 0) {
       const categoriasUnicas = [...new Set(productos.map(p => p.categoria?.nombre || 'Sin Categoría'))];
@@ -63,11 +64,22 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
     [...new Set(productos.map(p => p.categoria?.nombre || 'Sin Categoría'))],
   [productos]);
 
-  /** @brief Filtra los productos que se muestran basándose en la categoría seleccionada. */
-  const productosFiltradosPorCategoria = useMemo(() => {
+  /** @brief Filtra los productos que se muestran basándose en la categoría seleccionada y término de búsqueda. */
+  const productosFiltrados = useMemo(() => {
     if (!categoriaSeleccionada) return [];
-    return productos.filter(p => (p.categoria?.nombre || 'Sin Categoría') === categoriaSeleccionada && p.disponible);
-  }, [categoriaSeleccionada, productos]);
+
+    let results = productos.filter(p => 
+      (p.categoria?.nombre || 'Sin categoría') === categoriaSeleccionada && p.disponible
+    );
+    
+    if (productSearchTerm){
+      const curatedInput = productSearchTerm.toLowerCase();
+      results = results.filter(p => 
+        p.nombre.toLowerCase().includes(curatedInput)
+      );
+    }
+    return results;
+  }, [categoriaSeleccionada, productos, productSearchTerm]);
 
   /** @brief Calcula el total del pedido actual cada vez que la lista de ítems cambia. */
   const totalPedido = useMemo(() => {
@@ -136,6 +148,12 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
       }
     });
   }, []);
+
+  /** @brief Actualiza el estado del término de búsqueda de productos.  */
+  const handleProductSearchTerm = (event: ChangeEvent<HTMLInputElement>) => {
+    setPruductSearchTerm(event.target.value)
+  };
+
 
   const handleParaHoraChange = (e: ChangeEvent<HTMLInputElement>) => {
     setParaHora(e.target.value);
@@ -234,6 +252,7 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
                       onChange={(e) => setClienteInput(e.target.value)}
                       className={modalStyles.formControl}
                       placeholder="Nombre del cliente"
+                      autoFocus
                     />
                 </div>        
                 <div className={styles.formRowElement}>
@@ -311,6 +330,15 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
             {/* Panel de selección de productos */}
             <div className={styles.productSelectionPanel}>
               <h2>Seleccionar Productos</h2>
+              <div className={styles.productSearchContainer}>
+                <input
+                  type="text"
+                  placeholder="Buscar producto en esta categoría..."
+                  value={productSearchTerm}
+                  onChange={handleProductSearchTerm}
+                  className={styles.productSearchInput}
+                />
+              </div>
               <div className={styles.categoryTabs}>
                 {(categoriasUnicas || []).map(cat => (
                   <button
@@ -324,8 +352,8 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
                 ))}
               </div>
               <div className={styles.productList}>
-                {productosFiltradosPorCategoria.length > 0 ? (
-                  productosFiltradosPorCategoria.map(producto => (
+                {productosFiltrados.length > 0 ? (
+                  productosFiltrados.map(producto => (
                     <div key={producto.id} className={styles.productItem}>
                       <div className={styles.productInfo}>
                         <button

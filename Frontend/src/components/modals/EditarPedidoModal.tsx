@@ -19,6 +19,8 @@ const EditarPedidoModal: React.FC<EditarPedidoModalProps> = ({ isOpen, onClose, 
   const [editFormData, setEditFormData] = useState<Partial<PedidoInput>>({});
   const [editingPedidoItems, setEditingPedidoItems] = useState<PedidoItem[]>([]);
   const [editCategoriaSeleccionada, setEditCategoriaSeleccionada] = useState<string>('');
+  const [productSearchTerm, setProductSearchTerm] = useState<string>('');
+  
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -41,6 +43,7 @@ const EditarPedidoModal: React.FC<EditarPedidoModalProps> = ({ isOpen, onClose, 
         subtotal: (parseFloat(item.cantidad_producto.toString()) * (parseFloat(item.precio_unitario.toString()) || 0)) || 0,
         aclaraciones: item.aclaraciones || '',
       })));
+      setProductSearchTerm('');
     }
   }, [isOpen, editingPedido]);
 
@@ -50,11 +53,22 @@ const EditarPedidoModal: React.FC<EditarPedidoModalProps> = ({ isOpen, onClose, 
     [productos]
   );
 
-  /** @brief Filtra los productos por la categoría seleccionada. */
-  const editProductosFiltradosPorCategoria = useMemo(() => {
+  /** @brief Filtra los productos que se muestran basándose en la categoría seleccionada y término de búsqueda. */
+  const productosFiltrados = useMemo(() => {
     if (!editCategoriaSeleccionada) return [];
-    return productos.filter(p => (p.categoria?.nombre || 'Sin Categoría') === editCategoriaSeleccionada && p.disponible);
-  }, [editCategoriaSeleccionada, productos]);
+
+    let results = productos.filter(p => 
+      (p.categoria?.nombre || 'Sin categoría') === editCategoriaSeleccionada && p.disponible
+    );
+    
+    if (productSearchTerm){
+      const curatedInput = productSearchTerm.toLowerCase();
+      results = results.filter(p => 
+        p.nombre.toLowerCase().includes(curatedInput)
+      );
+    }
+    return results;
+  }, [editCategoriaSeleccionada, productos, productSearchTerm]);
 
   /** @brief Calcula el total del pedido. */
   const totalEditingPedido = useMemo(() => {
@@ -148,6 +162,11 @@ const EditarPedidoModal: React.FC<EditarPedidoModalProps> = ({ isOpen, onClose, 
       productos: productosParaEnviar,
     };
   }, []);
+
+  /** @brief Actualiza el estado del término de búsqueda de productos.  */
+  const handleProductSearchTerm = (event: ChangeEvent<HTMLInputElement>) => {
+    setProductSearchTerm(event.target.value)
+  };
 
   const handleEditSubmit = useCallback(async (e?: React.MouseEvent<HTMLButtonElement>) => {
     e?.preventDefault();
@@ -312,6 +331,15 @@ const EditarPedidoModal: React.FC<EditarPedidoModalProps> = ({ isOpen, onClose, 
             {/* Panel Derecho: Selección de Productos */}
             <div className={styles.productSelectionPanel}>
               <h2>Añadir Productos</h2>
+              <div className={styles.productSearchContainer}>
+                <input
+                  type="text"
+                  placeholder="Buscar producto en esta categoría..."
+                  value={productSearchTerm}
+                  onChange={handleProductSearchTerm}
+                  className={styles.productSearchInput}
+                />
+              </div>
               <div className={styles.categoryTabs}>
                 {(editCategoriasUnicas || []).map(cat => (
                   <button
@@ -325,8 +353,8 @@ const EditarPedidoModal: React.FC<EditarPedidoModalProps> = ({ isOpen, onClose, 
                 ))}
               </div>
               <div className={styles.productList}>
-                {editProductosFiltradosPorCategoria.length > 0 ? (
-                  editProductosFiltradosPorCategoria.map(producto => (
+                {productosFiltrados.length > 0 ? (
+                  productosFiltrados.map(producto => (
                     <div key={producto.id} className={styles.productItem}>
                       <div className={styles.productInfo}>
                         <button
