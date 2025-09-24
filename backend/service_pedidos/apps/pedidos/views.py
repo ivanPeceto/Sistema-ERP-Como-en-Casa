@@ -259,15 +259,17 @@ class ImprimirPedidoView(APIView):
             return Response({'detail':'Falta proporcionar número de pedido a editar'}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            fecha_sanitized = datetime.strptime(fecha, "%Y-%m-%d").date()
-        except:
+            fecha_obj = datetime.strptime(fecha, "%Y-%m-%d").date()
+            start_of_day = timezone.make_aware(datetime.combine(fecha_obj, time.min))
+            end_of_day = timezone.make_aware(datetime.combine(fecha_obj, time.max))
+        except ValueError:
             return Response({'detail':'Formato de fecha inválido'}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
             if not id_pedido:
-                pedido = Pedido.objects.get(fecha_pedido=fecha_sanitized, numero_pedido=numero_pedido)
+                pedido = Pedido.objects.get(fecha_pedido__range=(start_of_day, end_of_day), numero_pedido=numero_pedido)
             else:
-                pedido = Pedido.objects.get(id=id_pedido, fecha_pedido=fecha_sanitized, numero_pedido=numero_pedido)
+                pedido = Pedido.objects.get(id=id_pedido, fecha_pedido__range=(start_of_day, end_of_day), numero_pedido=numero_pedido)
 
             resp = self.imprimirComanda(pedido)
             return Response(resp, status=status.HTTP_200_OK)
