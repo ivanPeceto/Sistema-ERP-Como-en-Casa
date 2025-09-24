@@ -93,9 +93,10 @@ DATABASES = {
 
 # Config regional
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
-USE_I18N = True
+TIME_ZONE = 'America/Argentina/Buenos_Aires'
+
 USE_TZ = True
+USE_I18N = True
 
 # Archivos estáticos
 STATIC_URL = 'static/'

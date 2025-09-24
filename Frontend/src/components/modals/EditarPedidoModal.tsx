@@ -85,6 +85,10 @@ const EditarPedidoModal: React.FC<EditarPedidoModalProps> = ({ isOpen, onClose, 
     }));
   };
 
+  const getFechaISO = (dateString: string) => {
+    return dateString.split('T')[0];
+  };
+
   const updateEditingItemAclaraciones = useCallback((productId: number, aclaracion: string) => {
     setEditingPedidoItems(prevItems =>
       prevItems.map(item =>
@@ -151,7 +155,7 @@ const EditarPedidoModal: React.FC<EditarPedidoModalProps> = ({ isOpen, onClose, 
 
     return {
       numero_pedido: pedido.numero_pedido,
-      fecha_pedido: pedido.fecha_pedido,
+      fecha_pedido: getFechaISO(pedido.fecha_pedido),
       id_cliente: 1,
       cliente: updates.cliente !== undefined ? updates.cliente : pedido.cliente,
       para_hora: updates.para_hora !== undefined ? updates.para_hora : pedido.para_hora,
@@ -182,7 +186,7 @@ const EditarPedidoModal: React.FC<EditarPedidoModalProps> = ({ isOpen, onClose, 
     try {
       const payload = prepareUpdatePayload(editingPedido, editFormData, editingPedidoItems);
       await editarPedido(
-        { fecha: editingPedido.fecha_pedido, numero: editingPedido.numero_pedido },
+        { fecha: getFechaISO(editingPedido.fecha_pedido), numero: editingPedido.numero_pedido },
         payload
       );
       onClose();

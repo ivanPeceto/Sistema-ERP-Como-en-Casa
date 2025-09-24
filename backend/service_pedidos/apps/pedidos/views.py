@@ -6,7 +6,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from apps.pedidos.models import Pedido
 from apps.pedidos.serializer import PedidoSerializer
-from datetime import datetime
+from datetime import datetime, time
+from django.utils import timezone
 import requests
 from decouple import config 
 from utils.channels_helper import send_channel_message
@@ -43,11 +44,14 @@ class PedidoListView(ListAPIView):
             return Pedido.objects.none()
 
         try:
-            fecha_sanitized = datetime.strptime(fecha, "%Y-%m-%d").date()
-        except:
+            fecha_obj = datetime.strptime(fecha, "%Y-%m-%d").date()
+            start_of_day = timezone.make_aware(datetime.combine(fecha_obj, time.min))
+            end_of_day = timezone.make_aware(datetime.combine(fecha_obj, time.max))
+            queryset = Pedido.objects.filter(fecha_pedido__range=(start_of_day, end_of_day))
+
+        except ValueError: 
             return Pedido.objects.none()
         
-        queryset = Pedido.objects.filter(fecha_pedido=fecha_sanitized)
         if numero_pedido:
             queryset = queryset.filter(numero_pedido=numero_pedido)     
         return queryset
@@ -132,17 +136,17 @@ class EliminarPedidoView(APIView):
             return Response({'detail':'Falta proporcionar número de pedido a eliminar'}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            fecha_sanitized = datetime.strptime(fecha, "%Y-%m-%d").date()
+            fecha_obj = datetime.strptime(fecha, "%Y-%m-%d").date()
+            start_of_day = timezone.make_aware(datetime.combine(fecha_obj, time.min))
+            end_of_day = timezone.make_aware(datetime.combine(fecha_obj, time.max))
         except:
             return Response({'detail':'Formato de fecha inválido'}, status=status.HTTP_400_BAD_REQUEST)
     
         try:
             if not id_pedido:
-                pedido = Pedido.objects.get(fecha_pedido=fecha_sanitized, numero_pedido=numero_pedido)
-
+                pedido = Pedido.objects.get(fecha_pedido__range=(start_of_day, end_of_day), numero_pedido=numero_pedido)
             else:
-                pedido = Pedido.objects.get(id=id_pedido, fecha_pedido=fecha_sanitized, numero_pedido=numero_pedido)
-            
+                pedido = Pedido.objects.get(id=id_pedido, fecha_pedido__range=(start_of_day, end_of_day), numero_pedido=numero_pedido)            
             pedido_id = pedido.id
             pedido.delete()
 
@@ -195,16 +199,17 @@ class EditarPedidoView(APIView):
             return Response({'detail':'Falta proporcionar número de pedido a editar'}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            fecha_sanitized = datetime.strptime(fecha, "%Y-%m-%d").date()
+            fecha_obj = datetime.strptime(fecha, "%Y-%m-%d").date()
+            start_of_day = timezone.make_aware(datetime.combine(fecha_obj, time.min))
+            end_of_day = timezone.make_aware(datetime.combine(fecha_obj, time.max))
         except:
             return Response({'detail':'Formato de fecha inválido'}, status=status.HTTP_400_BAD_REQUEST)
-        
+    
         try:
             if not id_pedido:
-                pedido = Pedido.objects.get(fecha_pedido=fecha_sanitized, numero_pedido=numero_pedido)
+                pedido = Pedido.objects.get(fecha_pedido__range=(start_of_day, end_of_day), numero_pedido=numero_pedido)
             else:
-                pedido = Pedido.objects.get(id=id_pedido, fecha_pedido=fecha_sanitized, numero_pedido=numero_pedido)
-
+                pedido = Pedido.objects.get(id=id_pedido, fecha_pedido__range=(start_of_day, end_of_day), numero_pedido=numero_pedido)      
             pedidoSerializer = PedidoSerializer(pedido, data=request.data)
 
             if(pedidoSerializer.is_valid()):
