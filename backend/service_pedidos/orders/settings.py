@@ -1,6 +1,8 @@
+#/backend/service_pedidos/orders/settings.py
 from pathlib import Path
 from datetime import timedelta
 from decouple import config 
+import sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,6 +32,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'apps.pedidos',
     'apps.pedidosProductos',
+    'apps.cobros',
+    'apps.metodos',
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
@@ -123,11 +127,11 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'America/Argentina/Buenos_Aires'
-
-USE_TZ = True
+TIME_ZONE = 'UTC'
 
 USE_I18N = True
+
+USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
@@ -151,3 +155,4 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
