@@ -1,151 +1,195 @@
-/*
- * @archivo: formStyles.module.css
- * @descripcion: Estilos compartidos para formularios profesionales y modernos
- */
+/* --- Estilos para el contenedor del modal --- */
 
-/* Contenedor principal del formulario */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background-color: #2c2c2c;
+  color: #f1f1f1;
+  padding: 25px 25px;
+  border-radius: 8px;
+  max-width: 450px;
+  width: 100%;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modalContent h2 {
+  text-align: center;
+  color: #fff;
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+/* --- Estilos para los campos del formulario --- */
+
 .formContainer {
-  background-color: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-/* Secciones del formulario */
+
 .formSection {
-  margin-bottom: 1rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid #e2e8f0;
+  padding: 10px;
+  background-color: #333;
 }
 
-.formSection:last-child {
-  border-bottom: none;
-  margin-bottom: 0;
-  padding-bottom: 0;
+
+.formSectionScrollable {
+    padding: 10px;
+    background-color: #333;
+    max-height: 150px; 
+    overflow-y: auto; 
 }
 
 .formSectionTitle {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #2d3748;
-  margin-bottom: 1rem;
+  font-size: 1.2em;
+  color: #fff;
+  margin-top: 0;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #666;
 }
 
-/* Campos de entrada */
 .formField {
-  margin-bottom: 0.75rem;
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
+  margin-bottom: 10px;
 }
 
 .formLabel {
-  display: inline-block;
-  margin-bottom: 0;
-  font-weight: 500;
-  color: #000000 !important;
-  min-width: 120px;
-  text-align: right;
+  display: block;
+  margin-bottom: 5px;
+  font-size: 0.9em;
+  color: #aaa !important;
   font-weight: bold;
 }
 
+.requiredLabel::after {
+  content: " *";
+  color: #ff6b6b;
+}
+
 .formInput,
-.formTextarea {
-  flex: 1;
-  padding: 0.375rem 0.75rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  transition: border-color 0.2s ease;
-  color: #000 !important;
+.formTextarea,
+.formSelect {
+  width: 100%;
+  max-width: 230px;
+  padding: 8px;
+  border: 1px solid #555;
+  border-radius: 4px;
+  font-size: 1em;
+  background-color: #35394b;
+  color: #fff !important;
+  transition: all 0.3s ease;
 }
 
 .formInput:focus,
-.formTextarea:focus {
+.formTextarea:focus,
+.formSelect:focus {
   outline: none;
-  border-color: #4299e1;
-  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
-.formTextarea {
-  min-height: 60px;
-  resize: vertical;
-  flex: 1;
+
+.inlineFormFields .formSelect {
+    max-width: 150px;
 }
 
-/* Botones */
+.inlineFormFields .formInput[type="number"] {
+    max-width: 45px;
+}
+
+
+/* --- Estilos de botones --- */
+
 .formButtons {
   display: flex;
-  gap: 0.75rem;
   justify-content: center;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
+  gap: 15px;
+  margin-top: 15px;
 }
 
 .primaryButton,
 .secondaryButton {
-  padding: 0.375rem 1rem;
-  font-size: 0.875rem;
-  min-width: 100px;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  font-size: 1em;
 }
 
 .primaryButton {
-  background-color: #4299e1;
+  background-color: #007bff;
   color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
 }
 
 .primaryButton:hover {
-  background-color: #3168b3;
+  background-color: #0056b3;
 }
 
 .secondaryButton {
-  background-color: #cbd5e0;
-  color: #2d3748;
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+  background-color: #555;
+  color: white;
 }
 
 .secondaryButton:hover {
-  background-color: #a0aec0;
+  background-color: #666;
 }
 
-/* Mensajes de error */
-.formError {
-  color: #e53e3e;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
+/* --- Estilos de campos en línea --- */
+
+.inlineFormSection {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  justify-content: center;
 }
 
-/* Campos requeridos */
-.requiredLabel:after {
-  content: '*';
-  color: #e53e3e;
-  margin-left: 0.25rem;
+.inlineFormFields {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
-/* Selects */
-.formSelect {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  transition: border-color 0.2s ease;
+.inlineFormFields select,
+.inlineFormFields input[type="number"] {
+  flex-grow: 1;
 }
 
-.formSelect:focus {
-  outline: none;
-  border-color: #4299e1;
-  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+.formCheckbox {
+  margin-top: 10px;
+  transform: scale(1.5);
+}
+
+.deleteButton {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  background-color: #dc3545;
+  color: white;
+  cursor: pointer;
+}
+
+/* Estilos para el contenedor de la lista de insumos en el modal de recetas */
+.insumosListContainer {
+    max-height: 150px;
+    overflow-y: auto;
+    padding-right: 10px;
+    margin-bottom: 10px;
 }
