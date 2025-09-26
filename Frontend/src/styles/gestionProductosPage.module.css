@@ -123,13 +123,28 @@
   position: relative; 
 }
 
+
+.itemInfo strong::after,
+.itemInfo span::after {
+  content: '';
+  position: absolute;
+  right: -15px; 
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 80%;
+  background-color: #fff;
+}
+
+
+
 /* Al último elemento no le ponemos línea */
 .itemInfo small::after {
   content: none;
 }
 
 .editButton {
-  background-color: #e7eb02;
+  background-color: #e5e5e6;
   color: #333;
 
 }
