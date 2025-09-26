@@ -1,8 +1,8 @@
 /**
- * @archivo: gestionProductosPage.module.css
- * @descripcion: Estilos para la página de gestión de productos. Incluye la estructura
- * de la página, barra de herramientas, listado de productos, y el modal para
- * agregar o editar productos.
+ * @archivo: gestionCategoriaPage.module.css
+ * @descripcion: Estilos para la página de gestión de categoria. Incluye la estructura
+ * de la página, barra de herramientas, listado de categorias, y el modal para
+ * agregar o editar categoria.
  **/
 
 /* --- Estilos de Contenedor de Página --- */
@@ -38,7 +38,7 @@
   display: flex;
   flex-grow: 1;
   min-width: 250px;
-  max-width: 48%; /* El buscador y el botón ocupan casi la mitad del espacio */
+  max-width: 48%; 
 }
 
 .searchInput {
@@ -94,6 +94,7 @@
 .listItem {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 15px;
   border-bottom: 1px solid #777171;
   background-color: #3b4353;

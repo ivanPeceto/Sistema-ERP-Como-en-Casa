@@ -200,7 +200,6 @@ const GestionInsumosPage: React.FC<GestionInsumosPageProps> = () => {
             <h2>{editingInsumo ? 'Editar Insumo' : 'Nuevo Insumo'}</h2>
             <form onSubmit={handleSubmit} className={formStyles.formContainer}>
               <div className={formStyles.formSection}>
-                <h3 className={formStyles.formSectionTitle}>Información Básica</h3>
                 <div className={formStyles.formField}>
                   <label className={`${formStyles.formLabel} ${formStyles.requiredLabel}`} htmlFor="nombre">Nombre</label>
                   <input
