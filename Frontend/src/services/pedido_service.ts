@@ -48,6 +48,17 @@ export const getPedidosByDate = async (fecha: string): Promise<any[]> => {
 };
 
 /**
+ * @brief Obtiene la lista completa de pedidos desde el backend.
+ * @returns {Promise<Pedido[]>} Una promesa que se resuelve con un array de objetos Pedido.
+ * @throws {Error} Relanza el error si la petición a la API falla.
+ */
+export const getPedidos = async (): Promise<Pedido[]> => {
+    // Nota: El endpoint real podría requerir parámetros de búsqueda o filtro.
+    const response = await pedidoAPICLient.get<Pedido[]>('/api/pedidos/buscar/');
+    return response.data;
+};
+
+/**
  * @brief Actualiza un pedido existente en el backend.
  * @details Realiza una petición PUT al endpoint `/pedidos/editar/`. El backend identifica
  * el pedido a actualizar mediante la combinación de `fecha` y `numero` como query params.

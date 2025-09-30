@@ -14,16 +14,16 @@
 }
 
 .modalContent {
-  background-color: #2c2c2c;
-  color: #f1f1f1;
-  padding: 25px 25px;
+  background-color: #2c2c2c; /* Fondo oscuro del modal */
+  color: #f1f1f1; /* Color de letra claro */
+  padding: 25px 25px; /* Reducimos el padding para hacerlo menos alto y ancho */
   border-radius: 8px;
-  max-width: 450px;
+  max-width: 450px; /* Reducimos el ancho máximo del modal */
   width: 100%;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 10px; /* Reducimos el espacio entre las secciones */
 }
 
 .modalContent h2 {
@@ -38,21 +38,12 @@
 .formContainer {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 10px; /* Reducimos el espacio entre los campos */
 }
 
-
-.formSection {
+.formSection { /* Fondo un poco más claro para la sección para distinguirla */
   padding: 10px;
   background-color: #333;
-}
-
-
-.formSectionScrollable {
-    padding: 10px;
-    background-color: #333;
-    max-height: 150px; 
-    overflow-y: auto; 
 }
 
 .formSectionTitle {
@@ -60,8 +51,8 @@
   color: #fff;
   margin-top: 0;
   margin-bottom: 15px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #666;
+  padding-bottom: 10px; /* Un poco de espacio debajo del texto */
+  border-bottom: 1px solid #666; /* La línea divisoria */
 }
 
 .formField {
@@ -72,7 +63,7 @@
   display: block;
   margin-bottom: 5px;
   font-size: 0.9em;
-  color: #aaa !important;
+  color: #aaa !important; /* Color gris para el texto de la etiqueta */
   font-weight: bold;
 }
 
@@ -85,13 +76,13 @@
 .formTextarea,
 .formSelect {
   width: 100%;
-  max-width: 230px;
+  max-width: 230px; /* Hacemos los inputs un poco más cortos */
   padding: 8px;
   border: 1px solid #555;
   border-radius: 4px;
   font-size: 1em;
-  background-color: #35394b;
-  color: #fff !important;
+  background-color: #35394b; /* Fondo de campo oscuro */
+  color: #fff !important; /* Texto del campo blanco */
   transition: all 0.3s ease;
 }
 
@@ -103,7 +94,7 @@
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
-
+/* Reglas específicas para los inputs dentro de la sección de insumos */
 .inlineFormFields .formSelect {
     max-width: 150px;
 }
@@ -124,7 +115,7 @@
 
 .primaryButton,
 .secondaryButton {
-  padding: 12px 25px;
+  padding: 10px 20px; /* <-- Hacemos los botones menos altos */
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -186,9 +177,9 @@
   cursor: pointer;
 }
 
-/* Estilos para el contenedor de la lista de insumos en el modal de recetas */
+/* Nueva clase para el contenedor de la lista de insumos en el modal de recetas */
 .insumosListContainer {
-    max-height: 150px;
+    max-height: 200px;
     overflow-y: auto;
     padding-right: 10px;
     margin-bottom: 10px;
