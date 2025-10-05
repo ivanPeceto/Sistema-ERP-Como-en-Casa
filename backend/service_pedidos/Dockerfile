@@ -25,6 +25,6 @@ RUN chmod +x /usr/local/bin/wait-for-it.sh
 
 EXPOSE 8004
 
-ENTRYPOINT ["wait-for-it.sh", "db_pedidos:3306", "--timeout=60", "--"]
+ENTRYPOINT ["wait-for-it.sh", "db_pedidos:3306", "--timeout=240", "--"]
 
 CMD ["daphne", "-b", "0.0.0.0", "-p", "8004", "orders.asgi:application"]
