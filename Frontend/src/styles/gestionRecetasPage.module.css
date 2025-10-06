@@ -124,11 +124,6 @@
 .deleteButton {
   background-color: #dc3545;
   color: white;
-  margin-left: 10px;
-}
-.viewButton {
-  background-color: #dc3545;
-  color: white;
 }
 .deleteButton:hover {
   background-color: #c82333;
