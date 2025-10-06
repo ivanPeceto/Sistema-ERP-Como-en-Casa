@@ -6,12 +6,11 @@ from rest_framework.response import Response
 from rest_framework import status
 from apps.pedidos.models import Pedido
 from apps.pedidos.serializer import PedidoSerializer
-from datetime import datetime
+from datetime import datetime, time
+from django.utils import timezone
 import requests
 from decouple import config 
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
-
+from utils.channels_helper import send_channel_message
 
 class PedidoListView(ListAPIView):
     """!
@@ -45,11 +44,14 @@ class PedidoListView(ListAPIView):
             return Pedido.objects.none()
 
         try:
-            fecha_sanitized = datetime.strptime(fecha, "%Y-%m-%d").date()
-        except:
+            fecha_obj = datetime.strptime(fecha, "%Y-%m-%d").date()
+            start_of_day = timezone.make_aware(datetime.combine(fecha_obj, time.min))
+            end_of_day = timezone.make_aware(datetime.combine(fecha_obj, time.max))
+            queryset = Pedido.objects.filter(fecha_pedido__range=(start_of_day, end_of_day))
+
+        except ValueError: 
             return Pedido.objects.none()
         
-        queryset = Pedido.objects.filter(fecha_pedido=fecha_sanitized)
         if numero_pedido:
             queryset = queryset.filter(numero_pedido=numero_pedido)     
         return queryset
@@ -84,7 +86,6 @@ class CrearPedidoView(APIView):
         if pedidoSerializer.is_valid():
             pedido = pedidoSerializer.save()
 
-            channel_layer = get_channel_layer()
             message_payload = {
                 'type': 'send.notification',
                 'message': {
@@ -93,7 +94,7 @@ class CrearPedidoView(APIView):
                     'pedido': PedidoSerializer(pedido).data
                 }
             }
-            async_to_sync(channel_layer.group_send)('app_notifications', message_payload)
+            send_channel_message('app_notifications', message_payload, 10, 0.5)
 
             return Response(PedidoSerializer(pedido).data, status=status.HTTP_200_OK)
         else:
@@ -135,21 +136,20 @@ class EliminarPedidoView(APIView):
             return Response({'detail':'Falta proporcionar número de pedido a eliminar'}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            fecha_sanitized = datetime.strptime(fecha, "%Y-%m-%d").date()
+            fecha_obj = datetime.strptime(fecha, "%Y-%m-%d").date()
+            start_of_day = timezone.make_aware(datetime.combine(fecha_obj, time.min))
+            end_of_day = timezone.make_aware(datetime.combine(fecha_obj, time.max))
         except:
             return Response({'detail':'Formato de fecha inválido'}, status=status.HTTP_400_BAD_REQUEST)
     
         try:
             if not id_pedido:
-                pedido = Pedido.objects.get(fecha_pedido=fecha_sanitized, numero_pedido=numero_pedido)
-
+                pedido = Pedido.objects.get(fecha_pedido__range=(start_of_day, end_of_day), numero_pedido=numero_pedido)
             else:
-                pedido = Pedido.objects.get(id=id_pedido, fecha_pedido=fecha_sanitized, numero_pedido=numero_pedido)
-            
+                pedido = Pedido.objects.get(id=id_pedido, fecha_pedido__range=(start_of_day, end_of_day), numero_pedido=numero_pedido)            
             pedido_id = pedido.id
             pedido.delete()
 
-            channel_layer = get_channel_layer()
             message_payload = {
                 'type': 'send.notification',
                 'message': {
@@ -158,7 +158,7 @@ class EliminarPedidoView(APIView):
                     'id': pedido_id,
                 }
             }
-            async_to_sync(channel_layer.group_send)('app_notifications', message_payload)
+            send_channel_message('app_notifications', message_payload, 10, 0.5)
 
             return Response({'detail':'Pedido eliminado exitosamente'}, status=status.HTTP_200_OK)
         except:
@@ -199,22 +199,22 @@ class EditarPedidoView(APIView):
             return Response({'detail':'Falta proporcionar número de pedido a editar'}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            fecha_sanitized = datetime.strptime(fecha, "%Y-%m-%d").date()
+            fecha_obj = datetime.strptime(fecha, "%Y-%m-%d").date()
+            start_of_day = timezone.make_aware(datetime.combine(fecha_obj, time.min))
+            end_of_day = timezone.make_aware(datetime.combine(fecha_obj, time.max))
         except:
             return Response({'detail':'Formato de fecha inválido'}, status=status.HTTP_400_BAD_REQUEST)
-        
+    
         try:
             if not id_pedido:
-                pedido = Pedido.objects.get(fecha_pedido=fecha_sanitized, numero_pedido=numero_pedido)
+                pedido = Pedido.objects.get(fecha_pedido__range=(start_of_day, end_of_day), numero_pedido=numero_pedido)
             else:
-                pedido = Pedido.objects.get(id=id_pedido, fecha_pedido=fecha_sanitized, numero_pedido=numero_pedido)
-
+                pedido = Pedido.objects.get(id=id_pedido, fecha_pedido__range=(start_of_day, end_of_day), numero_pedido=numero_pedido)      
             pedidoSerializer = PedidoSerializer(pedido, data=request.data)
 
             if(pedidoSerializer.is_valid()):
                 pedido_actualizado = pedidoSerializer.save()
 
-                channel_layer = get_channel_layer()
                 message_payload = {
                     'type': 'send.notification', 
                     'message': {
@@ -223,7 +223,7 @@ class EditarPedidoView(APIView):
                         'pedido': PedidoSerializer(pedido_actualizado).data
                     }
                 }
-                async_to_sync(channel_layer.group_send)('app_notifications', message_payload)
+                send_channel_message('app_notifications', message_payload, 10, 0.5)
                 return Response({'detail':'Pedido editado exitosamente'}, status=status.HTTP_200_OK)
             else:
                 return Response(pedidoSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -237,8 +237,8 @@ class ImprimirPedidoView(APIView):
         try:
             pedidoSerialized = PedidoSerializer(pedido).data
             ip = config('IP_IMPRESORA')
-            route = f"http://{ip}/imprimir_comanda"
-            r = requests.post("http://192.168.1.26:5000/imprimir_comanda", json=pedidoSerialized)
+            route = f"http://{ip}:5000/imprimir_comanda"
+            r = requests.post(route, json=pedidoSerialized)
             r.raise_for_status()
             return r.json()
         except requests.exceptions.RequestException as e:
@@ -259,15 +259,17 @@ class ImprimirPedidoView(APIView):
             return Response({'detail':'Falta proporcionar número de pedido a editar'}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            fecha_sanitized = datetime.strptime(fecha, "%Y-%m-%d").date()
-        except:
+            fecha_obj = datetime.strptime(fecha, "%Y-%m-%d").date()
+            start_of_day = timezone.make_aware(datetime.combine(fecha_obj, time.min))
+            end_of_day = timezone.make_aware(datetime.combine(fecha_obj, time.max))
+        except ValueError:
             return Response({'detail':'Formato de fecha inválido'}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
             if not id_pedido:
-                pedido = Pedido.objects.get(fecha_pedido=fecha_sanitized, numero_pedido=numero_pedido)
+                pedido = Pedido.objects.get(fecha_pedido__range=(start_of_day, end_of_day), numero_pedido=numero_pedido)
             else:
-                pedido = Pedido.objects.get(id=id_pedido, fecha_pedido=fecha_sanitized, numero_pedido=numero_pedido)
+                pedido = Pedido.objects.get(id=id_pedido, fecha_pedido__range=(start_of_day, end_of_day), numero_pedido=numero_pedido)
 
             resp = self.imprimirComanda(pedido)
             return Response(resp, status=status.HTTP_200_OK)
