@@ -4,9 +4,6 @@
  * de la página, barra de herramientas, listado de productos, y el modal para
  * agregar o editar productos.
  **/
-
-/* --- Estilos de Contenedor de Página --- */
-
 .pageContainer {
   display: flex;
   flex-direction: column;
@@ -23,8 +20,6 @@
   color: #ffffff;
 }
 
-/* --- Estilos de la Barra de Herramientas (Toolbar) --- */
-
 .toolbar {
   display: flex;
   justify-content: space-between;
@@ -38,24 +33,20 @@
   display: flex;
   flex-grow: 1;
   min-width: 250px;
-  max-width: 48%; /* El buscador y el botón ocupan casi la mitad del espacio */
+  max-width: 30vw;
 }
 
 .searchInput {
-  color: #ffffff;
   width: 100%;
-  max-width: 300px;
   padding: 10px 15px;
   margin-right: 1rem;
-  border: 1.75px solid #807575;
-  background-color: #303644;
+  border: 1px solid #807575;
   border-radius: 4px;
   font-size: 1rem;
 }
 
 .addButton,
 .editButton,
-.viewButton,
 .deleteButton,
 .saveButton,
 .cancelButton {
@@ -68,17 +59,10 @@
   white-space: nowrap;
 }
 
-.viewButton {
-  background-color: #d4d7ff;
-  color: rgb(61, 61, 61);
-  margin-right: 10px;
-}
-
 .addButton {
-  background-color: #1c7e40;
+  background-color: #09c935;
   color: white;
 }
-
 .addButton:hover {
   background-color: #09c935;
 }
@@ -88,7 +72,7 @@
   overflow-y: auto;
   background-color: #3b4353;
   border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .listItem {
@@ -97,76 +81,58 @@
   padding: 15px;
   border-bottom: 1px solid #777171;
   background-color: #3b4353;
-  color: #fff;
-  gap: 30px;
 }
-
 .listItem:last-child {
   border-bottom: none;
 }
 
 .itemInfo {
   display: flex;
-  flex-direction: row; 
-  align-items: center;
-  gap: 30px; 
+  flex-direction: column;
+  gap: 4px;
   flex-grow: 1;
   max-width: 60%;
 }
-
-.itemInfo strong,
+.itemInfo strong {
+  font-size: 1.1rem;
+  margin-bottom: 2px;
+}
 .itemInfo span,
 .itemInfo small {
   font-size: 0.9rem;
-  color: #fff;
-  white-space: nowrap;
-  position: relative; 
+  color: #ffffff;
+}
+.itemInfo small {
+    color: #ffffff;
 }
 
 
-.itemInfo strong::after,
-.itemInfo span::after {
-  content: '';
-  position: absolute;
-  right: -15px; 
-  top: 50%;
-  transform: translateY(-50%);
-  width: 1px;
-  height: 80%;
-  background-color: #fff;
-}
-
-
-
-/* Al último elemento no le ponemos línea */
-.itemInfo small::after {
-  content: none;
+.itemActions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .editButton {
-  background-color: #e5e5e6;
+  background-color: #ffc107;
   color: #333;
-
 }
-
 .editButton:hover {
-  background-color: #bebdbd;
+  background-color: #e0a800;
 }
 
 .deleteButton {
-  background-color: #cc404e;
+  background-color: #dc3545;
   color: white;
-  margin-left: 10px;
 }
-
 .deleteButton:hover {
   background-color: #c82333;
 }
 
 .noResults {
-  text-align: center;
-  padding: 20px;
-  color: #ffffff;
+    text-align: center;
+    padding: 20px;
+    color: #ffffff;
 }
 
 .modalOverlay {
@@ -175,7 +141,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0,0,0,0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -183,12 +149,12 @@
 }
 
 .modalContent {
-  background-color: rgb(43, 43, 43);
+  background-color: white;
   padding: 25px;
   border-radius: 8px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
   width: 100%;
-  max-width: 400px;
+  max-width: 500px;
 }
 
 .modalContent h2 {
@@ -200,13 +166,11 @@
 .formGroup {
   margin-bottom: 15px;
 }
-
 .formGroup label {
   display: block;
   margin-bottom: 5px;
   font-weight: bold;
 }
-
 .formGroup input[type="text"],
 .formGroup input[type="email"],
 .formGroup input[type="tel"],
@@ -218,7 +182,6 @@
   box-sizing: border-box;
   font-size: 1rem;
 }
-
 .formGroup textarea {
   min-height: 80px;
   resize: vertical;
@@ -240,7 +203,6 @@
   background-color: #007bff;
   color: white;
 }
-
 .saveButton:hover {
   background-color: #0056b3;
 }
@@ -249,36 +211,41 @@
   background-color: #6c757d;
   color: white;
 }
-
 .cancelButton:hover {
   background-color: #545b62;
 }
 
 .categoryTabs {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: nowrap; 
   overflow-x: auto;
   padding-bottom: 15px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #e0e0e0;
   scrollbar-width: thin;
   scrollbar-color: #a0a0a0 #f0f0f0;
 }
 
 .categoryTab {
-  flex-shrink: 0;
+  flex-shrink: 0; 
   padding: 8px 16px;
   margin-right: 10px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
   background-color: #f9f9f9;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   white-space: nowrap;
 }
 
-.categoryTab:focus {
-  outline: none;
+.categoryTab:hover {
+  background-color: #e0e0e0;
+  border-color: #a0a0a0;
 }
 
 .activeTab {
-  background-color: #533ea1;
+  background-color: #007bff;
   color: white;
+  border-color: #007bff;
   font-weight: bold;
 }
