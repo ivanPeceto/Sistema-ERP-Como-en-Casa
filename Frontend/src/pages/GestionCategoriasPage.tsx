@@ -12,7 +12,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styles from '../styles/gestionProductosPage.module.css';
+import styles from '../styles/gestionCategoriaPage.module.css';
 import formStyles from '../styles/formStyles.module.css';
 import {
   getCategorias,
