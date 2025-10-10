@@ -23,8 +23,11 @@ from apps.metodos.views import (
     MetodoCobroListarView,
     MetodoCobroBuscarView
 )
+from apps.healthcheck.views import HealthCheckView
 
 urlpatterns = [
+    path('healthcheck/', HealthCheckView.as_view(), name='healthcheck'),
+
     #Rutas de Pedidos
     path('api/pedidos/buscar/', PedidoListView.as_view(), name='pedidos'),
     path('api/pedidos/crear/', CrearPedidoView.as_view(), name='crear_pedido'),

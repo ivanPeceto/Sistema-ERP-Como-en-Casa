@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 class Pedido(models.Model):
     """!
@@ -22,8 +23,7 @@ class Pedido(models.Model):
 
     id = models.AutoField(primary_key=True, db_column='id')
     numero_pedido = models.IntegerField(db_column='numero_pedido')    
-    fecha_pedido = models.DateField(db_column='fecha_pedido')
-    #Deprecated
+    fecha_pedido = models.DateTimeField(default=timezone.now, db_column='fecha_pedido')    #Deprecated
     id_cliente = models.IntegerField(db_column='id_cliente')
     #--
     cliente = models.CharField(max_length=100, default="Sin nombre", db_column='cliente')
