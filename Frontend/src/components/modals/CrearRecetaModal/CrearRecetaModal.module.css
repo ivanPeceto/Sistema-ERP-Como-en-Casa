@@ -1,0 +1,53 @@
+.insumosListContainer {
+  /* Define una altura máxima. Si el contenido de adentro la supera, aparecerá el scroll.
+     Puedes ajustar este valor. 130px es aprox. para 2 o 3 items. */
+  max-height: 130px;
+  
+  /* El comando mágico: si el contenido se pasa de la altura, poné un scroll vertical. */
+  overflow-y: auto;
+  
+  /* Estilos para que se vea bien */
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 15px; /* Separación con el botón de abajo */
+}
+
+/* Estilos para cada fila de la lista */
+.insumoItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.insumoItem:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.insumoControls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cantidadInput {
+  width: 65px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.deleteButton {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+.deleteButton:hover {
+  background-color: #c0392b;
+}

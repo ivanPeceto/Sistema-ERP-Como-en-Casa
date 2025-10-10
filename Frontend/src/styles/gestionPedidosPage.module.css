@@ -35,7 +35,7 @@
   display: flex;
   gap: 10px;
   flex-grow: 1;
-  max-width: 600px;
+  max-width: 670px;
 }
 
 .searchInput::placeholder {
@@ -77,7 +77,7 @@
 .itemInfo {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 30px;
   flex-grow: 1;
 }
 .itemInfo strong {
@@ -87,6 +87,7 @@
   font-size: 0.9rem;
   color: #555;
 }
+
 
 .itemActions {
   display: flex;

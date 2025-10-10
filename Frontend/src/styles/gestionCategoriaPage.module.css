@@ -1,9 +1,12 @@
 /**
- * @archivo: gestionRecetasPage.module.css
- * @descripcion: Estilos para la página de gestión de recetas, basados en los estilos de productos.
- * Incluye la estructura de la página, barra de herramientas, listado de recetas y el modal para
- * agregar o editar.
+ * @archivo: gestionCategoriaPage.module.css
+ * @descripcion: Estilos para la página de gestión de categoria. Incluye la estructura
+ * de la página, barra de herramientas, listado de categorias, y el modal para
+ * agregar o editar categoria.
  **/
+
+/* --- Estilos de Contenedor de Página --- */
+
 .pageContainer {
   display: flex;
   flex-direction: column;
@@ -20,6 +23,8 @@
   color: #ffffff;
 }
 
+/* --- Estilos de la Barra de Herramientas (Toolbar) --- */
+
 .toolbar {
   display: flex;
   justify-content: space-between;
@@ -33,20 +38,24 @@
   display: flex;
   flex-grow: 1;
   min-width: 250px;
-  max-width: 30vw;
+  max-width: 48%; 
 }
 
 .searchInput {
+  color: #ffffff;
   width: 100%;
+  max-width: 300px;
   padding: 10px 15px;
   margin-right: 1rem;
-  border: 1px solid #807575;
+  border: 1.75px solid #807575;
+  background-color: #303644;
   border-radius: 4px;
   font-size: 1rem;
 }
 
 .addButton,
 .editButton,
+.viewButton,
 .deleteButton,
 .saveButton,
 .cancelButton {
@@ -59,10 +68,17 @@
   white-space: nowrap;
 }
 
+.viewButton {
+  background-color: #d4d7ff;
+  color: rgb(61, 61, 61);
+  margin-right: 10px;
+}
+
 .addButton {
-  background-color: #09c935;
+  background-color: #1c7e40;
   color: white;
 }
+
 .addButton:hover {
   background-color: #09c935;
 }
@@ -72,7 +88,7 @@
   overflow-y: auto;
   background-color: #3b4353;
   border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .listItem {
@@ -81,63 +97,62 @@
   padding: 15px;
   border-bottom: 1px solid #777171;
   background-color: #3b4353;
+  color: #fff;
+  gap: 30px;
 }
+
 .listItem:last-child {
   border-bottom: none;
 }
 
 .itemInfo {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  flex-direction: column; 
+  align-items: center;
+  gap: 4px; 
   flex-grow: 1;
   max-width: 60%;
 }
-.itemInfo strong {
-  font-size: 1.1rem;
-  margin-bottom: 2px;
-}
+
+.itemInfo strong,
 .itemInfo span,
 .itemInfo small {
   font-size: 0.9rem;
-  color: #ffffff;
-}
-.itemInfo small {
-    color: #ffffff;
+  color: #fff;
+  white-space: nowrap;
+  position: relative; 
 }
 
 
-.itemActions {
-  display: flex;
-  gap: 8px;
-  flex-shrink: 0;
+/* Al último elemento no le ponemos línea */
+.itemInfo small::after {
+  content: none;
 }
 
 .editButton {
-  background-color: #ffc107;
+  background-color: #e7eb02;
   color: #333;
+
 }
+
 .editButton:hover {
-  background-color: #e0a800;
+  background-color: #bebdbd;
 }
 
 .deleteButton {
-  background-color: #dc3545;
+  background-color: #cc404e;
   color: white;
   margin-left: 10px;
 }
-.viewButton {
-  background-color: #dc3545;
-  color: white;
-}
+
 .deleteButton:hover {
   background-color: #c82333;
 }
 
 .noResults {
-    text-align: center;
-    padding: 20px;
-    color: #ffffff;
+  text-align: center;
+  padding: 20px;
+  color: #ffffff;
 }
 
 .modalOverlay {
@@ -146,7 +161,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -154,12 +169,12 @@
 }
 
 .modalContent {
-  background-color: white;
+  background-color: rgb(43, 43, 43);
   padding: 25px;
   border-radius: 8px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   width: 100%;
-  max-width: 500px;
+  max-width: 400px;
 }
 
 .modalContent h2 {
@@ -171,11 +186,13 @@
 .formGroup {
   margin-bottom: 15px;
 }
+
 .formGroup label {
   display: block;
   margin-bottom: 5px;
   font-weight: bold;
 }
+
 .formGroup input[type="text"],
 .formGroup input[type="email"],
 .formGroup input[type="tel"],
@@ -187,6 +204,7 @@
   box-sizing: border-box;
   font-size: 1rem;
 }
+
 .formGroup textarea {
   min-height: 80px;
   resize: vertical;
@@ -208,6 +226,7 @@
   background-color: #007bff;
   color: white;
 }
+
 .saveButton:hover {
   background-color: #0056b3;
 }
@@ -216,41 +235,36 @@
   background-color: #6c757d;
   color: white;
 }
+
 .cancelButton:hover {
   background-color: #545b62;
 }
 
 .categoryTabs {
   display: flex;
-  flex-wrap: nowrap; 
+  flex-wrap: nowrap;
   overflow-x: auto;
   padding-bottom: 15px;
-  margin-bottom: 20px;
-  border-bottom: 1px solid #e0e0e0;
   scrollbar-width: thin;
   scrollbar-color: #a0a0a0 #f0f0f0;
 }
 
 .categoryTab {
-  flex-shrink: 0; 
+  flex-shrink: 0;
   padding: 8px 16px;
   margin-right: 10px;
-  border: 1px solid #ccc;
-  border-radius: 20px;
   background-color: #f9f9f9;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   white-space: nowrap;
 }
 
-.categoryTab:hover {
-  background-color: #e0e0e0;
-  border-color: #a0a0a0;
+.categoryTab:focus {
+  outline: none;
 }
 
 .activeTab {
-  background-color: #007bff;
+  background-color: #533ea1;
   color: white;
-  border-color: #007bff;
   font-weight: bold;
 }

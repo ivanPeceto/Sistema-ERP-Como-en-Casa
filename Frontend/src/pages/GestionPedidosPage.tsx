@@ -17,8 +17,8 @@ import type { ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import styles from '../styles/gestionPedidosPage.module.css';
 import modalStyles from '../styles/modalStyles.module.css';
-import CrearPedidoModal from '../components/modals/CrearPedidoModal'; 
-import EditarPedidoModal from '../components/modals/EditarPedidoModal'; 
+import CrearPedidoModal from '../components/modals/CrearPedidoModal/CrearPedidoModal.tsx'; 
+import EditarPedidoModal from '../components/modals/CrearPedidoModal/EditarPedidoModal.tsx'; 
 
 import { getPedidosByDate, editarPedido, deletePedido, printPedido } from '../services/pedido_service';
 import { getProductos } from '../services/product_service';

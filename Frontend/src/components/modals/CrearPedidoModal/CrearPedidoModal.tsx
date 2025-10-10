@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'; 
 import type { ChangeEvent } from 'react';
 import styles from './CrearPedidoModal.module.css';
-import modalStyles from '../../styles/modalStyles.module.css'; 
+import modalStyles from '../../../styles/modalStyles.module.css'; 
 
-import { createPedido, getPedidosByDate } from '../../services/pedido_service';
-import type { Producto, PedidoItem, PedidoInput, PedidoEstado } from '../../types/models.d.ts';
+import { createPedido, getPedidosByDate } from '../../../services/pedido_service';
+import type { Producto, PedidoItem, PedidoInput } from '../../../types/models.d.ts';
 
 interface CrearPedidoModalProps {
   isOpen: boolean; 
