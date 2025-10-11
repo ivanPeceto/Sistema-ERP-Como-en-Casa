@@ -1,6 +1,8 @@
+#/backend/service_pedidos/orders/settings.py
 from pathlib import Path
 from datetime import timedelta
 from decouple import config 
+import sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,6 +32,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'apps.pedidos',
     'apps.pedidosProductos',
+    'apps.cobros',
+    'apps.metodos',
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
@@ -130,6 +134,7 @@ USE_TZ = True
 USE_I18N = True
 
 
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
@@ -151,3 +156,4 @@ CHANNEL_LAYERS = {
         },
     },
 }
+

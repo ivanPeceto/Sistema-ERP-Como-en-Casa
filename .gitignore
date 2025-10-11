@@ -241,8 +241,8 @@ dist-ssr/ # Para builds de Server-Side Rendering si se utiliza
 # Archivos de caché generados por diversas herramientas de desarrollo.
 
 # Caché de Vite
-.vite/ # A veces Vite genera una caché aquí dentro de node_modules, pero por si acaso.
-       # La caché principal de Vite suele estar en node_modules/.vite, ya cubierta por 'node_modules/'
+.vite/ 
+
 
 # Caché de TypeScript
 *.tsbuildinfo

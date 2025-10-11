@@ -10,6 +10,7 @@ from datetime import datetime, time
 from django.utils import timezone
 import requests
 from decouple import config 
+from channels.layers import get_channel_layer
 from utils.channels_helper import send_channel_message
 
 class PedidoListView(ListAPIView):
@@ -44,14 +45,11 @@ class PedidoListView(ListAPIView):
             return Pedido.objects.none()
 
         try:
-            fecha_obj = datetime.strptime(fecha, "%Y-%m-%d").date()
-            start_of_day = timezone.make_aware(datetime.combine(fecha_obj, time.min))
-            end_of_day = timezone.make_aware(datetime.combine(fecha_obj, time.max))
-            queryset = Pedido.objects.filter(fecha_pedido__range=(start_of_day, end_of_day))
-
-        except ValueError: 
+            fecha_sanitized = datetime.strptime(fecha, "%Y-%m-%d").date()
+        except:
             return Pedido.objects.none()
         
+        queryset = Pedido.objects.filter(fecha_pedido=fecha_sanitized)
         if numero_pedido:
             queryset = queryset.filter(numero_pedido=numero_pedido)     
         return queryset
