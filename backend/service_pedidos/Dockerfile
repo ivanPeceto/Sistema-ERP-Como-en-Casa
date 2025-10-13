@@ -18,10 +18,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install channels
 RUN pip install channels_redis
 
-# Instala una herramienta para hacer peticiones HTTP
 RUN apt-get update && apt-get install -y curl
 
-# Define el Health Check
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=5 \
   CMD curl -f http://localhost:8004/healthcheck/ || exit 1
 

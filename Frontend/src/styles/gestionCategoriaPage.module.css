@@ -1,0 +1,270 @@
+/**
+ * @archivo: gestionCategoriaPage.module.css
+ * @descripcion: Estilos para la página de gestión de categoria. Incluye la estructura
+ * de la página, barra de herramientas, listado de categorias, y el modal para
+ * agregar o editar categoria.
+ **/
+
+/* --- Estilos de Contenedor de Página --- */
+
+.pageContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  flex-grow: 1;
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: #272f3f;
+}
+
+.pageContainer h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #ffffff;
+}
+
+/* --- Estilos de la Barra de Herramientas (Toolbar) --- */
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.searchBarContainer {
+  display: flex;
+  flex-grow: 1;
+  min-width: 250px;
+  max-width: 48%; 
+}
+
+.searchInput {
+  color: #ffffff;
+  width: 100%;
+  max-width: 300px;
+  padding: 10px 15px;
+  margin-right: 1rem;
+  border: 1.75px solid #807575;
+  background-color: #303644;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.addButton,
+.editButton,
+.viewButton,
+.deleteButton,
+.saveButton,
+.cancelButton {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.viewButton {
+  background-color: #d4d7ff;
+  color: rgb(61, 61, 61);
+  margin-right: 10px;
+}
+
+.addButton {
+  background-color: #1c7e40;
+  color: white;
+}
+
+.addButton:hover {
+  background-color: #09c935;
+}
+
+.listContainer {
+  flex-grow: 1;
+  overflow-y: auto;
+  background-color: #3b4353;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.listItem {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #777171;
+  background-color: #3b4353;
+  color: #fff;
+  gap: 30px;
+}
+
+.listItem:last-child {
+  border-bottom: none;
+}
+
+.itemInfo {
+  display: flex;
+  flex-direction: column; 
+  align-items: center;
+  gap: 4px; 
+  flex-grow: 1;
+  max-width: 60%;
+}
+
+.itemInfo strong,
+.itemInfo span,
+.itemInfo small {
+  font-size: 0.9rem;
+  color: #fff;
+  white-space: nowrap;
+  position: relative; 
+}
+
+
+/* Al último elemento no le ponemos línea */
+.itemInfo small::after {
+  content: none;
+}
+
+.editButton {
+  background-color: #e7eb02;
+  color: #333;
+
+}
+
+.editButton:hover {
+  background-color: #bebdbd;
+}
+
+.deleteButton {
+  background-color: #cc404e;
+  color: white;
+  margin-left: 10px;
+}
+
+.deleteButton:hover {
+  background-color: #c82333;
+}
+
+.noResults {
+  text-align: center;
+  padding: 20px;
+  color: #ffffff;
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background-color: rgb(43, 43, 43);
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 400px;
+}
+
+.modalContent h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.formGroup {
+  margin-bottom: 15px;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.formGroup input[type="text"],
+.formGroup input[type="email"],
+.formGroup input[type="tel"],
+.formGroup textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 1rem;
+}
+
+.formGroup textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.toolbarButtons {
+  display: flex;
+  gap: 10px;
+}
+
+.modalActions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.saveButton {
+  background-color: #007bff;
+  color: white;
+}
+
+.saveButton:hover {
+  background-color: #0056b3;
+}
+
+.cancelButton {
+  background-color: #6c757d;
+  color: white;
+}
+
+.cancelButton:hover {
+  background-color: #545b62;
+}
+
+.categoryTabs {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 15px;
+  scrollbar-width: thin;
+  scrollbar-color: #a0a0a0 #f0f0f0;
+}
+
+.categoryTab {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  margin-right: 10px;
+  background-color: #f9f9f9;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  white-space: nowrap;
+}
+
+.categoryTab:focus {
+  outline: none;
+}
+
+.activeTab {
+  background-color: #533ea1;
+  color: white;
+  font-weight: bold;
+}

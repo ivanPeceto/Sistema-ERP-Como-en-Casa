@@ -1,19 +1,18 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'; 
 import type { ChangeEvent } from 'react';
 import styles from './CrearPedidoModal.module.css';
-import modalStyles from '../../styles/modalStyles.module.css'; 
+import modalStyles from '../../../styles/modalStyles.module.css'; 
 
-import { createPedido, getPedidosByDate } from '../../services/pedido_service';
-import type { Producto, PedidoItem, PedidoInput, PedidoEstado } from '../../types/models.d.ts';
+import { createPedido, getPedidosByDate } from '../../../services/pedido_service';
+import type { Producto, PedidoItem, PedidoInput } from '../../../types/models.d.ts';
 
 interface CrearPedidoModalProps {
   isOpen: boolean; 
   onClose: () => void; 
   productos: Producto[];
-  fetchInitialDataParent: () => void; 
 }
 
-const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, productos, fetchInitialDataParent }) => {
+const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, productos}) => {
   const [clienteInput, setClienteInput] = useState<string>(''); 
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<string>('');
   const [pedidoItems, setPedidoItems] = useState<PedidoItem[]>([]);
@@ -180,7 +179,9 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
     try {
       const today = new Date();
       const hoy = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+      console.log(hoy);
       const pedidosDeHoy = await getPedidosByDate(hoy);
+      console.log(pedidosDeHoy);
       const nuevoNumeroPedido: number =  (pedidosDeHoy.length === 0)? 1 : pedidosDeHoy[pedidosDeHoy.length-1].numero_pedido + 1;
 
       const pedidoData: PedidoInput = {
@@ -212,7 +213,6 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
       setClienteInput('');
       setParaHora(''); 
       onClose(); 
-      fetchInitialDataParent(); 
     } catch (err) {
       console.error("Error al confirmar el pedido:", err);
       setError('Error al confirmar el pedido. Intente de nuevo más tarde.');

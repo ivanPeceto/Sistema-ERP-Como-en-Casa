@@ -2,9 +2,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { ChangeEvent } from 'react';
 import styles from './CrearPedidoModal.module.css'; // Usamos los mismos estilos base
-import modalStyles from '../../styles/modalStyles.module.css';
-import { editarPedido } from '../../services/pedido_service';
-import type { Producto, Pedido, PedidoInput, PedidoItem } from '../../types/models.d.ts';
+import modalStyles from '../../../styles/modalStyles.module.css';
+import { editarPedido } from '../../../services/pedido_service.ts';
+import type { Producto, Pedido, PedidoInput, PedidoItem } from '../../../types/models.ts';
 
 // Define las props que el modal va a recibir
 interface EditarPedidoModalProps {

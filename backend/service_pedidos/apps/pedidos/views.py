@@ -10,6 +10,7 @@ from datetime import datetime, time
 from django.utils import timezone
 import requests
 from decouple import config 
+from channels.layers import get_channel_layer
 from utils.channels_helper import send_channel_message
 
 class PedidoListView(ListAPIView):
@@ -38,20 +39,20 @@ class PedidoListView(ListAPIView):
         @return: Un queryset de objetos Pedido filtrados, o un queryset vacío.
         """
         fecha = self.request.query_params.get('fecha')
-        numero_pedido = self.request.query_params.get('numero_pedido')
+        numero_pedido = self.request.query_params.get('numero')
 
-        if not fecha:
-            return Pedido.objects.none()
-
+        if not fecha and not numero_pedido:
+            return Response({'detail':'Falta proporcionar fecha o número de pedido.'}, status=status.HTTP_400_BAD_REQUEST)
+        
         try:
             fecha_obj = datetime.strptime(fecha, "%Y-%m-%d").date()
             start_of_day = timezone.make_aware(datetime.combine(fecha_obj, time.min))
             end_of_day = timezone.make_aware(datetime.combine(fecha_obj, time.max))
-            queryset = Pedido.objects.filter(fecha_pedido__range=(start_of_day, end_of_day))
-
-        except ValueError: 
+        except:
             return Pedido.objects.none()
         
+        queryset = Pedido.objects.filter(fecha_pedido__range=(start_of_day, end_of_day))
+
         if numero_pedido:
             queryset = queryset.filter(numero_pedido=numero_pedido)     
         return queryset
