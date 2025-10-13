@@ -177,8 +177,7 @@ const GestionPedidosPage: React.FC = () => {
 
   const closeCreateModal = useCallback(() => {
     setIsCreateModalOpen(false);
-    fetchInitialData();
-  }, [fetchInitialData]);
+  }, []);
 
   /** @brief Filtra los pedidos por texto después de haber sido filtrados por fecha. */
   const filteredPedidos = useMemo(() => {
@@ -700,10 +699,9 @@ const GestionPedidosPage: React.FC = () => {
       <CrearPedidoModal 
         isOpen={isCreateModalOpen} 
         onClose={closeCreateModal} 
-        // Pasa las props necesarias, por ejemplo:
         productos={productos}
-        // clientes={clientes} // Si decides mantener la lista de clientes en el padre
-        // onPedidoCreated={handlePedidoCreated} // Una función si necesitas hacer algo específico cuando el modal cree un pedido
+        // clientes={clientes} 
+        // onPedidoCreated={handlePedidoCreated}
       />
 
       {isModalOpen && viewingPedido && (
