@@ -1,19 +1,19 @@
-# [ fix/merge/cobros-ui ] - 2025-10-13
+## [ fix/merge/cobros-ui ] - 2025-10-13
 
-## Observations
+### Observations
 * Al intentar crear un cobro el cliente llama a la url `api/cobros/crear/` pero esta no está registrada en el reverse proxy por lo que el propio cliente responde con 404.
 
-## Implements
+### Implements
 * Implementa funcionalmente el modal de cobros.
 
-## Refactors
+### Refactors
 * Cambia funcionalidad del botón "Ver" en la card de pedido para deplegar el modal de cobros.
 
-## Improvements
+### Improvements
 * Elimina comentarios innecesarios y bloques comentados por desuso. 
 * Agrupa endpoints según el módulo específico al que respondan para facilitar la lectura del código.
 
-## Affects
+### Affects
 * `GestionPedidosPage.tsx`
 * `GestionCobrosModal.tsx`
 * `GestionMetodosCobroView.tsx`
