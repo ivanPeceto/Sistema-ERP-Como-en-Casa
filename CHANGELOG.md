@@ -30,6 +30,7 @@
 * Refactorizada la búsqueda de pedidos por fecha en `PedidoListView` para ser consistente con los otros métodos. Corrige el bug (2).
 * Divide los `url.py` del backend de pedidos y productos en submódulos para agruparlos evitando repetir patrones como _"api/pedidos/cobros/"_ en cáda endpoint.
 * Añade prefijo `api/pedidos` a los endpoint de cobros y metodos de cobro para poder ser reconocidos por el reverse proxy.
+* Corrige los endpoints en los servicios de cobro y metodos de cobro del frontend.
 
 ### Affects
 * `GestionPedidosPage.tsx`
@@ -37,3 +38,5 @@
 * `apps/pedidos/views.py`
 * `cobro_service.tsx`
 * Archivos `urls.py` en microservicio de pedidos y productos.
+* `cobro_service.ts`
+* `metodo_service.ts`
