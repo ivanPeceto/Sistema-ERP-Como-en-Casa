@@ -9,10 +9,10 @@ urlpatterns = [
     path('api/pedidos/', include('apps.pedidos.urls')),
 
     #Rutas de Cobros
-    path('api/pedidos/cobros', include('apps.cobros.urls'))
+    path('api/pedidos/cobros', include('apps.cobros.urls')),
 
     #Rutas de Métodos de Cobros
-    path('api/pedidos/cobros/metodos', include('apps.metodos.urls'))
+    path('api/pedidos/cobros/metodos', include('apps.metodos.urls')),
 ]
 
 
