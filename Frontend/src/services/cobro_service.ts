@@ -11,7 +11,6 @@ const cobroAPIClient = createAuthApiClient(PEDIDOS_API_BASE_URL);
  * @returns {Promise<Cobro[]>} Lista de cobros.
  */
 export const getCobrosByPedido = async (idPedido: number): Promise<Cobro[]> => {
-  // Nota: Se asume que el endpoint /api/cobros/listar/ está configurado en el backend para filtrar por 'id_pedido'.
   const response = await cobroAPIClient.get<Cobro[]>(`/api/cobros/listar/?id_pedido=${idPedido}`);
   return response.data;
 };

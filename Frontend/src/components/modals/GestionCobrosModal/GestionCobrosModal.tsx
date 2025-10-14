@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import formStyles from '../../styles/formStyles.module.css';
+import formStyles from '../../../styles/formStyles.module.css';
 import styles from './GestionCobrosModal.module.css';
 import { getCobrosByPedido, deleteCobro } from '../../../services/cobro_service';
 import { getMetodosCobro } from '../../../services/metodo_cobro_service';
 import { type Pedido, type Cobro, type MetodoCobro } from '../../../types/models';
 import CrearEditarCobroModal from '../CrearEditarCobroModal/CrearEditarCobroModal';
-import GestionMetodosCobroView from '../GestionMetodosCobroView'; 
+import GestionMetodosCobroView from './GestionMetodosCobroView'; 
 
 interface GestionCobrosModalProps {
   isOpen: boolean;
