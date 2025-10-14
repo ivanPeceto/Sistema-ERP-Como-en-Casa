@@ -28,7 +28,7 @@
 ### Changed
 * Removido `fetchInitialDataParent` como prop en el  modal de creación de pedidos debido a que junto  al websocket produce un doble llamado a la bdd. Este cambio corrige el bug (1).
 * Refactorizada la búsqueda de pedidos por fecha en `PedidoListView` para ser consistente con los otros métodos. Corrige el bug (2).
-* Divide los `url.py` del backend en submódulos para agruparlos evitando repetir patrones como _"api/pedidos/cobros/"_ en cáda endpoint.
+* Divide los `url.py` del backend de pedidos y productos en submódulos para agruparlos evitando repetir patrones como _"api/pedidos/cobros/"_ en cáda endpoint.
 * Añade prefijo `api/pedidos` a los endpoint de cobros y metodos de cobro para poder ser reconocidos por el reverse proxy.
 
 ### Affects
@@ -36,4 +36,4 @@
 * `CrearPedidoModal.tsx`
 * `apps/pedidos/views.py`
 * `cobro_service.tsx`
-* ``
+* Archivos `urls.py` en microservicio de pedidos y productos.
