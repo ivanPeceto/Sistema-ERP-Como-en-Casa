@@ -11,30 +11,30 @@ const cobroAPIClient = createAuthApiClient(PEDIDOS_API_BASE_URL);
  * @returns {Promise<Cobro[]>} Lista de cobros.
  */
 export const getCobrosByPedido = async (idPedido: number): Promise<Cobro[]> => {
-  const response = await cobroAPIClient.get<Cobro[]>(`/api/cobros/listar/?id_pedido=${idPedido}`);
+  const response = await cobroAPIClient.get<Cobro[]>(`/api/pedidos/cobros/listar/?id_pedido=${idPedido}`);
   return response.data;
 };
 
 /**
- * @brief Crea un nuevo cobro (POST a /api/cobros/crear/).
+ * @brief Crea un nuevo cobro (POST a /api/pedidos/cobros/crear/).
  */
 export const createCobro = async (cobroData: CobroInput): Promise<Cobro> => {
-  const response = await cobroAPIClient.post<Cobro>('/api/cobros/crear/', cobroData);
+  const response = await cobroAPIClient.post<Cobro>('/api/pedidos/cobros/crear/', cobroData);
   return response.data;
 };
 
 /**
- * @brief Actualiza un cobro existente (PUT a /api/cobros/editar/?id=...).
+ * @brief Actualiza un cobro existente (PUT a /api/pedidos/cobros/editar/?id=...).
  */
 export const updateCobro = async (id: number, cobroData: CobroInput): Promise<any> => {
-  const response = await cobroAPIClient.put(`/api/cobros/editar/?id=${id}`, cobroData);
+  const response = await cobroAPIClient.put(`/api/pedidos/cobros/editar/?id=${id}`, cobroData);
   return response.data;
 };
 
 /**
- * @brief Elimina un cobro existente (DELETE a /api/cobros/eliminar/?id=...).
+ * @brief Elimina un cobro existente (DELETE a /api/pedidos/cobros/eliminar/?id=...).
  */
 export const deleteCobro = async (id: number): Promise<any> => {
-  const response = await cobroAPIClient.delete(`/api/cobros/eliminar/?id=${id}`);
+  const response = await cobroAPIClient.delete(`/api/pedidos/cobros/eliminar/?id=${id}`);
   return response.data;
 };
