@@ -11,6 +11,9 @@
 
 ## Affects
 * `GestionPedidosPage.tsx`
+* `GestionCobrosModal.tsx`
+* `GestionMetodosCobroView.tsx`
+* `CrearEditarCobroModal.tsx`
 
 ## [ merge/feature/modales ] - 2025-10-11
 
