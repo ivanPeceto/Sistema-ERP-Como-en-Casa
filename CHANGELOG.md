@@ -3,12 +3,19 @@
 
 ### Observations
 * Al apretar el botón de cerrar en el modal de cobros, no se cierra.
+* Hay inconsistencias entre el frontend de cobros y el backend. Se calcula a mano el monto restante y el total abonado cuando esta información ya es devuelta por el backend.
 
 ### Changed
 * El callback `closeCobrosModal` en `GestionPedidosPage.tsx` afectaba al estado equivocado. Se corrigió para que afecte a `setIsCobrosModalOpen`.
 
+### Refactored
+* Ahora en `GestionCobroModal.tsx` se hace provecho de la información del backend para calcular `montoRestante` y `totalAbonado` en vez de calcularlos a mano.
+* Ajusta el tipo `Cobro` en `types/models.ts`
+
 ### Affects
 * `GestionPedidosPage.tsx`
+* `GestionCobrosModal.tsx`
+* `models.ts`
 
 ###
 

@@ -89,11 +89,8 @@ const GestionCobrosModal: React.FC<GestionCobrosModalProps> = ({ isOpen, onClose
 
   if (!isOpen || !pedido) return null;
 
-  const totalAbonado: number = Array.isArray(cobros) 
-    ? cobros.reduce((sum, c) => sum + c.monto, 0) 
-    : 0;
-  
-  const montoRestante = pedido.total - totalAbonado;
+  const montoRestante = cobros.length > 0 ? cobros[0].monto_restante : pedido.total;
+  const totalAbonado = pedido.total - montoRestante;
 
   const renderCobrosList = () => (
     <>
