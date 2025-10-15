@@ -117,7 +117,7 @@ const GestionPedidosPage: React.FC = () => {
   }, []);
 
   const closeCobrosModal = useCallback(() => {
-    setIsCreateModalOpen(false);
+    setIsCobrosModalOpen(false);
   }, []);
 
   const openCreateModal = useCallback(() => {

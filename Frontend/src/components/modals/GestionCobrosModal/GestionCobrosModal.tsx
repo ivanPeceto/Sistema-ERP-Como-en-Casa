@@ -89,7 +89,7 @@ const GestionCobrosModal: React.FC<GestionCobrosModalProps> = ({ isOpen, onClose
 
   if (!isOpen || !pedido) return null;
 
-  const totalAbonado = Array.isArray(cobros) 
+  const totalAbonado: number = Array.isArray(cobros) 
     ? cobros.reduce((sum, c) => sum + c.monto, 0) 
     : 0;
   
@@ -98,10 +98,10 @@ const GestionCobrosModal: React.FC<GestionCobrosModalProps> = ({ isOpen, onClose
   const renderCobrosList = () => (
     <>
       <div className={styles.cobrosResumen}>
-        <span><strong>Total:</strong> ${pedido.total.toFixed(2)}</span>
-        <span><strong>Abonado:</strong> ${totalAbonado.toFixed(2)}</span>
+        <span><strong>Total:</strong> ${pedido.total}</span>
+        <span><strong>Abonado:</strong> ${totalAbonado}</span>
         <span style={{color: montoRestante <= 0 ? '#1c7e40' : '#cc404e'}}>
-          <strong>Restante:</strong> ${montoRestante.toFixed(2)}
+          <strong>Restante:</strong> ${montoRestante}
         </span>
       </div>
 
@@ -111,7 +111,7 @@ const GestionCobrosModal: React.FC<GestionCobrosModalProps> = ({ isOpen, onClose
           {Array.isArray(cobros) && cobros.length > 0 ? (
             cobros.map(cobro => (
               <div key={cobro.id} className={styles.cobroItem}>
-                <span>Monto: ${cobro.monto.toFixed(2)}</span>
+                <span>Monto: ${cobro.monto}</span>
                 <small>Método: {metodosCobro.find(m => m.id === cobro.id_metodo_cobro)?.nombre || 'Desconocido'}</small>
                 <div className={styles.itemActions}>
                   <button onClick={() => handleEdit(cobro)} className={formStyles.editButton}>Editar</button>

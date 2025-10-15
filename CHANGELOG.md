@@ -1,3 +1,17 @@
+
+## [ fix/front/cobros-modal ] - 2025-10-15
+
+### Observations
+* Al apretar el botón de cerrar en el modal de cobros, no se cierra.
+
+### Changed
+* El callback `closeCobrosModal` en `GestionPedidosPage.tsx` afectaba al estado equivocado. Se corrigió para que afecte a `setIsCobrosModalOpen`.
+
+### Affects
+* `GestionPedidosPage.tsx`
+
+###
+
 ## [ fix/merge/cobros-ui ] - 2025-10-13
 
 ### Observations
