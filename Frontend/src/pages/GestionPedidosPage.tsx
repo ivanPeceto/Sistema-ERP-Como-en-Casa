@@ -19,6 +19,7 @@ import styles from '../styles/gestionPedidosPage.module.css';
 import modalStyles from '../styles/modalStyles.module.css';
 import CrearPedidoModal from '../components/modals/CrearPedidoModal/CrearPedidoModal.tsx'; 
 import EditarPedidoModal from '../components/modals/CrearPedidoModal/EditarPedidoModal.tsx'; 
+import GestionCobrosModal from '../components/modals/GestionCobrosModal/GestionCobrosModal.tsx';
 
 import { getPedidosByDate, editarPedido, deletePedido, printPedido } from '../services/pedido_service';
 import { getProductos } from '../services/product_service';
@@ -50,14 +51,6 @@ import { usePedidosSocket } from '../hooks/usePedidosSocket';
  */
 const GestionPedidosPage: React.FC = () => {
   const navigate = useNavigate(); 
-
-  // Nuevo estado para controlar la visibilidad del modal de creación de pedido
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
-
-  // Funciones para abrir y cerrar el nuevo modal
-  const openCreateModal = useCallback(() => {
-    setIsCreateModalOpen(true);
-  }, []);
 
   // Estados principales
   /** @brief Lista completa de pedidos */
@@ -108,6 +101,32 @@ const GestionPedidosPage: React.FC = () => {
   /** @brief Almacena el total de ventas calculado para el día */
   const [totalVentasDia, setTotalVentasDia] = useState<number>(0);
 
+  /** @brief Controla la visibilidad del modal de creación de pedido */
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
+
+  /** @brief Controla la visibilidad del modal de cobros*/
+  const [isCobrosModalOpen, setIsCobrosModalOpen] = useState<boolean>(false);
+
+  /** @brief Almacena el pedido asociado al cobro */
+  const [pedidoCobrar, setPedidoCobrar] = useState<Pedido | null>(null);
+  
+
+  const openCobrosModal = useCallback((pedido: Pedido) => {
+    setPedidoCobrar(pedido)
+    setIsCobrosModalOpen(true);
+  }, []);
+
+  const closeCobrosModal = useCallback(() => {
+    setIsCreateModalOpen(false);
+  }, []);
+
+  const openCreateModal = useCallback(() => {
+    setIsCreateModalOpen(true);
+  }, []);
+
+  const closeCreateModal = useCallback(() => {
+    setIsCreateModalOpen(false);
+  }, []);
 
   const handleSocketMessage = useCallback((data: SocketMessage) => {
       if (data.source === 'pedidos') {
@@ -175,9 +194,6 @@ const GestionPedidosPage: React.FC = () => {
     fetchInitialData();
   }, [fetchInitialData]);
 
-  const closeCreateModal = useCallback(() => {
-    setIsCreateModalOpen(false);
-  }, []);
 
   /** @brief Filtra los pedidos por texto después de haber sido filtrados por fecha. */
   const filteredPedidos = useMemo(() => {
@@ -576,12 +592,12 @@ const GestionPedidosPage: React.FC = () => {
 
               <div className={styles.pedidoAcciones}>
                 <button
-                  onClick={() => openViewModal(pedido)}
+                  onClick={() => openCobrosModal(pedido)}
                   className={styles.actionButton}
-                  title="Ver detalles"
+                  title="Crear cobro"
                 >
                   <i className="fas fa-eye"></i>
-                  <span>Ver</span>
+                  <span>Cobro</span>
                 </button>
                 <button
                   onClick={() => openEditModal(pedido)}
@@ -601,6 +617,7 @@ const GestionPedidosPage: React.FC = () => {
                 </button>
               </div>
             </div>
+            
           ))}
         </div>
       ) : (
@@ -638,26 +655,15 @@ const GestionPedidosPage: React.FC = () => {
         </div>
           <button
           onClick={handleCalcularTotalVentas}
-          className={`${styles.newOrderButton}`} // Puedes crear un estilo nuevo o reutilizar uno existente
+          className={`${styles.newOrderButton}`}
           title="Calcular total de ventas del día"
           >
           <i className="fas fa-calculator" style={{ marginRight: '8px' }}></i>
           Calcular Ventas
         </button>
-        {/* Botón "Armar Pedido" 
-        <button
-          onClick={() => navigate('/gestion')} 
-          className={styles.newOrderButton} 
-        >*/}
       </div>
 
       <div className={styles.tabsContainer}>
-      {/**<button
-          className={`${styles.tabButton} ${activeTab === 'todos' ? styles.activeTab : ''}`}
-          onClick={() => setActiveTab('todos')}
-        >
-          Todos ({filteredPedidos.length})
-        </button>*/}
         <button
           className={`${styles.tabButton} ${activeTab === 'PENDIENTE' ? styles.activeTab : ''}`}
           onClick={() => setActiveTab('PENDIENTE')}
@@ -702,6 +708,11 @@ const GestionPedidosPage: React.FC = () => {
         productos={productos}
         // clientes={clientes} 
         // onPedidoCreated={handlePedidoCreated}
+      />
+      <GestionCobrosModal
+        isOpen={isCobrosModalOpen}
+        onClose={closeCobrosModal}
+        pedido={pedidoCobrar}
       />
 
       {isModalOpen && viewingPedido && (

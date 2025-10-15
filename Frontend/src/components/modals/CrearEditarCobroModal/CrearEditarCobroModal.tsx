@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
-import formStyles from '../../styles/formStyles.module.css';
+import formStyles from '../../../styles/formStyles.module.css';
 import { createCobro, updateCobro } from '../../../services/cobro_service';
 import { type Cobro, type CobroInput, type MetodoCobro } from '../../../types/models';
 

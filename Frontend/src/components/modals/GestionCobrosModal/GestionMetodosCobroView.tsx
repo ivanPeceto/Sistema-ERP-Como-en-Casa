@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
-import formStyles from '../../styles/formStyles.module.css';
-import styles from '../modals/GestionCobrosModal.module.css'; 
-import { createMetodoCobro, updateMetodoCobro, deleteMetodoCobro, getMetodosCobro } from '../../services/metodo_cobro_service';
-import { type MetodoCobro } from '../../types/models';
+import formStyles from '../../../styles/formStyles.module.css';
+import styles from './GestionCobrosModal.module.css'; 
+import { createMetodoCobro, updateMetodoCobro, deleteMetodoCobro, getMetodosCobro } from '../../../services/metodo_cobro_service';
+import { type MetodoCobro } from '../../../types/models';
 
 interface GestionMetodosCobroViewProps {
     onBack: () => void; 
