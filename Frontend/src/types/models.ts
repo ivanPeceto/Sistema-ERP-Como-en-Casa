@@ -244,10 +244,10 @@ export interface Cobro {
     monto: number;
     moneda: string;
     id_metodo_cobro: number;
-    metodo_cobro: MetodoCobro; // Para la lectura, el backend devuelve el objeto completo
+    metodo_cobro: MetodoCobro; 
     descuento: number;
     recargo: number;
-    monto_restante?: number;
+    monto_restante: number;
     pagado_completo?: boolean;
 }
 
