@@ -1,3 +1,21 @@
+## [ refactor/back/cobros ] - 2025-10-16
+
+### Observations
+* El módulo de cobros contenía una sección de lógica que impedía crear cobros una vez alcanzado el monto a abonar del pedido. Esto por diversas razones es impráctico y poco flexible por lo que se refactorizó el `serializer.py`.
+
+### Changed
+* Se refactorizó la lógica en `serializer.py` del backend de cobros para ser más flexible.
+* Para acompañar estos cambios se refactorizaron los archivos relacionados en el frontend.
+
+### Added
+* Nuevo método `createFullPaymentCobro` en `cobro_service.ts`.
+
+### Affects
+* `service_pedidos/apps/cobros/serializer.py`
+* `service_pedidos/apps/cobros/models.py`
+* `models.ts`
+* `CrearEditarCobroModal.tsx`
+* `cobro_service.ts`
 
 ## [ fix/front/cobros-modal ] - 2025-10-15
 

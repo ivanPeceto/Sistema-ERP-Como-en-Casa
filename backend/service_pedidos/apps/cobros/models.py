@@ -27,6 +27,8 @@ class Cobro(models.Model):
     )
     descuento = models.DecimalField(max_digits=10, decimal_places=2, db_column='descuento', null=True, blank=True, default=0.00)
     recargo = models.DecimalField(max_digits=10, decimal_places=2, db_column='recargo', null=True, blank=True, default=0.00)
+    descuento_porcentual = models.DecimalField(max_digits=5, decimal_places=2, default=0, null=True, blank=True)
+    recargo_porcentual = models.DecimalField(max_digits=5, decimal_places=2, default=0, null=True, blank=True)
 
     class Meta:
         db_table = 'cobros'

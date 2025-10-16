@@ -59,55 +59,65 @@ from apps.pedidos.serializer import PedidoSerializer
 from django.db.models import Sum
 
 class CobroSerializer(serializers.ModelSerializer):
-    # Ahora se permite monto como campo de entrada opcional
     monto = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
+    descuento_porcentual = serializers.DecimalField(max_digits=5, decimal_places=2, required=False, write_only=True)
+    recargo_porcentual = serializers.DecimalField(max_digits=5, decimal_places=2, required=False, write_only=True)
 
     class Meta:
         model = Cobro
         fields = '__all__'
+        read_only_fields = ('descuento', 'recargo')
 
+    def _get_pedido_total(self, pedido):
+        """
+        Helper para obtener el total de un pedido.
+        """
+        pedido_serializer = PedidoSerializer(pedido)
+        return Decimal(pedido_serializer.data.get('total', 0))
+    
     def create(self, validated_data):
+        """
+        Crea una instancia de Cobro, aplicando la lógica de negocio para
+        descuentos, recargos y cálculo de montos.
+        """
         pedido = validated_data['pedido']
         pedido_serializer = PedidoSerializer(pedido)
         subtotal = Decimal(pedido_serializer.data.get('total', 0))
 
-        descuento = Decimal(validated_data.get('descuento', 0))
-        recargo = Decimal(validated_data.get('recargo', 0))
+        descuento_porcentual = validated_data.pop('descuento_porcentual', Decimal('0.0'))
+        recargo_porcentual = validated_data.pop('recargo_porcentual', Decimal('0.0'))
+        descuento_fijo = Decimal(validated_data.get('descuento', 0))
+        recargo_fijo = Decimal(validated_data.get('recargo', 0))
 
-        total_abonado = Cobro.objects.filter(pedido=pedido).aggregate(Sum('monto'))['monto__sum'] or Decimal("0.00")
-        monto_restante = subtotal - total_abonado
-
-        if monto_restante <= 0:
-            raise serializers.ValidationError({
-                'monto': 'El pedido ya fue pagado completamente.'
-            })
-
-        # Si el cliente especifica monto manual, se usa ese
+        descuento_calculado = descuento_fijo + (subtotal * (descuento_porcentual / 100))
+        recargo_calculado = recargo_fijo + (subtotal * (recargo_porcentual / 100))
+    
+        monto_final_del_pedido = subtotal - descuento_calculado + recargo_calculado
         monto_manual = validated_data.pop('monto', None)
 
         if monto_manual is not None:
             monto_a_pagar = Decimal(monto_manual)
         else:
-            monto_a_pagar = monto_restante + recargo - descuento
+            # Si no se especifica un monto, se asume que se paga el total restante
+            total_abonado_previo = Cobro.objects.filter(pedido=pedido).aggregate(Sum('monto'))['monto__sum'] or Decimal("0.00")
+            monto_restante = monto_final_del_pedido - total_abonado_previo
+            monto_a_pagar = monto_restante
 
         if monto_a_pagar <= 0:
             raise serializers.ValidationError({
                 'monto': 'El monto calculado debe ser mayor a cero.'
             })
 
-        if monto_a_pagar > monto_restante:
-            raise serializers.ValidationError({
-                'monto': f'El pago excede el total del pedido. Ya abonado: {total_abonado}, nuevo cobro: {monto_a_pagar}, subtotal: {subtotal}'
-            })
-
         cobro = Cobro.objects.create(
             **validated_data,
-            monto=round(monto_a_pagar, 2)
+            monto=round(monto_a_pagar, 2),
+            descuento=round(descuento_calculado, 2),
+            recargo=round(recargo_calculado, 2)
         )
 
-        if total_abonado + monto_a_pagar >= subtotal:
-            pedido.pagado = True
-            pedido.save()
+        total_abonado_actual = (Cobro.objects.filter(pedido=pedido).aggregate(Sum('monto'))['monto__sum'] or Decimal("0.00"))
+        pedido.pagado = total_abonado_actual >= subtotal
+        pedido.save()
 
         return cobro
 
@@ -124,7 +134,6 @@ class CobroSerializer(serializers.ModelSerializer):
 
         return rep
 
-    #valida si el nuevo monto editado hace que el total de cobros supere el subtotal del pedido
     def update(self, instance, validated_data):
         pedido = validated_data.get('pedido', instance.pedido)
         pedido_serializer = PedidoSerializer(pedido)

@@ -38,3 +38,17 @@ export const deleteCobro = async (id: number): Promise<any> => {
   const response = await cobroAPIClient.delete(`/api/pedidos/cobros/eliminar/?id=${id}`);
   return response.data;
 };
+
+/**
+ * @brief Crea un cobro para saldar el total de un pedido.
+ * @details Envía un cobro sin monto para que el backend calcule y aplique el pago total restante.
+ * Se debe especificar un método de cobro por defecto (ej. efectivo).
+ */
+export const createFullPaymentCobro = async (pedidoId: number, metodoCobroId: number): Promise<Cobro> => {
+    const cobroData: CobroInput = {
+        pedido: pedidoId,
+        id_metodo_cobro: metodoCobroId,
+    };
+    const response = await cobroAPIClient.post<Cobro>('/api/pedidos/cobros/crear/', cobroData);
+    return response.data;
+}
