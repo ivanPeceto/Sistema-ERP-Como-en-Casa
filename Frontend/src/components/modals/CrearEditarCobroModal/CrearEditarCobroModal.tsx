@@ -1,9 +1,17 @@
+/**
+ * @file CrearEditarCobroModal.tsx
+ * @brief Componente modal para registrar o modificar un cobro asociado a un pedido.
+ */
 import React, { useState, useEffect } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import formStyles from '../../../styles/formStyles.module.css';
 import { createCobro, updateCobro } from '../../../services/cobro_service';
 import { type Cobro, type CobroInput, type MetodoCobro } from '../../../types/models';
 
+/**
+ * @interface CrearEditarCobroModalProps
+ * @brief Propiedades para el componente CrearEditarCobroModal.
+ */
 interface CrearEditarCobroModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -13,6 +21,12 @@ interface CrearEditarCobroModalProps {
   metodosCobro: MetodoCobro[];
 }
 
+/**
+ * @class CrearEditarCobroModal
+ * @brief Componente funcional de React para la gestión de cobros.
+ * * @param {CrearEditarCobroModalProps} props Las propiedades del componente.
+ * @returns {React.ReactElement | null} El JSX del componente modal o `null` si no está abierto.
+ */
 const CrearEditarCobroModal: React.FC<CrearEditarCobroModalProps> = ({
   isOpen,
   onClose,
@@ -21,54 +35,88 @@ const CrearEditarCobroModal: React.FC<CrearEditarCobroModalProps> = ({
   editingCobro,
   metodosCobro,
 }) => {
-  const [formData, setFormData] = useState<CobroInput>({
+  /**
+   * @brief Genera el estado inicial para el formulario.
+   * @returns El objeto de estado inicial del formulario.
+   */
+  const getInitialFormData = () => ({
     pedido: pedidoId,
-    // Usamos chequeo opcional (?) aquí también, aunque la prop debe ser un array.
-    id_metodo_cobro: metodosCobro[0]?.id, 
-    monto: 0,
-    descuento: 0,
-    recargo: 0,
+    id_metodo_cobro: metodosCobro[0]?.id?.toString() || '',
+    monto: '',
+    descuento: '',
+    recargo: '',
   });
+  
+  /** @brief Estado para manejar los datos del formulario. Los valores se guardan como strings para permitir campos vacíos. */
+  const [formData, setFormData] = useState(getInitialFormData());
 
+  /**
+   * @brief Hook para inicializar o resetear el estado del formulario.
+   * @details
+   * - Se activa cuando el modal se abre (`isOpen`) o cuando cambia el cobro a editar.
+   * - Si hay un `editingCobro`, puebla el formulario con sus datos.
+   * - Si no, resetea el formulario a su estado inicial vacío.
+   */
   useEffect(() => {
-    if (editingCobro) {
-      setFormData({
-        pedido: editingCobro.pedido,
-        id_metodo_cobro: editingCobro.id_metodo_cobro,
-        monto: +editingCobro.monto,
-        descuento: +editingCobro.descuento,
-        recargo: +editingCobro.recargo,
-      });
-    } else {
-      setFormData({
-        pedido: pedidoId,
-        // Usamos chequeo opcional en el inicio del formulario
-        id_metodo_cobro: metodosCobro[0]?.id, 
-        monto: 0,
-        descuento: 0,
-        recargo: 0,
-      });
+    if (isOpen) {
+        if (editingCobro) {
+          setFormData({
+            pedido: editingCobro.pedido,
+            id_metodo_cobro: editingCobro.id_metodo_cobro.toString(),
+            monto: editingCobro.monto.toString(),
+            descuento: editingCobro.descuento?.toString() || '',
+            recargo: editingCobro.recargo?.toString() || '',
+          });
+        } else {
+          setFormData(getInitialFormData());
+        }
     }
-  }, [editingCobro, pedidoId, metodosCobro]);
+  }, [isOpen, editingCobro, pedidoId, metodosCobro]);
 
+  /**
+   * @brief Maneja los cambios en los inputs del formulario.
+   * @param {ChangeEvent<HTMLInputElement | HTMLSelectElement>} e El evento de cambio del input.
+   * @details
+   * Actualiza el estado `formData` con el nuevo valor del campo modificado.
+   * El valor se mantiene como `string` para una mejor experiencia de usuario.
+   */
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
-    if (type === 'number') {
-      setFormData(prev => ({ ...prev, [name]: parseFloat(value) || 0 }));
-    } else if (name === 'id_metodo_cobro') {
-      setFormData(prev => ({ ...prev, [name]: parseInt(value) }));
-    } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
-    }
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
-
+  
+  /**
+   * @brief Gestiona el envío del formulario.
+   * @param {FormEvent<HTMLFormElement>} e El evento de envío del formulario.
+   * @details
+   * 1. Previene el comportamiento por defecto del formulario parseando los strings a number.
+   * 2. Valida que el monto sea un número válido y mayor a cero.
+   * 3. Convierte los datos del estado (strings) al formato numérico esperado por la API (`CobroInput`).
+   * 4. Llama al servicio `updateCobro` o `createCobro` según si se está editando o creando.
+   * 5. En caso de éxito, refresca los datos en el padre y cierra el modal.
+   * 6. En caso de error, muestra una alerta con el mensaje del backend.
+   */
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
+    if (!formData.monto || parseFloat(formData.monto) <= 0) {
+      alert('El monto es requerido y debe ser mayor a cero.');
+      return;
+    }
+
+    const dataToSubmit: CobroInput = {
+      pedido: pedidoId,
+      id_metodo_cobro: parseInt(formData.id_metodo_cobro, 10),
+      monto: parseFloat(formData.monto),
+      descuento: parseFloat(formData.descuento) || 0,
+      recargo: parseFloat(formData.recargo) || 0,
+    };
+
     try {
       if (editingCobro) {
-        await updateCobro(editingCobro.id, formData);
+        await updateCobro(editingCobro.id, dataToSubmit);
       } else {
-        await createCobro(formData);
+        await createCobro(dataToSubmit);
       }
       fetchCobros();
       onClose();
@@ -94,9 +142,10 @@ const CrearEditarCobroModal: React.FC<CrearEditarCobroModalProps> = ({
                 <input
                   type="number"
                   name="monto"
-                  value={formData.monto}
+                  value={formData.monto} 
                   onChange={handleInputChange}
                   className={formStyles.formInput}
+                  placeholder="0.00" 
                   step="0.01"
                   required
                 />
@@ -105,12 +154,12 @@ const CrearEditarCobroModal: React.FC<CrearEditarCobroModalProps> = ({
                 <label className={formStyles.formLabel}>Método de Cobro</label>
                 <select
                   name="id_metodo_cobro"
-                  value={formData.id_metodo_cobro || ''}
+                  value={formData.id_metodo_cobro}
                   onChange={handleInputChange}
                   className={formStyles.formSelect}
                   required
                 >
-                  {/* FIX: Chequeo defensivo para evitar el error de .map() */}
+                  <option value="" disabled>Seleccione un método</option>
                   {Array.isArray(metodosCobro) && metodosCobro.map(metodo => (
                     <option key={metodo.id} value={metodo.id}>{metodo.nombre}</option>
                   ))}
@@ -121,9 +170,10 @@ const CrearEditarCobroModal: React.FC<CrearEditarCobroModalProps> = ({
                 <input
                   type="number"
                   name="descuento"
-                  value={formData.descuento || 0}
+                  value={formData.descuento}
                   onChange={handleInputChange}
                   className={formStyles.formInput}
+                  placeholder="0.00" 
                   step="0.01"
                 />
               </div>
@@ -132,9 +182,10 @@ const CrearEditarCobroModal: React.FC<CrearEditarCobroModalProps> = ({
                 <input
                   type="number"
                   name="recargo"
-                  value={formData.recargo || 0}
+                  value={formData.recargo}
                   onChange={handleInputChange}
                   className={formStyles.formInput}
+                  placeholder="0.00"
                   step="0.01"
                 />
               </div>
