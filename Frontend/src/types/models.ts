@@ -247,6 +247,8 @@ export interface Cobro {
     metodo_cobro: MetodoCobro; 
     descuento: number;
     recargo: number;
+    descuento_porcentual: number;
+    recargo_porcentual: number;
     monto_restante: number;
     pagado_completo?: boolean;
 }

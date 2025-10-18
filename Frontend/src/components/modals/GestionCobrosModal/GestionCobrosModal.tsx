@@ -87,10 +87,26 @@ const GestionCobrosModal: React.FC<GestionCobrosModalProps> = ({ isOpen, onClose
     }
   };
 
+  const montoRestanteHelper = (c_array: Cobro[], p: Pedido): number =>{
+    if(c_array.length > 0 && c_array[0].monto_restante !== undefined){
+      //Devuelve el monto restante ó 0 si es negativo.
+      const monto = Number(c_array[0].monto_restante);
+      if(monto >= 0){
+        return monto;
+      }else{
+        return 0;
+      }
+    }else{
+      return Number(p.total);
+    }
+  }
+
   if (!isOpen || !pedido) return null;
 
-  const montoRestante = cobros.length > 0 ? cobros[0].monto_restante : pedido.total;
-  const totalAbonado = pedido.total - montoRestante;
+  const montoRestante = montoRestanteHelper(cobros, pedido);
+  const totalAbonado: number = Array.isArray(cobros)
+    ? cobros.reduce((sum, cobro) => sum + Number(cobro.monto), 0)
+    : 0;
 
   const renderCobrosList = () => (
     <>
@@ -108,8 +124,8 @@ const GestionCobrosModal: React.FC<GestionCobrosModalProps> = ({ isOpen, onClose
           {Array.isArray(cobros) && cobros.length > 0 ? (
             cobros.map(cobro => (
               <div key={cobro.id} className={styles.cobroItem}>
-                <span>Monto: ${cobro.monto}</span>
-                <small>Método: {metodosCobro.find(m => m.id === cobro.id_metodo_cobro)?.nombre || 'Desconocido'}</small>
+                <span>${Number(cobro.monto)}</span>
+                <small>{metodosCobro.find(m => m.id === cobro.id_metodo_cobro)?.nombre || 'Desconocido'}</small>
                 <div className={styles.itemActions}>
                   <button onClick={() => handleEdit(cobro)} className={formStyles.editButton}>Editar</button>
                   <button onClick={() => handleDelete(cobro.id)} className={formStyles.deleteButton}>X</button>
@@ -186,6 +202,7 @@ const GestionCobrosModal: React.FC<GestionCobrosModalProps> = ({ isOpen, onClose
         pedidoId={pedido.id}
         editingCobro={editingCobro}
         metodosCobro={metodosCobro}
+        montoRestante={montoRestante}
       />
     </div>
   );
