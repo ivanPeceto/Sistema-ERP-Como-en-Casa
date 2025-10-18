@@ -247,6 +247,8 @@ export interface Cobro {
     metodo_cobro: MetodoCobro; 
     descuento: number;
     recargo: number;
+    descuento_porcentual: number;
+    recargo_porcentual: number;
     monto_restante: number;
     pagado_completo?: boolean;
 }
@@ -258,8 +260,10 @@ export interface Cobro {
 export interface CobroInput {
     pedido: number;
     id_metodo_cobro: number;
-    monto?: number; // Es opcional en el serializer
+    monto?: number; 
     moneda?: string;
     descuento?: number;
-    recargo?: number;
+    recargo?: number;   
+    descuento_porcentual?: number; 
+    recargo_porcentual?: number;   
 }
