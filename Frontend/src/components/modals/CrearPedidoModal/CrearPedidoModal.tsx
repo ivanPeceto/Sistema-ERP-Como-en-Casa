@@ -187,9 +187,6 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
       const pedidoData: PedidoInput = {
         numero_pedido: nuevoNumeroPedido,
         fecha_pedido: today.toISOString(),
-        //Deprecated
-        id_cliente: 1,
-        //
         cliente: clienteInput.trim(), 
         para_hora: paraHora || null,
         estado: 'PENDIENTE', 

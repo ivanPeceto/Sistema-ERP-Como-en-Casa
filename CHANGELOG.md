@@ -7,11 +7,16 @@ _(Cambios realizados por @ivanPeceto)_
 ### Refactors
 * Restaura lo ya existente en el contenedor de clientes comentado en `docker-compose.yml.template` y `nginx.conf.template`.
 * Añade directivas de migraciones al script de instalación `./start_server.sh`.
+* Elimina el campo `id_cliente` en `models.py` y `models.ts` de pedidos.
+* Adapta payloads para coincidir con la refactorización de id_cliente en `CrearPedidoModal.tsx` y `EditarPedidoModal.tsx`
 
 ### Affects
 * `docker-compose.yml.template`
 * `nginx.conf.template`
 * `./start_server.sh`
+* `/backend/service_pedidos/apps/pedidos/models.py`
+* `/Frontend/src/types/models.ts`
+* `CrearPedidoModal.tsx` y `EditarPedidoModal.tsx`
 
 ## [ refactor/back/cobros ] - 2025-10-17
 

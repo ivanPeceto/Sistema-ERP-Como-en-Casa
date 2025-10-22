@@ -76,9 +76,6 @@ export interface Pedido {
   id: number;
   numero_pedido: number;
   fecha_pedido: string; 
-  // Deprecated
-  id_cliente: number;
-  //--
   cliente: string;
   para_hora: string | null; 
   estado: string; // 'PENDIENTE', 'LISTO', 'ENTREGADO'
@@ -107,9 +104,6 @@ export interface Pedido {
 export interface PedidoInput {
     numero_pedido: number;
     fecha_pedido: string;
-    // Deprecated 
-    id_cliente: number;
-    // --
     cliente: string;
     para_hora: string | null; 
     estado: string; // 'PENDIENTE', 'LISTO', 'ENTREGADO'
