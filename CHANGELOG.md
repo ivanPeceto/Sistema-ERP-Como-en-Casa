@@ -6,10 +6,12 @@ _(Cambios realizados por @ivanPeceto)_
 
 ### Refactors
 * Restaura lo ya existente en el contenedor de clientes comentado en `docker-compose.yml.template` y `nginx.conf.template`.
+* Añade directivas de migraciones al script de instalación `./start_server.sh`.
 
 ### Affects
 * `docker-compose.yml.template`
 * `nginx.conf.template`
+* `./start_server.sh`
 
 ## [ refactor/back/cobros ] - 2025-10-17
 

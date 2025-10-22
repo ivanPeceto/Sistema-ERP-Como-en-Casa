@@ -178,7 +178,7 @@ services:
         max-file: "2"  
     depends_on:
       - usuarios
-      #- clientes
+      - clientes
       - productos
       - pedidos
 
@@ -198,12 +198,12 @@ services:
     depends_on:
       - frontend
       - usuarios
-      #- clientes
+      - clientes
       - productos
       - pedidos
 
 volumes:
   usuarios_data:
   pedidos_data:
-  #clientes_data:
+  clientes_data:
   productos_data:
