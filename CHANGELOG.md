@@ -1,8 +1,11 @@
-## [ refactor/back/client ] - 2025-10-22
+## [ refactor/back/client ] - 2025-10-23
 
 _(Cambios realizados por @ivanPeceto)_
 
-### Observations
+
+## [ refactor/back/client ] - 2025-10-22
+
+_(Cambios realizados por @ivanPeceto)_
 
 ### Refactors
 * Restaura lo ya existente en el contenedor de clientes comentado en `docker-compose.yml.template` y `nginx.conf.template`.
