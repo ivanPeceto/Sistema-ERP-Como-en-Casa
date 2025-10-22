@@ -45,7 +45,7 @@ update_files() {
 }
 
 wait_for_services() {
-    SERVICES=("usuarios" "productos" "pedidos")
+    SERVICES=("usuarios" "productos" "clientes" "pedidos")
     for service in "${SERVICES[@]}"; do
         echo "Esperando a que la base de datos '$service' esté lista..."
         while ! docker compose logs $service | grep -q "${service}:3306 is available"; do
@@ -63,6 +63,8 @@ run_migrations() {
     docker compose exec usuarios python manage.py migrate
     docker compose exec productos python manage.py makemigrations
     docker compose exec productos python manage.py migrate
+    docker compose exec clientes python manage.py makemigrations
+    docker compose exec clientes python manage.py migrate
     docker compose exec pedidos python manage.py makemigrations
     docker compose exec pedidos python manage.py migrate
 }

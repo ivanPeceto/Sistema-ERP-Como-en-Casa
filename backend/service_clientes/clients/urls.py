@@ -5,6 +5,7 @@ from apps.clientes.views import (
     ClienteEliminarView,
     ClienteListarView,
     ClienteBuscarView,
+    ClienteBuscarCoincidenciasView,
 )
 
 urlpatterns = [
@@ -13,4 +14,5 @@ urlpatterns = [
     path('api/clientes/eliminar/', ClienteEliminarView.as_view(), name='cliente_eliminar'),
     path('api/clientes/listar/', ClienteListarView.as_view(), name='cliente_listar'),
     path('api/clientes/buscar/', ClienteBuscarView.as_view(), name='cliente_buscar'), 
+    path('api/clientes/buscar/coincidencias/', ClienteBuscarCoincidenciasView.as_view(), name='buscar_cliente_coincidencias'),
 ]

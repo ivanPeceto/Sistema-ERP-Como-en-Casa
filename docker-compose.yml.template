@@ -36,40 +36,40 @@ services:
     depends_on:
       - db_usuarios
 
-  #db_clientes:
-  #  image: mysql:8.0
-  #  container_name: db_clientes
-  #  restart: always
-  #  environment:
-  #    MYSQL_DATABASE: ${CLIENTES_DB_NAME}
-  #    MYSQL_PASSWORD: ${CLIENTES_DB_PASSWORD}
-  #    MYSQL_ROOT_PASSWORD: ${CLIENTES_DB_PASSWORD}
-  #  logging:
-  #    driver: "json-file"
-  #    options:
-  #      max-size: "10m"
-  #      max-file: "2"  
-  #  ports:
-  #    - "3308:3306"
-  #  volumes:
-  #    - clientes_data:/var/lib/mysql
+  db_clientes:
+    image: mysql:8.0
+    container_name: db_clientes
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${CLIENTES_DB_NAME}
+      MYSQL_PASSWORD: ${CLIENTES_DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${CLIENTES_DB_PASSWORD}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "2"  
+    ports:
+      - "3308:3306"
+    volumes:
+      - clientes_data:/var/lib/mysql
 
-  #clientes:
-  #  build: ./backend/service_clientes
-  #  container_name: clientes
-  #  env_file:
-  #    - ./.env 
-  #  volumes:
-  #    - ./backend/service_clientes:/app
-  #  logging:
-  #    driver: "json-file"
-  #    options:
-  #      max-size: "10m"
-  #      max-file: "2"  
-  #  ports:
-  #    - "8002:8002"
-  #  depends_on:
-  #    - db_clientes
+  clientes:
+    build: ./backend/service_clientes
+    container_name: clientes
+    env_file:
+      - ./.env 
+    volumes:
+      - ./backend/service_clientes:/app
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "2"  
+    ports:
+      - "8002:8002"
+    depends_on:
+      - db_clientes
 
   db_productos:
     image: mysql:8.0
@@ -178,7 +178,7 @@ services:
         max-file: "2"  
     depends_on:
       - usuarios
-      #- clientes
+      - clientes
       - productos
       - pedidos
 
@@ -198,12 +198,12 @@ services:
     depends_on:
       - frontend
       - usuarios
-      #- clientes
+      - clientes
       - productos
       - pedidos
 
 volumes:
   usuarios_data:
   pedidos_data:
-  #clientes_data:
+  clientes_data:
   productos_data:

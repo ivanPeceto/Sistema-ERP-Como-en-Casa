@@ -156,7 +156,6 @@ const EditarPedidoModal: React.FC<EditarPedidoModalProps> = ({ isOpen, onClose, 
     return {
       numero_pedido: pedido.numero_pedido,
       fecha_pedido: getFechaISO(pedido.fecha_pedido),
-      id_cliente: 1,
       cliente: updates.cliente !== undefined ? updates.cliente : pedido.cliente,
       para_hora: updates.para_hora !== undefined ? updates.para_hora : pedido.para_hora,
       estado: updates.estado !== undefined ? updates.estado : pedido.estado,

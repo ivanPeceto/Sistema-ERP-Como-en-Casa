@@ -7,6 +7,7 @@ from .serializer import ClienteSerializer
 from rest_framework.permissions import IsAuthenticated
 from utils.permissions import IsSuperUser
 from rest_framework.generics import ListAPIView
+from django.db.models import Q
 
 class ClienteCrearView(APIView):
     """!
@@ -193,4 +194,31 @@ class ClienteBuscarView(ListAPIView):
                 cliente = Cliente.objects.filter(id=id)
                 return cliente
         except:
+            return Cliente.objects.none()
+
+class ClienteBuscarCoincidenciasView(ListAPIView):
+    """!
+    @brief Vista para buscar clientes por coincidencias parciales (fuzzy search) de nombre.
+    @details
+        Recibe un parámetro de consulta 'nombre' y devuelve los 3 clientes cuyos nombres
+        o apellidos contengan ese texto (ignorando mayúsculas/minúsculas).
+    """
+    serializer_class = ClienteSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """!
+        @brief Filtra los clientes basándose en el parámetro de consulta 'nombre'.
+        @return QuerySet: Los 3 clientes que mejor coinciden o un queryset vacío.
+        """
+        queryset = Cliente.objects.all()
+        query = self.request.query_params.get('nombre', None) 
+
+        if query:
+            queryset = queryset.filter(
+                Q(nombre__icontains=query) | Q(apellido__icontains=query)
+            )
+            # Devuelve las mejores 3 coincidencias
+            return queryset[:3] 
+        else:
             return Cliente.objects.none()

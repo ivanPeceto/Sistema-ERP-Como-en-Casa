@@ -1,3 +1,31 @@
+## [ refactor/back/client ] - 2025-10-23
+
+_(Cambios realizados por @ivanPeceto)_
+
+
+## [ refactor/back/client ] - 2025-10-22
+
+_(Cambios realizados por @ivanPeceto)_
+
+### Refactors
+* Restaura lo ya existente en el contenedor de clientes comentado en `docker-compose.yml.template` y `nginx.conf.template`.
+* Añade directivas de migraciones al script de instalación `./start_server.sh`.
+* Elimina el campo `id_cliente` en `models.py` y `models.ts` de pedidos.
+* Adapta payloads para coincidir con la refactorización de id_cliente en `CrearPedidoModal.tsx` y `EditarPedidoModal.tsx`
+
+### Adds
+* Nuevo endpoint en el microservicio de clientes para devolver mejores coincidencias con un nombre en el payload.
+
+### Affects
+* `docker-compose.yml.template`
+* `nginx.conf.template`
+* `./start_server.sh`
+* `/backend/service_pedidos/apps/pedidos/models.py`
+* `/Frontend/src/types/models.ts`
+* `CrearPedidoModal.tsx` y `EditarPedidoModal.tsx`
+* `/backend/service_clientes/apps/clientes/views.py`
+* `/backend/service_clientes/clients/urls.py`
+
 ## [ refactor/back/cobros ] - 2025-10-17
 
 _(Cambios realizados por @ivanPeceto)_
