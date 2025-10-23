@@ -60,9 +60,6 @@ class PedidoSerializer(serializers.ModelSerializer):
         fields = ['id',
                   'numero_pedido',
                   'fecha_pedido',
-                  #
-                  'id_cliente',
-                  #
                   'cliente',
                   'para_hora',
                   'productos',

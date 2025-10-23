@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'; 
-import type { ChangeEvent } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'; 
+import type { ChangeEvent, KeyboardEvent } from 'react';
 import styles from './CrearPedidoModal.module.css';
 import modalStyles from '../../../styles/modalStyles.module.css'; 
 
 import { createPedido, getPedidosByDate } from '../../../services/pedido_service';
-import type { Producto, PedidoItem, PedidoInput } from '../../../types/models.d.ts';
+import type { Producto, PedidoItem, PedidoInput, Cliente } from '../../../types/models.d.ts';
+import { buscarClientesPorCoincidencia, createCliente } from '../../../services/client_service';
 
 interface CrearPedidoModalProps {
   isOpen: boolean; 
@@ -14,6 +15,11 @@ interface CrearPedidoModalProps {
 
 const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, productos}) => {
   const [clienteInput, setClienteInput] = useState<string>(''); 
+  const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null);
+  const [clienteSuggestions, setClienteSuggestions] = useState<Cliente[]>([]);
+  const [isSearchingClientes, setIsSearchingClientes] = useState<boolean>(false);
+  const suggestionsRef = useRef<HTMLUListElement>(null);
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState<number>(-1);
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<string>('');
   const [pedidoItems, setPedidoItems] = useState<PedidoItem[]>([]);
   const [paraHora, setParaHora] = useState<string>(''); 
@@ -25,6 +31,9 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
 
   const resetModalState = useCallback(() => {
     setClienteInput('');
+    setSelectedCliente(null);
+    setClienteSuggestions([]);
+    setActiveSuggestionIndex(-1);
     setPedidoItems([]);
     setParaHora('');
     setError(null);
@@ -43,12 +52,14 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
     }
   }, [productos]);
   
+  /** @brief Hook que resetea el estado cuando el modal se abre. */
   useEffect(() => {
     if (isOpen) {
       resetModalState();
     }
   }, [isOpen, resetModalState]);
 
+  /** @brief Hook para seleccionar la primera categoría por defecto si no hay ninguna seleccionada. */
   useEffect(() => {
     if (productos.length > 0 && !categoriaSeleccionada) {
       const categoriasUnicas = [...new Set(productos.map(p => p.categoria?.nombre || 'Sin Categoría'))];
@@ -57,6 +68,48 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
       }
     }
   }, [productos, categoriaSeleccionada]);
+  
+  /**
+   * @brief Hook `useEffect` que realiza la búsqueda de clientes con debounce.
+   * @details Se activa cuando `clienteInput` cambia. Espera 300ms después de la
+   * última pulsación antes de llamar a `buscarClientesPorCoincidencia`.
+   */
+  useEffect(() => {
+    setIsSearchingClientes(true);
+
+    // Temporizador de debounce
+    const timerId = setTimeout(async () => {
+      try {
+        const suggestions = await buscarClientesPorCoincidencia(clienteInput);
+        setClienteSuggestions(suggestions);
+        setActiveSuggestionIndex(-1); 
+      } catch (err) {
+        console.error("Error buscando clientes:", err);
+        setClienteSuggestions([]); 
+      } finally {
+        setIsSearchingClientes(false)
+      }
+    }, 300); // Esperar 300ms 
+
+    return () => {
+      clearTimeout(timerId);
+      setIsSearchingClientes(false);
+    };
+  }, [clienteInput]); 
+
+  /**
+   * @brief Hook `useEffect` para hacer scroll automático a la sugerencia activa.
+   * @details Cuando `activeSuggestionIndex` cambia, hace scroll en la lista
+   * para que la sugerencia activa sea visible.
+   */
+  useEffect(() => {
+    if (activeSuggestionIndex >= 0 && suggestionsRef.current) {
+        const activeItem = suggestionsRef.current.children[activeSuggestionIndex] as HTMLLIElement;
+        if (activeItem) {
+            activeItem.scrollIntoView({ block: 'nearest' });
+        }
+    }
+  }, [activeSuggestionIndex]);
 
   /** @brief Extrae una lista de nombres de categorías únicas a partir de los productos. */
   const categoriasUnicas = useMemo(() =>
@@ -153,6 +206,59 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
     setPruductSearchTerm(event.target.value)
   };
 
+  /** @brief Actualiza el estado del input del cliente */
+  const handleClienteInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setClienteInput(e.target.value);
+  };
+
+  /** @brief Selecciona una sugerencia de cliente */
+  const handleSelectSuggestion = (cliente: Cliente) => {
+    setClienteInput(`${cliente.nombre}`);
+    setSelectedCliente(cliente);
+    setClienteSuggestions([]); 
+    setActiveSuggestionIndex(-1);
+  };
+
+  /**
+   * @brief Manejador para eventos de teclado en el input de cliente.
+   * @details Permite navegar (flechas arriba/abajo), seleccionar (Enter/Tab)
+   * y cerrar (Escape) la lista de sugerencias.
+   * @param {KeyboardEvent<HTMLInputElement>} e Evento de teclado.
+   */  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (clienteSuggestions.length === 0) return;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault(); 
+        setActiveSuggestionIndex(prevIndex =>
+          prevIndex < clienteSuggestions.length - 1 ? prevIndex + 1 : prevIndex
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault(); 
+        setActiveSuggestionIndex(prevIndex => (prevIndex > 0 ? prevIndex - 1 : 0));
+        break;
+      case 'Enter':
+        if (activeSuggestionIndex >= 0) {
+          e.preventDefault(); 
+          handleSelectSuggestion(clienteSuggestions[activeSuggestionIndex]);
+        }
+        break;
+      case 'Tab':
+         if (activeSuggestionIndex >= 0) {
+           e.preventDefault(); 
+           handleSelectSuggestion(clienteSuggestions[activeSuggestionIndex]);
+         }
+         break;
+      case 'Escape':
+        setClienteSuggestions([]);
+        setActiveSuggestionIndex(-1);
+        break;
+      default:
+        break;
+    }
+  };
+
 
   const handleParaHoraChange = (e: ChangeEvent<HTMLInputElement>) => {
     setParaHora(e.target.value);
@@ -164,7 +270,8 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
    * para el día, construye el payload y llama al servicio `createPedido`.
    */
   const handleConfirmarPedido = async () => {
-    if (!clienteInput.trim()) {
+    const clienteNombreTrimmed = clienteInput.trim();
+    if (!clienteNombreTrimmed) {
       setError('Debe ingresar un nombre de cliente para el pedido.');
       return;
     }
@@ -177,6 +284,18 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
     setError(null);
 
     try {
+      if (!selectedCliente) {
+          console.log("Intentando crear nuevo cliente:", clienteNombreTrimmed);
+          try {
+              const nuevoCliente = await createCliente({
+                  nombre: clienteNombreTrimmed,
+              });
+              console.log("Nuevo cliente creado:", nuevoCliente);
+          } catch (createError: any) {
+              console.error("Error al crear el cliente:", createError);
+              console.warn("Continuando la creación del pedido con el nombre ingresado tras error al crear cliente.");
+          }
+      }
       const today = new Date();
       const hoy = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
       console.log(hoy);
@@ -236,19 +355,38 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
               <h2>Información del Pedido</h2>
               
               <div className={[modalStyles.formGroup, styles.clientForm].join(" ")}>
-                <div className={styles.formRowElement}>
+                <div className={`${styles.formRowElement} ${styles.clienteInputContainer}`}> {/* Contenedor relativo */}
                     <label className={modalStyles.formLabel} htmlFor="clienteInput">Cliente</label>
                     <input
                       type="text"
                       id="clienteInput"
                       name="clienteInput"
                       value={clienteInput}
-                      onChange={(e) => setClienteInput(e.target.value)}
+                      onChange={handleClienteInputChange} 
+                      onKeyDown={handleKeyDown}
                       className={modalStyles.formControl}
                       placeholder="Nombre del cliente"
                       autoFocus
+                      autoComplete="off" 
                     />
-                </div>        
+                     {isSearchingClientes && <div className={styles.searchingIndicator}>Buscando...</div>}
+                     {clienteSuggestions.length > 0 && (
+                        <ul className={styles.suggestionsList} ref={suggestionsRef}>
+                            {clienteSuggestions.map((suggestion, index) => (
+                            <li
+                                key={suggestion.id}
+                                className={`${styles.suggestionItem} ${index === activeSuggestionIndex ? styles.suggestionItemActive : ''}`}
+                                onClick={() => handleSelectSuggestion(suggestion)}
+                                role="option"
+                                aria-selected={index === activeSuggestionIndex}
+                                tabIndex={-1} 
+                            >
+                                {suggestion.nombre}
+                            </li>
+                            ))}
+                        </ul>
+                     )}
+                </div>       
                 <div className={styles.formRowElement}>
                   <label className={modalStyles.formLabel} htmlFor="para_hora">Hora de Entrega</label>
                   <input
