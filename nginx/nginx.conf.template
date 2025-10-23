@@ -6,9 +6,9 @@ upstream usuarios {
     server usuarios:8001;
 }
 
-#upstream clientes {
-#    server clientes:8002;
-#}
+upstream clientes {
+    server clientes:8002;
+}
 
 upstream productos {
     server productos:8003;

@@ -1,7 +1,27 @@
-## [ refactor/back/client ] - 2025-10-23
+## [ refactor/front/client ] - 2025-10-23
 
 _(Cambios realizados por @ivanPeceto)_
 
+### Refactors
+* Cambia los campos `telefono` y `direccion` en `models.ts` para ser opcionales. 
+* Integra nuevo sistema de sugerencias de clientes por fuzzy search en `CrearPedidoModal.tsx`.
+
+### Bugfix
+* Faltaba descomentar un bloque en `nginx.conf.template.
+* Corrige el serializer de pedidos.
+* Corrige inconsistencia en el método de fuzzy search del microservicio de clientes.
+
+### Adds
+* Nuevo método en `client_service.ts` para llamar al nuevo endpoint de client fuzzy search. 
+* Estilos para las coincidencias de búsqueda.
+
+### Affects
+* `/Frontend/src/components/modals/CrearPedidoModal/CrearPedidoModal.tsx`
+* `/Frontend/src/services/client_service.ts`
+* `/Frontend/src/types/models.ts`
+* `nginx.conf.template`
+* `/backend/service_clientes/apps/clientes/views.py`
+* `/backend/service_pedidos/apps/pedidos/serializer.py`
 
 ## [ refactor/back/client ] - 2025-10-22
 

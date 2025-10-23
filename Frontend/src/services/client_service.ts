@@ -75,3 +75,18 @@ export const deleteCliente = async (id: number): Promise<any> => {
     const response = await clientAPIClient.post(`/api/clientes/eliminar/?id=${id}`);
     return response.data;
 };
+
+/**
+ * @brief Busca clientes que coincidan parcialmente con el término de búsqueda.
+ * @details Realiza una petición GET al endpoint `/clientes/buscar/coincidencias/`.
+ * @param {string} query El término de búsqueda para nombre o apellido.
+ * @returns {Promise<Cliente[]>} Una promesa que se resuelve con un array de hasta 3 clientes que coinciden.
+ * @throws {Error} Relanza el error si la petición a la API falla.
+ */
+export const buscarClientesPorCoincidencia = async (query: string): Promise<Cliente[]> => {
+    if (!query || query.trim() === '') {
+        return Promise.resolve([]); 
+    }
+    const response = await clientAPIClient.get<Cliente[]>(`/api/clientes/buscar/coincidencias/?nombre=${encodeURIComponent(query)}`);
+    return response.data;
+};

@@ -216,7 +216,7 @@ class ClienteBuscarCoincidenciasView(ListAPIView):
 
         if query:
             queryset = queryset.filter(
-                Q(nombre__icontains=query) | Q(apellido__icontains=query)
+                Q(nombre__icontains=query)
             )
             # Devuelve las mejores 3 coincidencias
             return queryset[:3] 
