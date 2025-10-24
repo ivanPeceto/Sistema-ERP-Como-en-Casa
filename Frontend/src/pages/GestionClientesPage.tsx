@@ -10,7 +10,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
-import styles from '../styles/gestionClientesPage.module.css';
+import styles from '../styles/gestionProductosPage.module.css';
 import formStyles from '../styles/formStyles.module.css';
 import {
   getClientes,
