@@ -2,6 +2,23 @@
 
 _(Cambios realizados por @ivanPeceto)_
 
+### Observations
+* Se podría unificar el css de la mayoría de páginas de gestion para usar un solo archivo global que tenga los estilos generales.
+
+### Changed
+* Vuelve a añadir "clientes" al footer.
+* Actualiza css para ser consistente con el resto de diseños.
+* Cambia el import de css en `GestionClientesPage.tsx` para usar el de `GestionProductosPage.tsx`
+
+### Affects
+* `/Frontend/src/components/sidebar/sidebar.tsx`
+* `/Frontend/src/styles/gestionClientesPage.module.css`
+* `/Frontend/src/pages/GestionClientesPage.tsx`
+
+## [ refactor/front/client ] - 2025-10-23
+
+_(Cambios realizados por @ivanPeceto)_
+
 ### Refactors
 * Cambia los campos `telefono` y `direccion` en `models.ts` para ser opcionales. 
 * Integra nuevo sistema de sugerencias de clientes por fuzzy search en `CrearPedidoModal.tsx`.
