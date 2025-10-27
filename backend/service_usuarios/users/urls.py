@@ -1,11 +1,10 @@
-
-from django.contrib import admin
-from django.urls import path
-from apps.usuarios.views import UserLoginView, UserSignUpView, UserTokenRefreshView
+from django.urls import path, include
 
 urlpatterns = [
-    path('api/usuarios/login/', UserLoginView.as_view(), name='ingresar'),
-    path('api/usuarios/signup/', UserSignUpView.as_view(), name='registrarse'),
-    path('api/usuarios/refresh_token/', UserTokenRefreshView.as_view(), name='refresh_token')
-]
+    #Rutas de usuarios
+    path('api/usuarios/', include('apps.usuarios.urls')),
 
+    #Rutas de roles
+    path('api/usuarios/rol/', include('apps.roles.urls')),
+
+]
