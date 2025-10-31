@@ -17,6 +17,25 @@ NGINX_CONF_FILE="nginx/nginx.conf"
 
 # --- Funciones ---
 
+show_help() {
+    echo "------------------------------------------------------------------------------------"
+    echo "Uso: ./start_server.sh [FLAG]"
+    echo ""
+    echo "FLAGS:"
+    echo "  (sin flag)      Levanta los contenedores en segundo plano (si ya existen)."
+    echo "  --help          Muestra este menú de ayuda."
+    echo "  --stop          Detiene y elimina los contenedores."
+    echo "  --build         Reconstruye las imágenes y levanta los contenedores."
+    echo "  --migrate       Levanta los contenedores y ejecuta las migraciones."
+    echo "                  (Espera a que las BDD estén listas)."
+    echo "  --clean         Detiene y elimina contenedores Y VOLÚMENES (borra las BDD)."
+    echo ""
+    echo "COMBINACIONES ESPECIALES:"
+    echo "  --clean --migrate Limpieza completa, reconstrucción, migraciones y creación"
+    echo "                    automática de superusuario (admin@admin.com / admin)."
+    echo "------------------------------------------------------------------------------------"
+}
+
 update_files() {
     ENV_TEMPLATE=".env.template"
     ENV_FILE=".env"
@@ -113,6 +132,9 @@ if [ "$1" == "--build" ]; then
     docker compose down
     docker compose up -d --build
     echo "Servidor disponible en: http://${IP_ADDRESS}/login"
+
+elif [ "$1" == "--help" ]; then
+    show_help
 
 elif [ "$1" == "--migrate" ]; then
     docker compose up -d

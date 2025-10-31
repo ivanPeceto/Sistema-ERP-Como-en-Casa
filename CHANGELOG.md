@@ -1,3 +1,12 @@
+## [ chore/documentation ] - 2025-10-30
+
+_(Cambios realizados por @ivanPeceto)_
+
+### Changed
+* Renueva la presentación en `README.md` para volverlo más atractivo y ajustarse a la presentación actual.
+
+### Affects
+* `README.md`
 ## [feature/backend/roles] – 2025-10-27
 (Cambios realizados por @jmrodriguezspinker)
 
