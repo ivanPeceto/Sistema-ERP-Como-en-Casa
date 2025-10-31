@@ -1,3 +1,38 @@
+## [feature/backend/roles] – 2025-10-27
+(Cambios realizados por @jmrodriguezspinker)
+
+### Adds
+
+* Agrega modelo `Rol` y su serializer, vistas, urls y migraciones iniciales.
+* Management command `seed_usuarios` para crear roles base y usuario admin.
+* Permisos personalizados en `permissions.py` para restringir rutas según rol.
+* URLs de usuarios para login, signup y refresh token.
+
+### Refactors
+
+* Re-crea migraciones de `Usuario` para incluir el campo `rol`.
+* Actualiza serializers de `Usuario` para incluir `rol`.
+* Relaciona `Usuario` con `Rol` en el modelo.
+* Ajusta `settings.py` y `urls.py` del proyecto para integración con roles y auth.
+
+### Chore
+
+* Se agrega `__init__.py` para marcar `apps` como paquete Python.
+* Modifica `start_server.sh`: se elimina `create_superuser` y se agregan seeders.
+
+### Affects
+
+* `/backend/service_usuarios/apps/roles/`
+* `/backend/service_usuarios/apps/usuarios/migrations/`
+* `/backend/service_usuarios/apps/usuarios/models.py`
+* `/backend/service_usuarios/apps/usuarios/serializer.py`
+* `/backend/service_usuarios/apps/usuarios/urls.py`
+* `/backend/service_usuarios/utils/permissions.py`
+* `/backend/service_usuarios/apps/usuarios/management/commands/seed_usuarios.py`
+* `/backend/service_usuarios/users/settings.py`
+* `/backend/service_usuarios/users/urls.py`
+* `start_server.sh`
+
 ## [ refactor/front/client ] - 2025-10-23
 
 _(Cambios realizados por @ivanPeceto)_
@@ -62,6 +97,7 @@ _(Cambios realizados por @ivanPeceto)_
 * `CrearPedidoModal.tsx` y `EditarPedidoModal.tsx`
 * `/backend/service_clientes/apps/clientes/views.py`
 * `/backend/service_clientes/clients/urls.py`
+# Changelog 
 
 ## [ refactor/back/cobros ] - 2025-10-17
 

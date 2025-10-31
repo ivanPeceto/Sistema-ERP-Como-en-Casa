@@ -16,7 +16,8 @@ class UsuarioSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Usuario
-        fields = ['id', 'email', 'nombre', 'fecha_creacion']
+        rol_nombre = serializers.CharField(source='rol.nombre', read_only=True)
+        fields = ['id', 'email', 'nombre', 'fecha_creacion', 'rol_nombre']
 
 class SignUpSerializer(serializers.ModelSerializer):
     """!
@@ -33,7 +34,7 @@ class SignUpSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Usuario
-        fields = ['email', 'nombre', 'password']
+        fields = ['email', 'nombre', 'password', 'rol']
 
     def create(self, validated_data):
         """!
