@@ -57,32 +57,33 @@ wait_for_services() {
     echo "Todas las bases de datos están operativas."
 }
 
+
 run_migrations() {
     echo "Ejecutando migraciones..."
-    docker compose exec usuarios python manage.py makemigrations
-    docker compose exec usuarios python manage.py migrate
-    docker compose exec productos python manage.py makemigrations
-    docker compose exec productos python manage.py migrate
-    docker compose exec clientes python manage.py makemigrations
-    docker compose exec clientes python manage.py migrate
-    docker compose exec pedidos python manage.py makemigrations
-    docker compose exec pedidos python manage.py migrate
+
+    set -e  # Si una falla, se detiene todo el script
+
+    docker compose exec usuarios python manage.py makemigrations --noinput
+    docker compose exec usuarios python manage.py migrate --noinput
+
+    docker compose exec productos python manage.py makemigrations --noinput
+    docker compose exec productos python manage.py migrate --noinput
+
+    docker compose exec pedidos python manage.py makemigrations --noinput
+    docker compose exec pedidos python manage.py migrate --noinput
+
+    echo "✅ Migraciones completadas correctamente."
 }
 
-create_superuser() {
-    echo "Creando superusuario..."
-    docker compose exec -T usuarios python manage.py shell <<EOF
-from django.contrib.auth import get_user_model
 
-User = get_user_model()
-
-if not User.objects.filter(email='admin@admin.com').exists():
-    User.objects.create_superuser(email='admin@admin.com', nombre='admin', password='admin')
-    print("Superusuario admin@admin.com creado exitosamente.")
-else:
-    print("ℹEl superusuario admin@admin.com ya existe.")
-EOF
+run_seeders() {
+    echo "Ejecutando seeders..."
+    set -e
+    docker compose exec usuarios python manage.py seed_usuarios || {
+        echo "⚠️ Error al ejecutar seeders. Verifica que las migraciones estén completas."
+    }
 }
+
 
 # --- End funciones ---
 
@@ -117,6 +118,8 @@ elif [ "$1" == "--migrate" ]; then
     docker compose up -d
     wait_for_services
     run_migrations
+    sleep 3
+    run_seeders
     echo "Servidor disponible en: http://${IP_ADDRESS}/login"
 
 elif [ "$1" == "--clean" ] && [ "$2" == "--migrate" ]; then
@@ -125,7 +128,8 @@ elif [ "$1" == "--clean" ] && [ "$2" == "--migrate" ]; then
     docker compose up -d --build
     wait_for_services
     run_migrations
-    create_superuser
+    sleep 3
+    run_seeders
     echo "Servidor disponible en: http://${IP_ADDRESS}/login"
 
 elif [ "$1" == "--clean" ]; then
@@ -141,4 +145,3 @@ else
     docker compose up -d
     echo "Servidor disponible en: http://${IP_ADDRESS}/login"
 fi
-
