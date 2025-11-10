@@ -1,85 +1,119 @@
-from django.test import TestCase
-from rest_framework.test import APIClient
+from types import SimpleNamespace
+from django.urls import reverse
+from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
-from .models import MetodoCobro
-from rest_framework_simplejwt.tokens import AccessToken
+from apps.metodos.models import MetodoCobro
 
-class MetodoCobroAPITestCase(TestCase):
+class MetodoCobroAPITest(APITestCase):
     def setUp(self):
         self.client = APIClient()
 
-        # Creamos un token para un SUPERUSUARIO
-        self.superuser_token = AccessToken()
-        self.superuser_token['user_id'] = 1
-        self.superuser_token['is_superuser'] = True
+        # Métodos de cobro de prueba
+        self.metodo1 = MetodoCobro.objects.create(nombre='Efectivo')
+        self.metodo2 = MetodoCobro.objects.create(nombre='Tarjeta')
 
-        # Creamos un token para un USUARIO REGULAR
-        self.regular_user_token = AccessToken()
-        self.regular_user_token['user_id'] = 2
-        self.regular_user_token['is_superuser'] = False
-        
-        # Creamos un método de cobro de prueba para usar en los tests de editar, eliminar y buscar
-        self.metodo_de_prueba = MetodoCobro.objects.create(
-            nombre="Efectivo"
+        # Usuario con rol Administrador
+        self.admin_user = SimpleNamespace(
+            is_authenticated=True,
+            rol=SimpleNamespace(nombre='Administrador')
         )
 
-    def test_crear_metodo_de_cobro_autenticado(self):
-        """Prueba la creación de un método de cobro con un usuario regular autenticado."""
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.superuser_token}')
-        data = {"nombre": "Crédito"}
-        response = self.client.post('/api/cobros/metodos/crear/', data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        # Usuario sin rol administrador
+        self.user = SimpleNamespace(
+            is_authenticated=True,
+            rol=SimpleNamespace(nombre='Usuario')
+        )
 
-    def test_listar_metodo_de_cobro_autenticado(self):
-        """Prueba que un usuario regular pueda listar los métodos de cobro."""
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.regular_user_token}')
-        response = self.client.get('/api/cobros/metodos/listar/')
+    # ---------- TESTS CORRECTOS ----------
+    def test_listar_metodos_cobro(self):
+        self.client.force_authenticate(user=self.admin_user)
+        url = reverse('metodos_cobros')
+        response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data), 2)
 
-    def test_editar_metodo_de_cobro_como_superuser(self):
-        """Prueba que un superusuario SÍ PUEDE editar un método de cobro."""
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.superuser_token}')
-        data = {"nombre": "Transferencia"}
-        url = f"/api/cobros/metodos/editar/?id={self.metodo_de_prueba.id}"
-        response = self.client.put(url, data, format='json')
+    def test_buscar_metodo_por_id(self):
+        self.client.force_authenticate(user=self.admin_user)
+        url = reverse('buscar_metodos_cobros') + f'?id={self.metodo1.id}'
+        response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # Verificamos que el nombre se haya actualizado en la BD
-        self.metodo_de_prueba.refresh_from_db()
-        self.assertEqual(self.metodo_de_prueba.nombre, "Transferencia")
-
-    def test_editar_metodo_de_cobro_como_regular_user_falla(self):
-        """Prueba que un usuario regular NO PUEDE editar un método de cobro."""
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.regular_user_token}')
-        data = {"nombre": "Débito"}
-        url = f"/api/cobros/metodos/editar/?id={self.metodo_de_prueba.id}"
-        response = self.client.put(url, data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-    def test_eliminar_metodo_de_cobro_como_superuser(self):
-        """Prueba que un superusuario SÍ PUEDE eliminar un método de cobro."""
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.superuser_token}')
-        url = f"/api/cobros/metodos/eliminar/?id={self.metodo_de_prueba.id}"
-        response = self.client.post(url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(MetodoCobro.objects.count(), 0)
-
-    def test_eliminar_metodo_de_cobro_como_regular_user_falla(self):
-        """Prueba que un usuario regular NO PUEDE eliminar un método de cobro."""
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.regular_user_token}')
-        url = f"/api/cobros/metodos/eliminar/?id={self.metodo_de_prueba.id}"
-        response = self.client.post(url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-    def test_buscar_metodo_de_cobro_por_nombre(self):
-        """Prueba la búsqueda de un método de cobro por su nombre."""
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.regular_user_token}')
-        response = self.client.get('/api/cobros/metodos/buscar/?nombre=Efectivo')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]['nombre'], 'Efectivo')
 
+    def test_buscar_metodo_por_nombre(self):
+        self.client.force_authenticate(user=self.admin_user)
+        url = reverse('buscar_metodos_cobros') + '?nombre=Tarjeta'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data[0]['nombre'], 'Tarjeta')
 
+    def test_crear_metodo_cobro_con_rol_admin(self):
+        self.client.force_authenticate(user=self.admin_user)
+        url = reverse('crear_metodos_cobros')
+        data = {'nombre': 'Transferencia'}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(MetodoCobro.objects.count(), 3)
 
+    def test_editar_metodo_cobro(self):
+        self.client.force_authenticate(user=self.admin_user)
+        url = reverse('editar_metodos_cobros') + f'?id={self.metodo1.id}'
+        data = {'nombre': 'Efectivo Modificado'}
+        response = self.client.put(url, data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.metodo1.refresh_from_db()
+        self.assertEqual(self.metodo1.nombre, 'Efectivo Modificado')
 
+    def test_eliminar_metodo_cobro(self):
+        self.client.force_authenticate(user=self.admin_user)
+        url = reverse('eliminar_metodos_cobros') + f'?id={self.metodo2.id}'
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(MetodoCobro.objects.filter(id=self.metodo2.id).exists())
 
+    # ---------- TESTS DE PERMISOS ----------
+    def test_crear_metodo_cobro_sin_rol_admin(self):
+        self.client.force_authenticate(user=self.user)
+        url = reverse('crear_metodos_cobros')
+        data = {'nombre': 'Transferencia'}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_editar_metodo_cobro_sin_rol_admin(self):
+        self.client.force_authenticate(user=self.user)
+        url = reverse('editar_metodos_cobros') + f'?id={self.metodo1.id}'
+        data = {'nombre': 'Nombre'}
+        response = self.client.put(url, data)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_eliminar_metodo_cobro_sin_rol_admin(self):
+        self.client.force_authenticate(user=self.user)
+        url = reverse('eliminar_metodos_cobros') + f'?id={self.metodo2.id}'
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    # ---------- TESTS DE ERRORES ----------
+    def test_editar_metodo_sin_id(self):
+        self.client.force_authenticate(user=self.admin_user)
+        url = reverse('editar_metodos_cobros')  # sin ?id=
+        data = {'nombre': 'Nuevo nombre'}
+        response = self.client.put(url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_editar_metodo_no_existente(self):
+        self.client.force_authenticate(user=self.admin_user)
+        url = reverse('editar_metodos_cobros') + '?id=9999'
+        data = {'nombre': 'Nuevo nombre'}
+        response = self.client.put(url, data)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_eliminar_metodo_sin_id(self):
+        self.client.force_authenticate(user=self.admin_user)
+        url = reverse('eliminar_metodos_cobros')  # sin ?id=
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_eliminar_metodo_no_existente(self):
+        self.client.force_authenticate(user=self.admin_user)
+        url = reverse('eliminar_metodos_cobros') + '?id=9999'
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
