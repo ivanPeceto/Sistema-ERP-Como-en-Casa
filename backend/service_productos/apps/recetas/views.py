@@ -8,11 +8,11 @@ from rest_framework import status
 from .models import Receta
 from .serializer import RecetaSerializer
 from rest_framework.permissions import IsAuthenticated
-from utils.permissions import IsSuperUser
+from utils.permissions import AllowRoles
 from rest_framework.generics import ListAPIView
 
 class RecetaCrearView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, AllowRoles('Administrador')]
 
     def post(self, request):
         serializer = RecetaSerializer(data=request.data)
@@ -22,7 +22,7 @@ class RecetaCrearView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class RecetaEditarView(APIView):
-    permission_classes = [IsAuthenticated, IsSuperUser]
+    permission_classes = [IsAuthenticated, AllowRoles('Cocinero', 'Administrador')]
 
     def put(self, request):
         id = request.query_params.get('id')
@@ -41,7 +41,7 @@ class RecetaEditarView(APIView):
             return Response({'detail':'Receta a editar no encontrada'}, status=status.HTTP_404_NOT_FOUND)
 
 class RecetaEliminarView(APIView):
-    permission_classes = [IsAuthenticated, IsSuperUser]
+    permission_classes = [IsAuthenticated, AllowRoles('Administrador')]
 
     def post(self, request):
         id = request.query_params.get('id')
@@ -56,7 +56,7 @@ class RecetaEliminarView(APIView):
             return Response({'detail':'Receta a eliminar no encontrada'}, status=status.HTTP_400_BAD_REQUEST)
 
 class RecetaListarView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, AllowRoles('Cocinero', 'Administrador')]
 
     def get(self, request):
         recetas = Receta.objects.all()
@@ -65,7 +65,7 @@ class RecetaListarView(APIView):
 
 class RecetaBuscarView(ListAPIView):
     serializer_class = RecetaSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, AllowRoles('Cocinero', 'Administrador')]
     
     def get_queryset(self):
         id = self.request.query_params.get('id')

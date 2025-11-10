@@ -6,11 +6,11 @@ from rest_framework import status
 from .models import MetodoCobro
 from .serializer import MetodoCobroSerializer
 from rest_framework.permissions import IsAuthenticated
-from utils.permissions import IsSuperUser
+from utils.permissions import AllowRoles
 from rest_framework.generics import ListAPIView
 
 class MetodoCobroCrearView(APIView):
-    permission_classes = [IsAuthenticated, IsSuperUser]
+    permission_classes = [IsAuthenticated, AllowRoles('Administrador')]
 
     def post(self, request):
         serializer = MetodoCobroSerializer(data=request.data)
@@ -21,7 +21,7 @@ class MetodoCobroCrearView(APIView):
 
 
 class MetodoCobroEditarView(APIView):
-    permission_classes = [IsAuthenticated, IsSuperUser]
+    permission_classes = [IsAuthenticated, AllowRoles('Administrador')]
 
     def put(self, request):
         id = request.query_params.get('id')
@@ -41,7 +41,7 @@ class MetodoCobroEditarView(APIView):
 
 
 class MetodoCobroEliminarView(APIView):
-    permission_classes = [IsAuthenticated, IsSuperUser]
+    permission_classes = [IsAuthenticated, AllowRoles('Administrador')]
 
     def post(self, request):
         id = request.query_params.get('id')

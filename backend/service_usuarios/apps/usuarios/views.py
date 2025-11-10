@@ -44,6 +44,10 @@ class UserLoginView(APIView):
 
         if loginserializer.is_valid():
             user = loginserializer.validated_data['user']
+            roles = []
+
+            if hasattr(user, 'rol') and user.rol:
+                roles = [user.rol.nombre]
 
             refresh_token = RefreshToken.for_user(user)
             access_token = refresh_token.access_token
@@ -51,10 +55,12 @@ class UserLoginView(APIView):
             refresh_token['email'] = user.email
             refresh_token['nombre'] = user.nombre
             refresh_token['is_superuser'] = user.is_superuser
+            refresh_token['roles'] = roles
 
             access_token['email'] = user.email
             access_token['nombre'] = user.nombre
             access_token['is_superuser'] = user.is_superuser
+            access_token['roles'] = roles
 
             return Response({
                     'refresh': str(refresh_token),
@@ -93,8 +99,11 @@ class UserSignUpView(APIView):
         signupserializer = SignUpSerializer(data=request.data)
 
         if signupserializer.is_valid():
-            ##El metodo save llama automaticamente a create()
             user = signupserializer.save()
+            roles = []
+
+            if hasattr(user, 'rol') and user.rol:
+                roles = [user.rol.nombre]
 
             refresh_token = RefreshToken.for_user(user)
             access_token = refresh_token.access_token
@@ -102,10 +111,12 @@ class UserSignUpView(APIView):
             refresh_token['email'] = user.email
             refresh_token['nombre'] = user.nombre
             refresh_token['is_superuser'] = user.is_superuser
+            refresh_token['roles'] = roles
 
             access_token['email'] = user.email
             access_token['nombre'] = user.nombre
             access_token['is_superuser'] = user.is_superuser
+            access_token['roles'] = roles
             
             return Response({
                 'refresh': str(refresh_token),
@@ -119,37 +130,62 @@ class UserTokenRefreshView(APIView):
     """!
     @brief Vista para refrescar un token de acceso utilizando un refresh token.
     @details
-        Esta vista recibe un refresh token válido y devuelve un nuevo access token 
-        con información adicional del usuario (email, nombre, is_superuser) directamente en su payload.
+        Esta vista permite renovar el token de acceso (Access Token) sin que el usuario
+        tenga que autenticarse nuevamente con sus credenciales.
+        El cliente envía un Refresh Token válido, y el sistema genera un nuevo Access Token
+        con los mismos claims personalizados incluidos originalmente al iniciar sesión o registrarse.
+
+        Los claims personalizados transferidos incluyen:
+        - email: Correo electrónico del usuario.
+        - nombre: Nombre completo del usuario.
+        - is_superuser: Indica si el usuario tiene privilegios de administrador.
+        - roles: Lista de roles asociados al usuario.
+
+        El Refresh Token sigue siendo válido hasta su expiración (configurada en settings.py),
+        por lo que puede seguir utilizándose para generar nuevos Access Tokens.
+
+        En caso de que el Refresh Token haya expirado o sea inválido,
+        se devuelve un error HTTP 400.
     """
+
     def post(self, request):
         """!
-        @brief Maneja las solicitudes POST para generar un nuevo access token.
+        @brief Maneja las solicitudes POST para la renovación del Access Token.
         @details
-            Espera un cuerpo de solicitud JSON con la forma: {"refresh": "token_string"}.
-            Valida el refresh token proporcionado y genera un nuevo access token.
-            Transfiere los claims personalizados (email, nombre, is_superuser) del
-            refresh token al nuevo access token.
-        @param request: El objeto de la solicitud HTTP.
+            Espera un cuerpo JSON con la forma:
+                {"refresh": "token_refresh_valido"}
+
+            Si el Refresh Token es válido:
+                - Se genera un nuevo Access Token.
+                - Se copian los claims personalizados (email, nombre, is_superuser, roles)
+                  desde el Refresh Token original al nuevo Access Token.
+                - Se devuelve el nuevo Access Token al cliente.
+
+            Si el Refresh Token no está presente, es inválido o ha expirado,
+            se devuelve un mensaje de error con código HTTP 400.
+
+        @param request: Objeto de la solicitud HTTP con el campo "refresh" en el cuerpo JSON.
         @return:
-                - Exito: Respuesta HTTP 200 OK con el nuevo access token.
-                - Falla: Respuesta HTTP 400 BAD REQUEST.
+                - Si el refresh token es válido: Respuesta HTTP 200 OK con un nuevo Access Token.
+                - Si el refresh token no fue proporcionado o es inválido: Respuesta HTTP 400 BAD REQUEST.
         """
         refresh_token_str = request.data.get('refresh')
 
         if not refresh_token_str:
-            return Response({'detail': 'El refresh token no fue proporcionado.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail': 'El refresh token no fue proporcionado.'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         try:
             refresh_token = RefreshToken(refresh_token_str)
-
             access_token = refresh_token.access_token
 
             access_token['email'] = refresh_token.get('email')
             access_token['nombre'] = refresh_token.get('nombre')
             access_token['is_superuser'] = refresh_token.get('is_superuser', False)
+            access_token['roles'] = refresh_token.get('roles', [])
 
-            return Response({'access': str(access_token),}, status=status.HTTP_200_OK)
+            return Response({'access': str(access_token)}, status=status.HTTP_200_OK)
 
         except TokenError:
-            return Response({'detail': 'El refresh token es inválido o ha expirado.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail': 'El refresh token es inválido o ha expirado.'},
+                            status=status.HTTP_400_BAD_REQUEST)
