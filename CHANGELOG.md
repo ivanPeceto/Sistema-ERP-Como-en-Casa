@@ -1,4 +1,51 @@
-# Changelog 
+# Changelog
+
+## [feature/backend/cobros-refac] – 2025-11-10
+
+(Cambios realizados por @jmrodriguezspinker)
+
+### Adds
+
+* Adaptación de vistas en varios microservicios (`usuarios`, `roles`, `productos`, `pedidos`, `cobros`) para usar `AllowRoles`.
+* Tests actualizados y nuevos para `AllowRoles` en auth y permisos.
+
+### Refactors
+
+* Reemplazo de `IsSuperUser` por `AllowRoles` en permisos personalizados (`permissions.py`) de todos los microservicios.
+* Adaptación de JWT auth para nuevos requerimientos de roles y restricción de unicidad.
+* Renombramiento de clases a PascalCase en serializers y apps para consistencia.
+
+### Hotfix
+
+* Corrección de errores en el cálculo de cobros en `backend/service_pedidos/apps/cobros/serializer.py`.
+
+### Affects
+
+* `/backend/service_usuarios/apps/roles/`
+* `/backend/service_usuarios/apps/usuarios/views.py`
+* `/backend/service_usuarios/utils/permissions.py`
+* `/backend/service_productos/apps/categorias/views.py`
+* `/backend/service_productos/apps/insumos/views.py`
+* `/backend/service_productos/apps/productos/views.py`
+* `/backend/service_productos/apps/recetas/views.py`
+* `/backend/service_productos/utils/permissions.py`
+* `/backend/service_pedidos/apps/cobros/views.py`
+* `/backend/service_pedidos/apps/metodos/views.py`
+* `/backend/service_pedidos/apps/pedidos/views.py`
+* `/backend/service_pedidos/utils/permissions.py`
+* `/backend/service_pedidos/apps/authentication/jwt_auth.py`
+* `/backend/service_productos/apps/authentication/jwt_auth.py`
+* `/backend/service_productos/apps/categorias/serializer.py`
+* `/backend/service_pedidos/apps/cobros/serializer.py`
+* `/backend/service_pedidos/apps/cobros/tests.py`
+* `/backend/service_pedidos/apps/metodos/tests.py`
+* `/backend/service_pedidos/apps/pedidos/tests.py`
+* `/backend/service_productos/apps/categorias/tests.py`
+* `/backend/service_productos/apps/insumos/tests.py`
+* `/backend/service_productos/apps/productos/tests.py`
+* `/backend/service_productos/apps/recetas/tests.py`
+* `/backend/service_usuarios/apps/roles/tests.py`
+
 
 ## [feature/backend/roles] – 2025-10-27
 (Cambios realizados por @jmrodriguezspinker)
