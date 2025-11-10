@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Categoria
 
 class CategoriaSerializer(serializers.ModelSerializer):
+    descripcion = serializers.CharField(required=False, allow_blank=True)
     """!
     @brief Serializador para el modelo Categoria.
     @details
