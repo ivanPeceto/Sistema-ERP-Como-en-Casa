@@ -1,26 +1,37 @@
 from rest_framework.permissions import BasePermission
 
+
 class RolePermission(BasePermission):
     """!
-    @brief Permiso personalizado basado en roles de usuario.
+    @brief Permiso personalizado basado en el rol del usuario.
     @details
-        Esta clase hereda de BasePermission de Django REST Framework y permite
-        restringir el acceso a las vistas solo a usuarios cuyo rol esté dentro
-        de una lista de roles permitidos.
+        Esta clase extiende `BasePermission` de Django REST Framework
+        para implementar un sistema de control de acceso basado en roles.
 
-        Se debe pasar una lista de nombres de roles válidos al inicializar la clase.
-        Si el usuario no está autenticado o su rol no se encuentra en la lista,
-        el acceso será denegado.
+        Es completamente compatible con la autenticación
+        **MicroservicesJWTAuthentication**, donde el atributo `user.rol`
+        es un **string** que representa el nombre del rol (por ejemplo:
+        `"Administrador"`, `"Recepcionista"`, `"Cajero"`).
+
+        El permiso verifica que el usuario esté autenticado y que su rol
+        se encuentre dentro de la lista de roles permitidos (`allowed_roles`).
+        
+        Si el usuario no está autenticado, no posee un rol o su rol no está
+        en la lista autorizada, el acceso es denegado.
 
     @example
-        permission_classes = [RolePermission(['Administrador', 'Gerente'])]
+        permission_classes = [RolePermission(['Administrador', 'Recepcionista'])]
     """
 
     def __init__(self, allowed_roles=None):
         """!
         @brief Inicializa la clase RolePermission con los roles permitidos.
-        @param allowed_roles: Lista de nombres de roles que tienen acceso permitido.
-                              Si no se proporciona, se utiliza una lista vacía.
+        @details
+            Se define una lista de roles válidos que pueden acceder a la vista.
+            Si no se proporciona una lista, se inicializa como vacía.
+        
+        @param allowed_roles: Lista de strings con los nombres de roles que tienen acceso permitido.
+                              Ejemplo: `['Administrador', 'Recepcionista']`
         """
         self.allowed_roles = allowed_roles or []
 
@@ -28,34 +39,47 @@ class RolePermission(BasePermission):
         """!
         @brief Verifica si el usuario tiene permiso para acceder a la vista.
         @details
-            Este método es llamado automáticamente por Django REST Framework para determinar
-            si un usuario autenticado tiene acceso a una vista o endpoint específico.
+            - Comprueba si el usuario está autenticado (`is_authenticated`).
+            - Obtiene el rol del usuario (`user.rol`).
+            - Valida que dicho rol se encuentre dentro de la lista de roles permitidos.
+            
+            Si cualquiera de las condiciones falla, retorna `False`.
 
-        @param request: Objeto de la solicitud HTTP que contiene la información del usuario.
-        @param view: La vista que se intenta acceder (no utilizada directamente en esta implementación).
-        @return bool: True si el usuario está autenticado y su rol pertenece a los roles permitidos,
-                      False en caso contrario.
+        @param request: Objeto `Request` que contiene al usuario autenticado.
+        @param view: La vista o ViewSet que se intenta acceder.
+        @return bool: `True` si el rol del usuario está permitido, `False` en caso contrario.
         """
         user = request.user
-        if not user or not user.is_authenticated:
+        if not user or not getattr(user, "is_authenticated", False):
             return False
-        return user.rol.nombre in self.allowed_roles
+
+        # Como user.rol ahora es un string
+        user_role = getattr(user, "rol", None)
+        if not user_role:
+            return False
+
+        return user_role in self.allowed_roles
 
 
 def AllowRoles(*roles):
     """!
-    @brief Crea una subclase personalizada de RolePermission con roles predefinidos.
+    @brief Crea dinámicamente una subclase de RolePermission con roles predefinidos.
     @details
-        Función fábrica de permisos que genera dinámicamente una subclase de RolePermission
-        con roles permitidos. Soporta tanto una lista/tupla como múltiples argumentos
-        posicionales.
-    
-    @param roles: Lista, tupla o múltiples strings representando los roles autorizados.
-    @return type: Subclase personalizada de RolePermission con los roles establecidos.
-    
+        Función fábrica que permite crear una clase de permiso personalizada
+        con roles específicos sin necesidad de definir una nueva clase manualmente.
+
+        Soporta tanto:
+        - Una lista o tupla: `AllowRoles(['Administrador', 'Recepcionista'])`
+        - Múltiples argumentos: `AllowRoles('Administrador', 'Recepcionista')`
+
+        El resultado puede usarse directamente en las vistas de Django REST Framework.
+
+    @param roles: Lista, tupla o múltiples argumentos de strings que representan los roles permitidos.
+    @return type: Subclase personalizada de `RolePermission` con los roles establecidos.
+
     @example
-        permission_classes = [AllowRoles(['Administrador', 'Supervisor'])]
         permission_classes = [AllowRoles('Administrador', 'Supervisor')]
+        permission_classes = [AllowRoles(['Administrador', 'Recepcionista'])]
     """
     if len(roles) == 1 and isinstance(roles[0], (list, tuple)):
         roles = list(roles[0])
@@ -63,7 +87,13 @@ def AllowRoles(*roles):
         roles = list(roles)
 
     class CustomRolePermission(RolePermission):
+        """!
+        @brief Subclase generada dinámicamente de `RolePermission`.
+        @details
+            Esta clase se crea internamente por la función `AllowRoles`
+            y hereda automáticamente los roles definidos como permitidos.
+        """
         def __init__(self):
             super().__init__(allowed_roles=roles)
-    
+
     return CustomRolePermission
