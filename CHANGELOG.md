@@ -1,8 +1,61 @@
 # Changelog
 
+## [feature/backend/cobros-design] – 2025-11-12
+
+_(Cambios realizados por @jmrodriguezspinker)_
+
+### Adds
+
+* Implementación de **Abstract Factory** y **Decorators** en `cobros` para mejorar la extensión de tipos de cobro.
+* Nuevas migraciones para `cobros` y `usuarios` (`0002_cobro_estado`, `0002_alter_usuario_rol`).
+* Nuevos archivos de soporte para cobros: `decorators.py` y `factories.py`.
+
+### Refactors
+
+* Actualización de la autenticación JWT y permisos en varios microservicios (`pedidos`, `productos`) para reflejar cambios en el token (`roles[]` → `rol(string)`).
+* Refactor de modelos, serializers, views y URLs de `cobros` para acomodar abstract factory y decorators.
+* Refactor de modelos y serializers de `pedidos` para alinearse con la nueva lógica de negocio.
+* Limpieza y reorganización de migraciones obsoletas en `cobros`, `pedidos` y `pedidosProductos`.
+* Actualización de configuración: `settings.py`, URLs y `requirements.txt` (incluye django-filter y eliminación de app obsoleta `metodos`).
+
+### Fixes
+
+* Reemplazo de `rol_nombre` por `rol` como campo readonly en serializers de `usuarios`.
+* Ajuste de vistas en `usuarios` para reemplazar `roles[]` por `rol(string)`.
+
+### Removes / Chores
+
+* Eliminación completa de la app `metodos` y sus migraciones asociadas.
+* Eliminación de migraciones antiguas en `cobros`, `pedidos` y `pedidosProductos`.
+
+### Affects
+
+* `/backend/service_pedidos/apps/authentication/jwt_auth.py`
+* `/backend/service_productos/apps/authentication/jwt_auth.py`
+* `/backend/service_pedidos/utils/permissions.py`
+* `/backend/service_productos/utils/permissions.py`
+* `/backend/service_pedidos/apps/cobros/models.py`
+* `/backend/service_pedidos/apps/cobros/serializer.py`
+* `/backend/service_pedidos/apps/cobros/views.py`
+* `/backend/service_pedidos/apps/cobros/urls.py`
+* `/backend/service_pedidos/apps/cobros/tests.py`
+* `/backend/service_pedidos/apps/cobros/decorators.py`
+* `/backend/service_pedidos/apps/cobros/factories.py`
+* `/backend/service_pedidos/apps/pedidos/models.py`
+* `/backend/service_pedidos/apps/pedidos/serializer.py`
+* `/backend/service_pedidos/apps/cobros/migrations/0002_cobro_estado.py`
+* `/backend/service_usuarios/apps/usuarios/migrations/0002_alter_usuario_rol.py`
+* `/backend/service_pedidos/apps/pedidosProductos/migrations/0001_initial.py`
+* `/backend/service_pedidos/orders/settings.py`
+* `/backend/service_pedidos/orders/urls.py`
+* `/backend/service_pedidos/requirements.txt`
+* `/backend/service_usuarios/apps/usuarios/serializer.py`
+* `/backend/service_usuarios/apps/usuarios/views.py`
+
+
 ## [feature/backend/cobros-refac] – 2025-11-10
 
-(Cambios realizados por @jmrodriguezspinker)
+_(Cambios realizados por @jmrodriguezspinker)_
 
 ### Adds
 
@@ -48,7 +101,8 @@
 
 
 ## [feature/backend/roles] – 2025-10-27
-(Cambios realizados por @jmrodriguezspinker)
+
+_(Cambios realizados por @jmrodriguezspinker)_
 
 ### Adds
 
