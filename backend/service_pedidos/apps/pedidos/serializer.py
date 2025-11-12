@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from apps.pedidos.models import Pedido
 from apps.pedidosProductos.models import PedidoProductos
+from apps.cobros.models import Cobro
 
 class PedidoProductosSerializer(serializers.ModelSerializer):
     """!
@@ -54,6 +55,8 @@ class PedidoSerializer(serializers.ModelSerializer):
     productos = PedidoProductosSerializer(many=True, write_only=True)
     productos_detalle = serializers.SerializerMethodField(read_only=True)
     total = serializers.SerializerMethodField()
+    total_pagado = serializers.SerializerMethodField()
+    saldo_pendiente = serializers.SerializerMethodField()
     
     class Meta:
         model = Pedido
@@ -73,7 +76,10 @@ class PedidoSerializer(serializers.ModelSerializer):
                   #
                   'avisado',
                   'pagado',
-                  'total']
+                  'total', 
+                  #
+                  'total_pagado',
+                  'saldo_pendiente']
         extra_kwargs = {
             'productos': {'write_only': True}
         }
@@ -177,6 +183,12 @@ class PedidoSerializer(serializers.ModelSerializer):
             
         return round(total,2)
 
+    def get_total_pagado(self, pedido):
+        cobros = Cobro.objects.filter(pedido=pedido)
+        return round(sum(cobro.monto for cobro in cobros), 2)
+
+    def get_saldo_pendiente(self, pedido):
+        return round(self.get_total(pedido) - self.get_total_pagado(pedido), 2)
 
         
         
