@@ -1,5 +1,6 @@
 # apps/cobros/tests/test_views.py
-from datetime import date, time
+from django.utils import timezone
+from datetime import time
 from decimal import Decimal
 from rest_framework.test import APITestCase, APIClient
 from rest_framework_simplejwt.tokens import AccessToken
@@ -25,7 +26,7 @@ class CobroViewSetTests(APITestCase):
         # Crear Pedido base
         self.pedido = Pedido.objects.create(
             numero_pedido=123,
-            fecha_pedido=date.today(),
+            fecha_pedido=timezone.now(),
             id_cliente=1,
             cliente="Cliente de prueba",
             para_hora=time(12, 0),
@@ -85,7 +86,7 @@ class CobroViewSetTests(APITestCase):
             pedido=self.pedido,
             tipo="efectivo",
             monto=100,
-            fecha=date.today(),
+            fecha=timezone.now(),
             estado="activo"
         )
         response = self.client.delete(f"/api/pedidos/cobros/{cobro.id}/")
@@ -104,7 +105,7 @@ class CobroViewSetTests(APITestCase):
             pedido=self.pedido,
             tipo="efectivo",
             monto=100,
-            fecha=date.today(),
+            fecha=timezone.now(),
             estado="activo"
         )
         response = self.client.delete(f"/api/pedidos/cobros/{cobro.id}/")
@@ -116,7 +117,7 @@ class CobroViewSetTests(APITestCase):
             pedido=self.pedido,
             tipo="efectivo",
             monto=100,
-            fecha=date.today(),
+            fecha=timezone.now(),
             estado="activo"
         )
         data = {"monto": 150}
@@ -131,7 +132,7 @@ class CobroViewSetTests(APITestCase):
             pedido=self.pedido,
             tipo="efectivo",
             monto=100,
-            fecha=date.today(),
+            fecha=timezone.now(),
             estado="cancelado"
         )
         data = {"monto": 150}
