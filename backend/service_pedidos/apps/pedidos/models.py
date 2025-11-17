@@ -1,3 +1,4 @@
+# pedidos/models.py
 from django.db import models
 from django.utils import timezone
 from apps.pedidosProductos.models import PedidoProductos
