@@ -17,7 +17,6 @@ class UsuarioSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Usuario
-        rol_nombre = serializers.CharField(source='rol.nombre', read_only=True)
         fields = ['id', 'email', 'nombre', 'fecha_creacion', 'rol']
 
 class SignUpSerializer(serializers.ModelSerializer):
