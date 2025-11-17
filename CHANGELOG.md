@@ -1,5 +1,70 @@
 # Changelog
 
+## [feature/frontend/cobros-refac] – 2025-11-17
+
+*(Cambios realizados por @jmrodriguezspinker)*
+
+### Adds
+
+* Agregada la dependencia **jwt-decoder** en el frontend para permitir la lectura de roles desde el token.
+* Integración de **gestión de roles en frontend**: nueva página `GestionRolesPage`, servicio `role_service` y estilos asociados.
+* Nuevos **tipos globales** en `types.ts` y reorganización de la estructura de `types`.
+* Agregado módulo `auth/` en frontend para la **decodificación del token JWT**.
+* Agregado **stock** al formData en el modal de creación de productos para alinearlo con el backend.
+
+### Refactors
+
+* Refactor del sistema de autenticación del frontend:
+
+  * Inclusión del **token** dentro de `AuthContextType` y `AuthProvider`.
+  * Actualización de rutas protegidas para soportar **restricción por roles**.
+* Refactor de modales de **crear y editar cobros** para alinearlos con el nuevo modelo del backend.
+* Ajustes en `cobro_service` y en los modelos de frontend (`Cobro` y `CobroInput`) para reflejar el modelo del backend.
+* Limpieza y reorganización de imports y estructura de `index.ts` en types.
+
+### Fixes
+
+* Corrección de modelos, serializers y tests del backend:
+
+  * Ajustes en modelos y serializers de `pedidos`.
+  * Correcciones en los tests de los módulos de `cobros` y `pedidos`.
+* Corrección del serializer de **usuarios** para alinearlo con cambios recientes del backend.
+
+### Removes / Chores
+
+* Reorganización de los puntos de acceso a tipos mediante `types/index.ts`.
+* Ajustes menores de estructura en frontend para facilitar el uso de modelos y types.
+
+### Affects
+
+**Frontend**
+
+* `Frontend/package.json`
+* `Frontend/package-lock.json`
+* `Frontend/src/components/modals/CrearEditarCobroModal/CrearEditarCobroModal.tsx`
+* `Frontend/src/components/modals/GestionCobrosModal/GestionCobrosModal.tsx`
+* `Frontend/src/services/cobro_service.ts`
+* `Frontend/src/types/models.ts`
+* `Frontend/src/components/modals/CrearProductoModal.tsx`
+* `Frontend/src/context/auth_context.tsx`
+* `Frontend/src/router/index.tsx`
+* `Frontend/src/router/protected_route.tsx`
+* `Frontend/src/pages/GestionRolesPage.tsx`
+* `Frontend/src/services/role_service.ts`
+* `Frontend/src/styles/gestionRolesPage.module.css`
+* `Frontend/src/types/types.ts`
+* `Frontend/src/types/index.ts`
+* `Frontend/src/auth/`
+
+**Backend**
+
+* `backend/service_pedidos/apps/cobros/tests.py`
+* `backend/service_pedidos/apps/pedidos/models.py`
+* `backend/service_pedidos/apps/pedidos/serializer.py`
+* `backend/service_pedidos/apps/pedidos/tests.py`
+* `backend/service_usuarios/apps/usuarios/serializer.py`
+
+
 ## [feature/backend/cobros-design] – 2025-11-12
 
 _(Cambios realizados por @jmrodriguezspinker)_
