@@ -1,9 +1,6 @@
 /**
  * @file router/index.tsx
- * @brief Define la configuración de enrutamiento principal para la aplicación.
- * @details
- * Este archivo utiliza la función `createBrowserRouter` de `react-router-dom` para
- * crear y configurar todas las rutas de la Single-Page Application (SPA).
+ * @brief Configuración de rutas principal con protección por autenticación y roles.
  */
 
 import { createBrowserRouter, Navigate } from 'react-router-dom';
@@ -17,8 +14,9 @@ import GestionPedidosPage from '../pages/GestionPedidosPage';
 import GestionCategoriasPage from '../pages/GestionCategoriasPage';
 import GestionRecetasPage from '../pages/GestionRecetasPage';
 import GestionInsumosPage from '../pages/GestionInsumosPage';
+import GestionRolesPage from '../pages/GestionRolesPage';
 import MainLayout from '../Layouts/MainLayout';
-import ProtectedRoute from './protected_route'; 
+import ProtectedRoute from './protected_route';
 
 const router = createBrowserRouter([
   {
@@ -26,7 +24,7 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       {
-        index: true, 
+        index: true,
         element: <Navigate to="/login" replace />,
       },
       {
@@ -38,35 +36,68 @@ const router = createBrowserRouter([
         ),
         children: [
           {
-            index: true, 
-            element: <CrearPedidoPage />,
+            index: true,
+            element: (
+              <ProtectedRoute allowedRoles={['Administrador', 'Recepcionista']}>
+                <CrearPedidoPage />
+              </ProtectedRoute>
+            ),
           },
           {
             path: 'productos',
-            element: 
-              <GestionProductosPage />,
+            element: (
+              <ProtectedRoute allowedRoles={['Administrador', 'Cocinero']}>
+                <GestionProductosPage />
+              </ProtectedRoute>
+            ),
           },
           {
             path: 'clientes',
-            element: 
-              <GestionClientesPage />,
+            element: (
+              <ProtectedRoute allowedRoles={['Administrador', 'Recepcionista']}>
+                <GestionClientesPage />
+              </ProtectedRoute>
+            ),
           },
           {
-            path: 'pedidos', 
-            element: 
-              <GestionPedidosPage />,
+            path: 'pedidos',
+            element: (
+              <ProtectedRoute allowedRoles={['Administrador', 'Recepcionista']}>
+                <GestionPedidosPage />
+              </ProtectedRoute>
+            ),
           },
           {
             path: 'categorias',
-            element: <GestionCategoriasPage />,
+            element: (
+              <ProtectedRoute allowedRoles={['Administrador']}>
+                <GestionCategoriasPage />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: 'roles',
+            element: (
+              <ProtectedRoute allowedRoles={['Administrador']}>
+                <GestionRolesPage />
+              </ProtectedRoute>
+            ),
           },
           {
             path: 'recetas',
-            element: <GestionRecetasPage />,
+            element: (
+              <ProtectedRoute allowedRoles={['Administrador', 'Cocinero']}>
+                <GestionRecetasPage />
+              </ProtectedRoute>
+            ),
           },
           {
             path: 'insumos',
-            element: <GestionInsumosPage />,
+            element: (
+              <ProtectedRoute allowedRoles={['Administrador', 'Cocinero']}>
+                <GestionInsumosPage />
+              </ProtectedRoute>
+            ),
           },
         ],
       },
@@ -79,6 +110,10 @@ const router = createBrowserRouter([
   {
     path: '/register',
     element: <RegisterPage />,
+  },
+  {
+    path: '/unauthorized',
+    element: <div>No tienes permiso para acceder a esta página.</div>,
   },
 ]);
 
