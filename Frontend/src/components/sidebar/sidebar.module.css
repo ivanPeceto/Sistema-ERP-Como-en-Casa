@@ -127,3 +127,58 @@
 .logoutButton:hover {
   background-color: #c82333;
 }
+
+.menuParent {
+  position: relative;
+  display: inline-block; /* para submenú relativo al item */
+}
+
+/* Contenedor del submenú */
+.subMenu {
+  position: absolute;
+  bottom: 100%;           /* abre hacia arriba */
+  left: 0;                /* alinea al borde izquierdo del item padre */
+  display: flex;
+  flex-direction: column; /* elementos uno debajo del otro */
+  background-color: #2d3748; 
+  border-radius: 6px;
+  box-shadow: 0 -4px 6px rgba(0,0,0,0.2);
+  z-index: 1000;
+  width: 100%;
+  padding: 0;             /* quitar padding extra para alinear elementos */
+}
+
+/* Cada item del submenú */
+.subMenuItem {
+  display: flex;           /* permite alinear icono y texto */
+  align-items: center;     /* centra verticalmente */
+  width: 100%;             /* ocupa todo el ancho del submenú */
+  padding: 0.5rem 1rem;    /* mismo padding para todos */
+  box-sizing: border-box;  /* incluye padding en el ancho */
+  color: #a0aec0;
+  text-decoration: none;
+  font-size: 0.875rem;
+}
+
+/* Hover */
+.subMenuItem:hover {
+  background-color: #4a5568;
+  color: #fff;
+}
+
+/* Item activo */
+.activeDarkSub {
+  background-color: #4a5568;
+  color: #fff;
+}
+
+
+.arrow {
+  margin-left: 0.5rem;
+  transition: transform 0.2s ease;
+  display: inline-block; /* necesario para aplicar transform */
+}
+
+.arrow.open {
+  transform: rotate(180deg); /* flecha invertida cuando abierto */
+}
