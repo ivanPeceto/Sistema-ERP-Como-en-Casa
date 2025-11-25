@@ -74,12 +74,14 @@ class CobroViewSet(viewsets.ModelViewSet):
             transaccion = Recargo(transaccion, recargo)
         return transaccion
 
-    def _guardar_cobro_y_actualizar_pedido(self, pedido, transaccion, tipo):
+    def _guardar_cobro_y_actualizar_pedido(self, pedido, transaccion, tipo, descuento=Decimal(0), recargo=Decimal(0)):
         """Guarda el cobro y actualiza automáticamente el estado de pago del pedido."""
         cobro = Cobro.objects.create(
             pedido=pedido,
             tipo=tipo,
             monto=transaccion.monto,
+            descuento=descuento,   
+            recargo=recargo,
             fecha=transaccion.fecha,
             banco=getattr(transaccion, 'banco', None),
             referencia=getattr(transaccion, 'referencia', None),
@@ -118,7 +120,7 @@ class CobroViewSet(viewsets.ModelViewSet):
             return Response({"error": "Tipo de cobro no válido"}, status=400)
 
         transaccion = self._aplicar_decoradores(transaccion, descuento, recargo)
-        cobro = self._guardar_cobro_y_actualizar_pedido(pedido, transaccion, tipo)
+        cobro = self._guardar_cobro_y_actualizar_pedido(pedido, transaccion, tipo, descuento=descuento, recargo=recargo)
 
         serializer = CobroSerializer(cobro)
         return Response({"detalle": transaccion.detalle(), "cobro": serializer.data}, status=201)
@@ -157,6 +159,8 @@ class CobroViewSet(viewsets.ModelViewSet):
         cobro.banco = getattr(transaccion, 'banco', None)
         cobro.referencia = getattr(transaccion, 'referencia', None)
         cobro.cuotas = getattr(transaccion, 'cuota', None)
+        cobro.descuento = descuento
+        cobro.recargo = recargo
         cobro.save()
 
         # Actualizar estado de pago del pedido
@@ -190,4 +194,5 @@ class CobroViewSet(viewsets.ModelViewSet):
         """Devuelve todos los cobros de un pedido específico"""
         cobros = Cobro.objects.filter(pedido_id=pedido_id, estado='activo').order_by('-fecha')
         serializer = self.get_serializer(cobros, many=True)
+
         return Response(serializer.data)
