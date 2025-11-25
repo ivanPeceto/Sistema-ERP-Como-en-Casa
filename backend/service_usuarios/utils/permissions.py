@@ -68,3 +68,15 @@ def AllowRoles(*roles):
     
     return CustomRolePermission
 
+class AdminOnly(RolePermission):
+    """!
+    @brief Permiso restringido únicamente al rol **Administrador**.
+    @details
+        Esta clase es una especialización de `RolePermission` que permite
+        el acceso solo a los usuarios cuyo `user.rol` sea `"Administrador"`.
+
+    @example
+        permission_classes = [AdminOnly]
+    """
+    def __init__(self):
+        super().__init__(allowed_roles=["Administrador"])
