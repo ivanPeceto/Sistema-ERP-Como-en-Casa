@@ -1,0 +1,35 @@
+[
+  {
+    "model": "usuarios.usuario",
+    "pk": 1,
+    "fields": {
+      "email": "admin@admin.com",
+      "nombre": "Administrador",
+      "fecha_creacion": "2025-11-18T12:00:00Z",
+      "rol": 1,
+      "password": "pbkdf2_sha256$1000000$is2F2Bh19xoGwoOxxtQ8l3$MEdTo7D95v2dx/6Kshcu/mteJNGK8s23TLs7xtBVUEk="
+    }
+  },
+  {
+    "model": "usuarios.usuario",
+    "pk": 2,
+    "fields": {
+      "email": "recepcionista@example.com",
+      "nombre": "Recepcionista",
+      "fecha_creacion": "2025-11-18T12:00:00Z",
+      "rol": 2,
+      "password": "pbkdf2_sha256$1000000$Q7iVThRQ5X42AV0YTrha3V$GnlM3p+b0SD9vi8bMLpyqciH1FB3YQ5AZ9zojniJyFc="
+    }
+  },
+  {
+    "model": "usuarios.usuario",
+    "pk": 3,
+    "fields": {
+      "email": "cocinero1@example.com",
+      "nombre": "Cocinero1",
+      "fecha_creacion": "2025-11-18T12:00:00Z",
+      "rol": 3,
+      "password": "pbkdf2_sha256$1000000$EF9GHlRpdbkT1BdzaCiLu9$Mj9DPn5hNJv2yBsX2Fzn06oI/gFDqO+dOR2aEPrm6bI="
+    }
+  }
+]

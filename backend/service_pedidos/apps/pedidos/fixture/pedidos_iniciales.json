@@ -1,0 +1,50 @@
+[
+  {
+    "model": "pedidos.pedido",
+    "pk": 1,
+    "fields": {
+      "numero_pedido": 1001,
+      "fecha_pedido": "2025-11-18T12:30:00Z",
+      "id_cliente": 1,
+      "cliente": "JUAN PEREZ",
+      "para_hora": "13:00:00",
+      "estado": "PENDIENTE",
+      "entregado": false,
+      "avisado": false,
+      "pagado": false,
+      "total": "0.00"
+    }
+  },
+  {
+    "model": "pedidos.pedido",
+    "pk": 2,
+    "fields": {
+      "numero_pedido": 1002,
+      "fecha_pedido": "2025-11-18T12:45:00Z",
+      "id_cliente": 2,
+      "cliente": "MARIA LOPEZ",
+      "para_hora": "13:30:00",
+      "estado": "LISTO",
+      "entregado": false,
+      "avisado": true,
+      "pagado": true,
+      "total": "0.00"
+    }
+  },
+  {
+    "model": "pedidos.pedido",
+    "pk": 3,
+    "fields": {
+      "numero_pedido": 1003,
+      "fecha_pedido": "2025-11-18T13:00:00Z",
+      "id_cliente": 3,
+      "cliente": "CARLOS GOMEZ",
+      "para_hora": "14:00:00",
+      "estado": "ENTREGADO",
+      "entregado": true,
+      "avisado": true,
+      "pagado": true,
+      "total": "0.00"
+    }
+  }
+]

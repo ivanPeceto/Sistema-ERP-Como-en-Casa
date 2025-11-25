@@ -1,0 +1,26 @@
+[
+  {
+    "model": "roles.rol",
+    "pk": 1,
+    "fields": {
+      "nombre": "Administrador",
+      "descripcion": "Usuario con todos los permisos"
+    }
+  },
+  {
+    "model": "roles.rol",
+    "pk": 2,
+    "fields": {
+      "nombre": "Recepcionista",
+      "descripcion": "Usuario que atiende clientes"
+    }
+  },
+  {
+    "model": "roles.rol",
+    "pk": 3,
+    "fields": {
+      "nombre": "Cocinero",
+      "descripcion": "Usuario que prepaara los elementos para vender"
+    }
+  }
+]

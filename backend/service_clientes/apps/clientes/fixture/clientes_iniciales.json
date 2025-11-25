@@ -1,0 +1,29 @@
+[
+  {
+    "model": "clientes.cliente",
+    "pk": 1,
+    "fields": {
+      "nombre": "Juan Perez",
+      "telefono": "123456789",
+      "direccion": "Calle Falsa 123, Ciudad"
+    }
+  },
+  {
+    "model": "clientes.cliente",
+    "pk": 2,
+    "fields": {
+      "nombre": "Maria Lopez",
+      "telefono": "987654321",
+      "direccion": "Avenida Siempre Viva 742, Ciudad"
+    }
+  },
+  {
+    "model": "clientes.cliente",
+    "pk": 3,
+    "fields": {
+      "nombre": "Carlos Gomez",
+      "telefono": "555123456",
+      "direccion": "Calle Luna 45, Ciudad"
+    }
+  }
+]

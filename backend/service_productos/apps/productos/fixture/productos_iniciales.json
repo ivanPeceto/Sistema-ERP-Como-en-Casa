@@ -1,0 +1,46 @@
+[
+  {
+    "model": "productos.producto",
+    "pk": 1,
+    "fields": {
+      "nombre": "Pollo al Horno",
+      "descripcion": "Pollo completo horneado con especias.",
+      "precio_unitario": "1200.00",
+      "disponible": true,
+      "categoria": 1
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 2,
+    "fields": {
+      "nombre": "Empanada de Carne",
+      "descripcion": "Empanada rellena de carne, cebolla y especias.",
+      "precio_unitario": "250.00",
+      "disponible": true,
+      "categoria": 2
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 3,
+    "fields": {
+      "nombre": "Pizza Napolitana",
+      "descripcion": "Pizza con tomate, mozzarella, ajo y albahaca.",
+      "precio_unitario": "1500.00",
+      "disponible": true,
+      "categoria": 3
+    }
+  },
+  {
+    "model": "productos.producto",
+    "pk": 4,
+    "fields": {
+      "nombre": "Gaseosa 500ml",
+      "descripcion": "Gaseosa cola de 500ml.",
+      "precio_unitario": "300.00",
+      "disponible": true,
+      "categoria": 4
+    }
+  }
+]
