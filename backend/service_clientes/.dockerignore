@@ -1,0 +1,46 @@
+# Carpetas y archivos que no deben estar en el contexto de Docker
+
+# Cache de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Entornos virtuales
+venv/
+.venv/
+
+# Archivos locales de configuración
+.env
+.env.*
+*.sqlite*
+*.db
+
+# Logs
+*.log
+
+# Carpeta de tests
+tests/
+test/
+__tests__/
+
+# Documentación
+docs/
+*.md
+
+# Archivos de control de Git
+.git/
+.gitignore
+
+# Archivos de editor
+.vscode/
+.idea/
+*.swp
+
+# Archivos de dependencias descargadas
+pip-wheel-metadata/
+pip-log.txt
+
+# Otros
+Dockerfile
+docker-compose.yml
