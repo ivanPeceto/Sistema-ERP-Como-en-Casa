@@ -74,9 +74,9 @@ export interface Producto {
 export interface PedidoItem extends Partial<Producto> {
     id: number;
     nombre: string;
+    cantidad: number;
     precio_unitario: number;
     aclaraciones?: string;
-    cantidad: number;
     subtotal: number;
 }
 
@@ -89,16 +89,9 @@ export interface Pedido {
   id: number;
   numero_pedido: number;
   fecha_pedido: string; 
-  // Deprecated
   id_cliente: number;
-  //--
   cliente: string;
   para_hora: string | null; 
-  estado: PedidoEstado;
-  // Deprecated
-  entregado: boolean;
-  //--
-  pagado: boolean;
   total: number;
   productos_detalle: {
       id_producto: number;
@@ -108,6 +101,12 @@ export interface Pedido {
       precio_unitario: number;
       subtotal: number;
   }[];
+  estado: PedidoEstado;
+  entregado: boolean;
+  avisado: boolean;
+  pagado: boolean;
+  total_pagado: number;
+  saldo_pendiente: number;
 }
 
 /**
@@ -119,17 +118,9 @@ export interface Pedido {
 export interface PedidoInput {
     numero_pedido: number;
     fecha_pedido: string;
-    // Deprecated 
     id_cliente: number;
-    // --
-    //cliente: string;
+    cliente: string;
     para_hora: string | null; 
-    estado: PedidoEstado; 
-    avisado: boolean;
-    // Deprecated
-    entregado: boolean;
-    //--
-    pagado: boolean;
     productos: {
         id_producto: number;
         nombre_producto: string;
@@ -137,6 +128,10 @@ export interface PedidoInput {
         precio_unitario: number;
         aclaraciones?: string;
     }[];
+    estado: PedidoEstado;
+    entregado: boolean;
+    avisado: boolean;
+    pagado: boolean;
 }
 
 // --- Tipos de Autenticación ---
@@ -152,6 +147,13 @@ export interface User {
   is_superuser: boolean;
   rol: string;
 }
+
+export interface UserForm {
+  email: string;
+  nombre: string;
+  rol?: string;
+}
+
 
 /**
  * @interface RefreshTokenResponse
