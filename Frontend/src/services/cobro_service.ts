@@ -1,6 +1,5 @@
 import createAuthApiClient from '../api/apiClient';
-import type { Cobro, CobroInput } from '../types/models';
-import type { MetodoCobro } from '../types/types';
+import type { Cobro, CobroInput, MetodoCobro } from '../types';
 
 const PEDIDOS_API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const cobroAPIClient = createAuthApiClient(PEDIDOS_API_BASE_URL);
@@ -12,7 +11,7 @@ const cobroAPIClient = createAuthApiClient(PEDIDOS_API_BASE_URL);
  * @returns {Promise<Cobro[]>} Lista de cobros.
  */
 export const getCobrosByPedido = async (idPedido: number): Promise<Cobro[]> => {
-  const response = await cobroAPIClient.get<Cobro[]>(`/api/pedidos/cobros/listar/?id_pedido=${idPedido}`);
+  const response = await cobroAPIClient.get<Cobro[]>(`/api/pedidos/cobros/listar/${idPedido}`);
   return response.data;
 };
 

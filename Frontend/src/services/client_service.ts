@@ -32,6 +32,7 @@ const clientAPIClient = createAuthApiClient(CLIENTES_API_BASE_URL);
  * @throws {Error} Relanza el error si la petición a la API falla.
  */
 export const getClientes = async (): Promise<Cliente[]> => {
+    console.log(CLIENTES_API_BASE_URL + '/api/clientes/crear/');
     const response = await clientAPIClient.get<Cliente[]>('/api/clientes/listar/');
     return response.data;
 };
