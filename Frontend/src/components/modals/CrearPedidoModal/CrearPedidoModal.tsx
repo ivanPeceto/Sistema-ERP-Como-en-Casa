@@ -1,30 +1,47 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'; 
-import type { ChangeEvent } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, type ChangeEvent } from 'react';
 import styles from './CrearPedidoModal.module.css';
-import modalStyles from '../../../styles/modalStyles.module.css'; 
-
+import modalStyles from '../../../styles/modalStyles.module.css';
 import { createPedido, getPedidosByDate } from '../../../services/pedido_service';
-import type { Producto, PedidoItem, PedidoInput } from '../../../types/models.d.ts';
+import { getClientes } from '../../../services/client_service';
+import type { Producto, PedidoItem, PedidoInput, Cliente } from '../../../types/models.d.ts';
 
 interface CrearPedidoModalProps {
-  isOpen: boolean; 
-  onClose: () => void; 
+  isOpen: boolean;
+  onClose: () => void;
   productos: Producto[];
 }
 
-const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, productos}) => {
-  const [clienteInput, setClienteInput] = useState<string>(''); 
+const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, productos }) => {
+  /** Estados de pedido */
+  const [clienteInput, setClienteInput] = useState<string>('');
+  const [clienteSeleccionado, setClienteSeleccionado] = useState<Cliente | null>(null);
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<string>('');
   const [pedidoItems, setPedidoItems] = useState<PedidoItem[]>([]);
-  const [paraHora, setParaHora] = useState<string>(''); 
+  const [paraHora, setParaHora] = useState<string>('');
   const [productSearchTerm, setPruductSearchTerm] = useState<string>('');
 
+  /** Estados de UI */
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [clientes, setClientes] = useState<Cliente[]>([]);
 
+  /** Obtener clientes desde la API */
+  useEffect(() => {
+    const fetchClientes = async () => {
+      try {
+        const data = await getClientes();
+        setClientes(data);
+      } catch (err) {
+        console.error("Error al cargar clientes", err);
+      }
+    };
+    fetchClientes();
+  }, []);
 
+  /** Reset modal */
   const resetModalState = useCallback(() => {
     setClienteInput('');
+    setClienteSeleccionado(null);
     setPedidoItems([]);
     setParaHora('');
     setError(null);
@@ -33,143 +50,95 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
 
     if (productos.length > 0) {
       const categoriasUnicas = [...new Set(productos.map(p => p.categoria?.nombre || 'Sin Categoría'))];
-      if (categoriasUnicas.length > 0) {
-        setCategoriaSeleccionada(categoriasUnicas[0]);
-      } else {
-        setCategoriaSeleccionada('');
-      }
+      setCategoriaSeleccionada(categoriasUnicas[0] || '');
     } else {
       setCategoriaSeleccionada('');
     }
   }, [productos]);
-  
+
   useEffect(() => {
-    if (isOpen) {
-      resetModalState();
-    }
+    if (isOpen) resetModalState();
   }, [isOpen, resetModalState]);
 
-  useEffect(() => {
-    if (productos.length > 0 && !categoriaSeleccionada) {
-      const categoriasUnicas = [...new Set(productos.map(p => p.categoria?.nombre || 'Sin Categoría'))];
-      if (categoriasUnicas.length > 0) {
-        setCategoriaSeleccionada(categoriasUnicas[0]);
-      }
-    }
-  }, [productos, categoriaSeleccionada]);
-
-  /** @brief Extrae una lista de nombres de categorías únicas a partir de los productos. */
+  /** Categorías únicas */
   const categoriasUnicas = useMemo(() =>
     [...new Set(productos.map(p => p.categoria?.nombre || 'Sin Categoría'))],
-  [productos]);
+    [productos]
+  );
 
-  /** @brief Filtra los productos que se muestran basándose en la categoría seleccionada y término de búsqueda. */
+  /** Filtrar productos por categoría y búsqueda */
   const productosFiltrados = useMemo(() => {
     if (!categoriaSeleccionada) return [];
-
-    let results = productos.filter(p => 
+    let results = productos.filter(p =>
       (p.categoria?.nombre || 'Sin categoría') === categoriaSeleccionada && p.disponible
     );
-    
-    if (productSearchTerm){
-      const curatedInput = productSearchTerm.toLowerCase();
-      results = results.filter(p => 
-        p.nombre.toLowerCase().includes(curatedInput)
-      );
+    if (productSearchTerm) {
+      const term = productSearchTerm.toLowerCase();
+      results = results.filter(p => p.nombre.toLowerCase().includes(term));
     }
     return results;
   }, [categoriaSeleccionada, productos, productSearchTerm]);
 
-  /** @brief Calcula el total del pedido actual cada vez que la lista de ítems cambia. */
-  const totalPedido = useMemo(() => {
-    return pedidoItems.reduce((total, item) => total + (item.subtotal || 0), 0);
-  }, [pedidoItems]);
+  /** Calcular total del pedido */
+  const totalPedido = useMemo(() => pedidoItems.reduce((total, item) => total + (item.subtotal || 0), 0), [pedidoItems]);
 
-  /** @brief Elimina un ítem del pedido actual. */
+  /** Funciones para manejo de items */
   const eliminarItemDelPedido = useCallback((productoId: number) => {
-    setPedidoItems(prevItems => prevItems.filter(item => item.id !== productoId));
+    setPedidoItems(prev => prev.filter(item => item.id !== productoId));
   }, []);
 
-  /** @brief Actualiza la cantidad de un ítem en el pedido. Si la cantidad es < 1, lo elimina. */
   const actualizarCantidadItem = useCallback((productoId: number, cantidad: number) => {
     if (cantidad < 0) {
       eliminarItemDelPedido(productoId);
       return;
     }
-    setPedidoItems(prevItems =>
-      prevItems.map(item =>
+    setPedidoItems(prev =>
+      prev.map(item =>
         item.id === productoId
-          ? { ...item, cantidad, subtotal: Number((cantidad * (Number(item.precio_unitario) || 0))) }
+          ? { ...item, cantidad, subtotal: Number(cantidad * (Number(item.precio_unitario) || 0)) }
           : item
       )
     );
   }, [eliminarItemDelPedido]);
 
-  /** @brief Actualiza la aclaración de un ítem de producto en el pedido. */
   const updateItemAclaraciones = useCallback((productoId: number, aclaracion: string) => {
-    setPedidoItems(prevItems =>
-      prevItems.map(item =>
-        item.id === productoId
-          ? { ...item, aclaraciones: aclaracion }
-          : item
-      )
-    );
+    setPedidoItems(prev => prev.map(item =>
+      item.id === productoId
+        ? { ...item, aclaraciones: aclaracion }
+        : item
+    ));
   }, []);
 
-  /** @brief Añade un producto al pedido o incrementa su cantidad si ya existe. */
   const agregarProductoAlPedido = useCallback((producto: Producto) => {
-    setPedidoItems(prevItems => {
-      const existingItem = prevItems.find(item => item.id === producto.id);
+    setPedidoItems(prev => {
+      const existing = prev.find(i => i.id === producto.id);
       const precioUnitario = Number(producto.precio_unitario) || 0;
-      
-      if (existingItem) {
-        const nuevaCantidad = existingItem.cantidad + 1;
-        return prevItems.map(item =>
-          item.id === producto.id
-            ? { 
-                ...item, 
-                cantidad: nuevaCantidad, 
-                subtotal: Number((nuevaCantidad * precioUnitario))
-              }
-            : item
+      if (existing) {
+        const nuevaCantidad = existing.cantidad + 1;
+        return prev.map(i =>
+          i.id === producto.id
+            ? { ...i, cantidad: nuevaCantidad, subtotal: Number(nuevaCantidad * precioUnitario) }
+            : i
         );
       } else {
-        return [
-          ...prevItems, 
-          { 
-            ...producto, 
-            cantidad: 1, 
-            precio_unitario: precioUnitario,
-            subtotal: Number(precioUnitario),
-            aclaraciones: '' 
-          }
-        ];
+        return [...prev, { ...producto, cantidad: 1, precio_unitario: precioUnitario, subtotal: Number(precioUnitario), aclaraciones: '' }];
       }
     });
   }, []);
 
-  /** @brief Actualiza el estado del término de búsqueda de productos.  */
-  const handleProductSearchTerm = (event: ChangeEvent<HTMLInputElement>) => {
-    setPruductSearchTerm(event.target.value)
-  };
+  /** Handlers de inputs */
+  const handleProductSearchTerm = (e: ChangeEvent<HTMLInputElement>) => setPruductSearchTerm(e.target.value);
+  const handleParaHoraChange = (e: ChangeEvent<HTMLInputElement>) => setParaHora(e.target.value);
 
-
-  const handleParaHoraChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setParaHora(e.target.value);
-  };
-
-  /**
-   * @brief Maneja la confirmación final y envío del pedido al backend.
-   * @details Valida que haya un cliente y productos, calcula el número de pedido secuencial
-   * para el día, construye el payload y llama al servicio `createPedido`.
-   */
+  /** Confirmar pedido */
   const handleConfirmarPedido = async () => {
-    if (!clienteInput.trim()) {
-      setError('Debe ingresar un nombre de cliente para el pedido.');
+    // Validaciones iniciales
+    if (!clienteSeleccionado) {
+      setError('Debe seleccionar un cliente.');
       return;
     }
     if (pedidoItems.length === 0) {
-      setError('El pedido no puede estar vacío. Añada al menos un producto.');
+      setError('El pedido no puede estar vacío.');
       return;
     }
 
@@ -177,81 +146,91 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
     setError(null);
 
     try {
+      // Fecha en formato YYYY-MM-DD
       const today = new Date();
-      const hoy = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
-      console.log(hoy);
-      const pedidosDeHoy = await getPedidosByDate(hoy);
-      console.log(pedidosDeHoy);
-      const nuevoNumeroPedido: number =  (pedidosDeHoy.length === 0)? 1 : pedidosDeHoy[pedidosDeHoy.length-1].numero_pedido + 1;
+      const hoy = today.toISOString().split('T')[0];
 
+      // Obtener pedidos del día para asignar nuevo número
+      const pedidosDeHoy = await getPedidosByDate(hoy);
+      const ultimoNumero = pedidosDeHoy.length === 0 ? 0 : pedidosDeHoy[pedidosDeHoy.length - 1].numero_pedido;
+      const nuevoNumeroPedido = ultimoNumero + 1;
+
+      // Armar payload
       const pedidoData: PedidoInput = {
         numero_pedido: nuevoNumeroPedido,
-        fecha_pedido: today.toISOString(),
-        //Deprecated
-        id_cliente: 1,
-        //
-        cliente: clienteInput.trim(), 
-        para_hora: paraHora || null,
-        estado: 'PENDIENTE', 
-        avisado: false, 
-        //Deprecated
-        entregado: false,
-        // 
-        pagado: false, 
+        fecha_pedido: today.toISOString().split('T')[0], // solo fecha
+        id_cliente: clienteSeleccionado.id,
+        cliente: clienteSeleccionado.nombre,
+        para_hora: paraHora || null, // null si está vacío
         productos: pedidoItems.map(item => ({
           id_producto: item.id,
           nombre_producto: item.nombre,
           cantidad_producto: item.cantidad,
           precio_unitario: item.precio_unitario,
-          aclaraciones: item.aclaraciones || '', 
+          aclaraciones: item.aclaraciones || ''
         })),
+        estado: 'PENDIENTE',
+        entregado: false,
+        avisado: false,
+        pagado: false
       };
 
+
+      // Depuración: revisar payload
+      console.log("Payload a enviar al backend:", pedidoData);
+
+      // Llamada al backend
       await createPedido(pedidoData);
 
-      setPedidoItems([]);
-      setClienteInput('');
-      setParaHora(''); 
-      onClose(); 
-    } catch (err) {
-      console.error("Error al confirmar el pedido:", err);
-      setError('Error al confirmar el pedido. Intente de nuevo más tarde.');
+      // Reset del modal y cierre
+      resetModalState();
+      onClose();
+    } catch (err: any) {
+      console.error("Error al crear pedido:", err);
+      // Si el backend devuelve mensaje, se puede mostrar
+      if (err.response?.data?.detail) {
+        setError(`Error: ${err.response.data.detail}`);
+      } else {
+        setError('Error al confirmar el pedido. Intente de nuevo.');
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
+
   if (!isOpen) return null;
 
   return (
     <div className={modalStyles.modalOverlay}>
-      <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-        <div className={styles.modalHeader}>
-        </div>
-        
+      <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+        <div className={styles.modalHeader}></div>
+
         {isLoading && <div className={modalStyles.loadingContainer}><p>Creando pedido...</p></div>}
-        {/**{error && <div className={modalStyles.error}>{error}</div>}*/}
+        {error && <div className={modalStyles.error}>{error}</div>}
 
         <div className={styles.modalBody}>
           <div className={styles.createModalGrid}>
-            {/* Panel de información del pedido (Cliente y Hora de Entrega) */}
+            {/* Información del pedido */}
             <div className={styles.clientSelectionPanel}>
               <h2>Información del Pedido</h2>
-              
-              <div className={[modalStyles.formGroup, styles.clientForm].join(" ")}>
+              <div className={[modalStyles.formGroup, styles.clientForm].join(' ')}>
                 <div className={styles.formRowElement}>
-                    <label className={modalStyles.formLabel} htmlFor="clienteInput">Cliente</label>
-                    <input
-                      type="text"
-                      id="clienteInput"
-                      name="clienteInput"
-                      value={clienteInput}
-                      onChange={(e) => setClienteInput(e.target.value)}
-                      className={modalStyles.formControl}
-                      placeholder="Nombre del cliente"
-                      autoFocus
-                    />
-                </div>        
+                  <label className={modalStyles.formLabel} htmlFor="clienteSelect">Cliente</label>
+                  <select
+                    id="clienteSelect"
+                    className={modalStyles.formControl}
+                    value={clienteSeleccionado?.id || ''}
+                    onChange={(e) => {
+                      const cliente = clientes.find(c => c.id === Number(e.target.value)) || null;
+                      setClienteSeleccionado(cliente);
+                      setClienteInput(cliente?.nombre || '');
+                    }}
+                  >
+                    <option value="">Seleccione un cliente</option>
+                    {clientes.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
+                  </select>
+                </div>
                 <div className={styles.formRowElement}>
                   <label className={modalStyles.formLabel} htmlFor="para_hora">Hora de Entrega</label>
                   <input
@@ -263,53 +242,40 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
                     className={`${modalStyles.formControl} ${modalStyles.timeInput}`}
                   />
                 </div>
-                
               </div>
 
-
-              
+              {/* Lista de items del pedido */}
               <div className={styles.orderItemsList}>
                 {pedidoItems.length === 0 ? (
                   <p className={styles.emptyOrderText}>Aún no hay productos en el pedido.</p>
                 ) : (
                   pedidoItems.map(item => (
                     <div key={item.id} className={styles.orderItem}>
-
                       <div className={styles.orderItemControls}>
                         <button onClick={() => actualizarCantidadItem(item.id, item.cantidad - 1)} className={styles.quantityButton}>-</button>
                         <input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value={item.cantidad}
-                            onChange={(e: ChangeEvent<HTMLInputElement>) => actualizarCantidadItem(item.id, parseFloat(e.target.value))}
-                            className={styles.quantityInput}
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={item.cantidad}
+                          onChange={(e) => actualizarCantidadItem(item.id, parseFloat(e.target.value))}
+                          className={styles.quantityInput}
                         />
-
                         <button onClick={() => actualizarCantidadItem(item.id, item.cantidad + 1)} className={styles.quantityButton}>+</button>
-                        
                       </div>
-
                       <div className={styles.orderItemInfo}>
-
-                        <strong>{item.nombre}</strong>                        
+                        <strong>{item.nombre}</strong>
                         <textarea
                           placeholder="Aclaraciones..."
                           value={item.aclaraciones || ''}
-                          onChange={(e: ChangeEvent<HTMLTextAreaElement>) => updateItemAclaraciones(item.id, e.target.value)}
+                          onChange={(e) => updateItemAclaraciones(item.id, e.target.value)}
                           className={styles.aclaracionesInput}
-                        ></textarea>
-
+                        />
                       </div>
-
                       <div>
-                        
-                        <span className={styles.orderItemSubtotal}>${(item.subtotal || 0)}</span>
-                        
+                        <span className={styles.orderItemSubtotal}>${item.subtotal || 0}</span>
                         <button onClick={() => eliminarItemDelPedido(item.id)} className={styles.deleteItemButton}>×</button>
-
                       </div>
-
                     </div>
                   ))
                 )}
@@ -323,8 +289,8 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
                 </div>
               )}
             </div>
-            
-            {/* Panel de selección de productos */}
+
+            {/* Selección de productos */}
             <div className={styles.productSelectionPanel}>
               <h2>Seleccionar Productos</h2>
               <div className={styles.productSearchContainer}>
@@ -337,7 +303,7 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
                 />
               </div>
               <div className={styles.categoryTabs}>
-                {(categoriasUnicas || []).map(cat => (
+                {categoriasUnicas.map(cat => (
                   <button
                     key={cat}
                     type="button"
@@ -354,13 +320,13 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
                     <div key={producto.id} className={styles.productItem}>
                       <div className={styles.productInfo}>
                         <button
-                        onClick={() => agregarProductoAlPedido(producto)}
-                        className={styles.addButtonSmall}
+                          onClick={() => agregarProductoAlPedido(producto)}
+                          className={styles.addButtonSmall}
                         >
                           Añadir
                         </button>
                         <strong>{producto.nombre}</strong>
-                        <span>${(producto.precio_unitario || 0)}</span>
+                        <span>${producto.precio_unitario || 0}</span>
                       </div>
                     </div>
                   ))
@@ -371,7 +337,8 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
             </div>
           </div>
         </div>
-        
+
+        {/* Footer */}
         <div className={modalStyles.modalFooter}>
           <button
             type="button"
@@ -379,16 +346,14 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
             className={`${modalStyles.modalButton} ${modalStyles.modalButtonSecondary}`}
             disabled={isLoading}
           >
-            <i className={`fas fa-times ${modalStyles.iconMarginRight}`}></i>
             Cancelar
           </button>
           <button
             type="button"
             onClick={handleConfirmarPedido}
             className={`${modalStyles.modalButton} ${modalStyles.modalButtonPrimary}`}
-            disabled={isLoading || !clienteInput.trim() || pedidoItems.length === 0}
+            disabled={isLoading || !clienteSeleccionado || pedidoItems.length === 0}
           >
-            <i className={`fas fa-save ${modalStyles.iconMarginRight}`}></i>
             Guardar Pedido
           </button>
         </div>

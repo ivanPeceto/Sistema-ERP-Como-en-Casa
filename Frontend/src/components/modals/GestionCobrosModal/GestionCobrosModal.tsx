@@ -2,10 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import formStyles from '../../../styles/formStyles.module.css';
 import styles from './GestionCobrosModal.module.css';
 import { getCobrosByPedido, deleteCobro } from '../../../services/cobro_service';
-import { getMetodosCobro } from '../../../services/metodo_cobro_service';
 import { METODO_COBRO, type Pedido, type Cobro, type MetodoCobro } from '../../../types';
 import CrearEditarCobroModal from '../CrearEditarCobroModal/CrearEditarCobroModal';
-import GestionMetodosCobroView from './GestionMetodosCobroView'; 
 
 interface GestionCobrosModalProps {
   isOpen: boolean;
@@ -40,22 +38,12 @@ const GestionCobrosModal: React.FC<GestionCobrosModalProps> = ({ isOpen, onClose
     }
   }, [pedido]);
 
-  const fetchMetodosCobro = useCallback(async () => {
-    try {
-      const data = await getMetodosCobro();
-      setMetodosCobro(data);
-    } catch (error) {
-      console.error('Error al cargar métodos de cobro:', error);
-    }
-  }, []);
-
   useEffect(() => {
     if (isOpen) {
       fetchCobros();
-      fetchMetodosCobro();
       setCurrentView('cobros');
     }
-  }, [isOpen, fetchCobros, fetchMetodosCobro]);
+  }, [isOpen, fetchCobros]);
 
   const handleEdit = (cobro: Cobro) => {
     setEditingCobro(cobro);
@@ -80,9 +68,9 @@ const GestionCobrosModal: React.FC<GestionCobrosModalProps> = ({ isOpen, onClose
 
   if (!isOpen || !pedido) return null;
 
-  const totalAbonado = cobros.reduce((sum, c) => sum + Number(c.monto), 0);
-  const montoRestante = Math.max(0, Number(pedido.total) - totalAbonado);
-  const pedidoTotalAbonado = montoRestante <= 0;
+  const saldoPendiente = pedido.saldo_pendiente ?? 0;
+  const pedidoTotalAbonado = saldoPendiente <= 0;
+  const totalAbonado = Number(pedido.total) - saldoPendiente;
 
   const renderCobrosList = () => (
     <>
@@ -90,7 +78,7 @@ const GestionCobrosModal: React.FC<GestionCobrosModalProps> = ({ isOpen, onClose
         <span><strong>Total:</strong> ${pedido.total}</span>
         <span><strong>Abonado:</strong> ${totalAbonado}</span>
         <span style={{ color: pedidoTotalAbonado ? '#1c7e40' : '#cc404e' }}>
-          <strong>Restante:</strong> ${montoRestante}
+          <strong>Restante:</strong> ${saldoPendiente}
         </span>
         {pedidoTotalAbonado && <span style={{ color: '#1c7e40', fontWeight: 'bold', marginLeft: '15px' }}>¡Pedido totalmente abonado!</span>}
       </div>
@@ -122,13 +110,6 @@ const GestionCobrosModal: React.FC<GestionCobrosModalProps> = ({ isOpen, onClose
 
       <div className={formStyles.formButtons}>
         <button 
-          onClick={() => setCurrentView('metodos')} 
-          className={formStyles.secondaryButton}
-          style={{ marginRight: 'auto' }}
-        >
-          Gestionar Métodos
-        </button>
-        <button 
           onClick={handleCreate} 
           className={formStyles.primaryButton}
           disabled={pedidoTotalAbonado}
@@ -151,7 +132,6 @@ const GestionCobrosModal: React.FC<GestionCobrosModalProps> = ({ isOpen, onClose
             <button 
               onClick={() => {
                 setCurrentView('cobros'); 
-                fetchMetodosCobro(); 
               }} 
               style={GREEN_BACK_BUTTON_STYLE}
             >
@@ -168,14 +148,6 @@ const GestionCobrosModal: React.FC<GestionCobrosModalProps> = ({ isOpen, onClose
         
         {currentView === 'cobros' && renderCobrosList()}
         
-        {currentView === 'metodos' && (
-          <GestionMetodosCobroView 
-            onBack={() => {
-              setCurrentView('cobros');
-              fetchMetodosCobro();
-            }} 
-          />
-        )}
       </div>
       
       <CrearEditarCobroModal
@@ -185,7 +157,7 @@ const GestionCobrosModal: React.FC<GestionCobrosModalProps> = ({ isOpen, onClose
         pedidoId={pedido.id}
         editingCobro={editingCobro}
         metodosCobro={metodosCobro}
-        montoRestante={montoRestante}
+        saldoPendiente={saldoPendiente}
       />
     </div>
   );
