@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Usuario
+from .models import Usuario, Rol
 from django.contrib.auth import authenticate
 #----- Los serializers transforman las clases de django en json y validan datos-------##
 
@@ -85,3 +85,43 @@ class LogInSerializer(serializers.Serializer):
         if not user:
             raise serializers.ValidationError('Credenciales invalidas...')
         return {'user' : user}
+    
+class AdminCrearUsuarioSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+    rol_id = serializers.IntegerField(write_only=True)
+
+    class Meta:
+        model = Usuario
+        fields = ['email', 'nombre', 'password', 'rol_id']
+
+    def create(self, validated_data):
+        password = validated_data.pop("password")
+        rol_id = validated_data.pop("rol_id")
+
+        rol = Rol.objects.get(id=rol_id)
+
+        user = Usuario(
+            email=validated_data["email"],
+            nombre=validated_data["nombre"],
+            rol=rol
+        )
+        user.set_password(password)
+        user.save()
+        return user
+
+class AdminEditarUsuarioSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=False)
+    rol_id = serializers.IntegerField(write_only=True, required=False)
+
+    class Meta:
+        model = Usuario
+        fields = ['email', 'nombre', 'password', 'rol_id']
+
+    def update(self, instance, validated_data):
+        if "password" in validated_data:
+            instance.set_password(validated_data.pop("password"))
+
+        if "rol_id" in validated_data:
+            instance.rol = Rol.objects.get(id=validated_data.pop("rol_id"))
+
+        return super().update(instance, validated_data)
