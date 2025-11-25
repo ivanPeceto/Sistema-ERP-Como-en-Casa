@@ -1,5 +1,95 @@
 # Changelog
 
+## [feature/frontend/cobros-refac] – 2025-11-25
+
+*(Cambios realizados por @jmrodriguezspinker)*
+
+### Adds
+
+* Nuevos modales y componentes en frontend para **gestión de cobros y pedidos**:
+  * `CrearEditarCobroModal`, `CrearPedidoModal`, `GestionCobrosModal`.
+* Agregado submenu de **Administración** en el sidebar.
+* Nueva página de **gestión de usuarios**: `GestionUsuariosPage` con su servicio `user_service` y estilos asociados.
+* Integración de fixtures para poblar tablas en todos los microservicios backend.
+* Migraciones nuevas para pedidos con ajustes en campos booleanos (`0002`, `0003`, `0004`).
+
+### Refactors
+
+* Refactor de servicios de frontend:
+  * `client_service` y `cobro_service` actualizados para alinearse con backend.
+  * Eliminación de `metodo_cobro_service`.
+* Refactor de modelos en frontend:
+  * Ajustes en `Pedido`, `PedidoInput`, `PedidoItem` y agregado de `UserForm`.
+* Refactor en backend:
+  * Modelos y serializers de `pedidos` actualizados.
+  * Ajustes en vistas y permisos de `clientes` y `usuarios`.
+
+### Fixes
+
+* Backend:
+  * Corrección de serializer de `usuarios` para CRUD de administradores.
+  * Ajustes en la autenticación JWT y permisos de acceso (`AdminOnly`).
+
+### Removes / Chores
+
+* Eliminación de `GestionMetodosCobroView.tsx` en frontend.
+* Actualización de dockerignore en todos los microservicios y frontend.
+* Ajustes de infraestructura:
+  * `docker-compose.yml.template`, `nginx.conf.template` y scripts para habilitar microservicio Clientes.
+
+### Affects
+
+**Frontend**
+
+* `Frontend/src/components/modals/CrearEditarCobroModal/CrearEditarCobroModal.tsx`
+* `Frontend/src/components/modals/CrearPedidoModal/CrearPedidoModal.tsx`
+* `Frontend/src/components/modals/GestionCobrosModal/GestionCobrosModal.tsx`
+* `Frontend/src/components/sidebar/sidebar.module.css`
+* `Frontend/src/components/sidebar/sidebar.tsx`
+* `Frontend/src/pages/GestionClientesPage.tsx`
+* `Frontend/src/pages/GestionPedidosPage.tsx`
+* `Frontend/src/pages/GestionUsuariosPage.tsx`
+* `Frontend/src/router/index.tsx`
+* `Frontend/src/router/protected_route.tsx`
+* `Frontend/src/services/client_service.ts`
+* `Frontend/src/services/cobro_service.ts`
+* `Frontend/src/services/user_service.ts`
+* `Frontend/src/types/models.ts`
+* `Frontend/src/styles/gestionUsuariosPage.module.css`
+* `Frontend/.dockerignore`
+
+**Backend**
+
+* `backend/service_clientes/apps/authentication/jwt_auth.py`
+* `backend/service_clientes/apps/clientes/views.py`
+* `backend/service_clientes/utils/permissions.py`
+* `backend/service_clientes/.dockerignore`
+* `backend/service_pedidos/apps/cobros/views.py`
+* `backend/service_pedidos/apps/cobros/fixture/`
+* `backend/service_pedidos/apps/pedidos/models.py`
+* `backend/service_pedidos/apps/pedidos/serializer.py`
+* `backend/service_pedidos/apps/pedidos/fixture/`
+* `backend/service_pedidos/apps/pedidos/migrations/0002_alter_pedido_avisado_alter_pedido_entregado_and_more.py`
+* `backend/service_pedidos/apps/pedidos/migrations/0003_pedido_descuento_total.py`
+* `backend/service_pedidos/apps/pedidos/migrations/0004_remove_pedido_descuento_total.py`
+* `backend/service_pedidos/apps/pedidosProductos/fixture/`
+* `backend/service_pedidos/.dockerignore`
+* `backend/service_productos/apps/categorias/fixture/`
+* `backend/service_productos/apps/insumos/fixture/`
+* `backend/service_productos/apps/productos/fixture/`
+* `backend/service_productos/apps/recetas/fixture/`
+* `backend/service_productos/.dockerignore`
+* `backend/service_usuarios/apps/roles/fixture/`
+* `backend/service_usuarios/apps/usuarios/fixture/`
+* `backend/service_usuarios/apps/usuarios/serializer.py`
+* `backend/service_usuarios/apps/usuarios/tests.py`
+* `backend/service_usuarios/apps/usuarios/urls.py`
+* `backend/service_usuarios/apps/usuarios/views.py`
+* `backend/service_usuarios/utils/permissions.py`
+* `backend/service_usuarios/.dockerignore`
+* `docker-compose.yml.template`
+* `nginx/nginx.conf.template`
+
 ## [feature/frontend/cobros-refac] – 2025-11-17
 
 *(Cambios realizados por @jmrodriguezspinker)*
