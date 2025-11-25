@@ -17,6 +17,7 @@ import GestionInsumosPage from '../pages/GestionInsumosPage';
 import GestionRolesPage from '../pages/GestionRolesPage';
 import MainLayout from '../Layouts/MainLayout';
 import ProtectedRoute from './protected_route';
+import GestionUsuariosPage from '../pages/GestionUsuariosPage';
 
 const router = createBrowserRouter([
   {
@@ -80,6 +81,14 @@ const router = createBrowserRouter([
             element: (
               <ProtectedRoute allowedRoles={['Administrador']}>
                 <GestionRolesPage />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: 'usuarios',
+            element: (
+              <ProtectedRoute allowedRoles={['Administrador']}>
+                <GestionUsuariosPage />
               </ProtectedRoute>
             ),
           },
