@@ -94,10 +94,13 @@ class PedidoSerializer(serializers.ModelSerializer):
         return PedidoProductosSerializer(productos, many=True).data
 
     def get_total(self, pedido):
-        return float(pedido.calcular_total())
+        return float(pedido.total_ajustado())
 
     def get_total_pagado(self, pedido):
-        return float(pedido.total_pagado())
+        cobrado = sum(
+            Decimal(c.monto) for c in pedido.cobros.filter(estado='activo')
+        )
+        return float(cobrado)
 
     def get_saldo_pendiente(self, pedido):
         return float(pedido.saldo_pendiente())
