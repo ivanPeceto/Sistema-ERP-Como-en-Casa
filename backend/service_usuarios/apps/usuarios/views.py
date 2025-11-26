@@ -1,10 +1,12 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializer import LogInSerializer, SignUpSerializer, UsuarioSerializer
+from .models import Usuario
+from .serializer import LogInSerializer, SignUpSerializer, UsuarioSerializer, AdminCrearUsuarioSerializer, AdminEditarUsuarioSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
-
+from rest_framework.permissions import IsAuthenticated
+from utils.permissions import AdminOnly
 
 class UserLoginView(APIView):
     """!
@@ -195,3 +197,85 @@ class UserTokenRefreshView(APIView):
         except TokenError:
             return Response({'detail': 'El refresh token es inválido o ha expirado.'},
                             status=status.HTTP_400_BAD_REQUEST)
+
+
+class UsuarioListarView(APIView):
+    permission_classes = [IsAuthenticated, AdminOnly]
+
+    def get(self, request):
+        user_id = request.query_params.get("id")
+
+        if user_id:
+            try:
+                user = Usuario.objects.get(id=user_id)
+                return Response(UsuarioSerializer(user).data)
+            except Usuario.DoesNotExist:
+                return Response({"detail": "Usuario no encontrado"}, status=404)
+
+        users = Usuario.objects.all()
+        return Response(UsuarioSerializer(users, many=True).data)
+
+class UsuarioCrearView(APIView):
+    permission_classes = [IsAuthenticated, AdminOnly]
+
+    def post(self, request):
+        serializer = AdminCrearUsuarioSerializer(data=request.data)
+
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response(UsuarioSerializer(user).data, status=201)
+
+        return Response(serializer.errors, status=400)
+    
+class UsuarioEditarView(APIView):
+    permission_classes = [IsAuthenticated, AdminOnly]
+
+    def put(self, request):
+        user_id = request.query_params.get("id")
+
+        if not user_id:
+            return Response({"detail": "Debe enviar ?id="}, status=400)
+
+        try:
+            user = Usuario.objects.get(id=user_id)
+        except Usuario.DoesNotExist:
+            return Response({"detail": "Usuario no encontrado"}, status=404)
+
+        serializer = AdminEditarUsuarioSerializer(user, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(UsuarioSerializer(user).data)
+
+        return Response(serializer.errors, status=400)
+
+class UsuarioEliminarView(APIView):
+    permission_classes = [IsAuthenticated, AdminOnly]
+
+    def delete(self, request):
+        user_id = request.query_params.get("id")
+
+        if not user_id:
+            return Response(
+                {"detail": "Debe enviar el id como ?id=123"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            user = Usuario.objects.get(id=user_id)
+        except Usuario.DoesNotExist:
+            return Response({"detail": "Usuario no encontrado."},
+                            status=status.HTTP_404_NOT_FOUND)
+
+        if request.user.id == user.id:
+            return Response(
+                {"detail": "No puede eliminar su propio usuario."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        user.delete()
+
+        return Response(
+            {"detail": "Usuario eliminado correctamente."},
+            status=status.HTTP_200_OK
+        )

@@ -1,23 +1,48 @@
 from django.test import TestCase
 from rest_framework.test import APIClient
-from unittest.mock import MagicMock
 from django.utils import timezone
 from apps.pedidos.models import Pedido
 from apps.pedidosProductos.models import PedidoProductos
+from django.contrib.auth import get_user_model
 from django.urls import reverse
 from rest_framework import status
+
+User = get_user_model()
 
 class PedidoViewsMicroserviceUserTestCase(TestCase):
 
     def setUp(self):
-        self.client = APIClient()
+        # Crear usuarios reales con roles
+        self.admin = User.objects.create_user(
+            username="Administrador",
+            email="admin@test.com",
+            password="1234",
+        )
+        self.admin.rol = "Administrador"
+        self.admin.save()
 
-        # Mock usuario de microservicio
-        self.mock_user = MagicMock()
-        self.mock_user.is_authenticated = True
-        self.mock_user.rol = MagicMock()
-        self.mock_user.rol.nombre = 'Administrador'
-        self.client.force_authenticate(user=self.mock_user)
+        self.recepcionista = User.objects.create_user(
+            username="Recepcionista",
+            email="recep@test.com",
+            password="1234",
+        )
+        self.recepcionista.rol = "Recepcionista"
+        self.recepcionista.save()
+
+        self.otro_usuario = User.objects.create_user(
+            username="Cliente",
+            email="user@test.com",
+            password="1234",
+        )
+        self.otro_usuario.rol = "Cliente"
+        self.otro_usuario.save()
+
+        # Autenticar como admin por defecto
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.admin)
+        
+        self.client_false = APIClient()
+        self.client_false.force_authenticate(user= self.otro_usuario)
 
         # Crear un pedido de prueba
         self.pedido = Pedido.objects.create(
@@ -159,10 +184,8 @@ class PedidoViewsMicroserviceUserTestCase(TestCase):
 
     def test_create_pedido_role_not_allowed(self):
         # Mock usuario con rol no permitido
-        self.mock_user.rol.nombre = 'Cliente'
-        self.client.force_authenticate(user=self.mock_user)
         url = reverse('crear_pedido')
         payload = {"numero_pedido": 2, "fecha_pedido": "2025-11-10T08:01:18", "id_cliente": 1, "cliente": "MARIA LOPEZ",
                    "para_hora": "15:00:00", "estado": "PENDIENTE", "entregado": False, "avisado": False, "pagado": False, "productos": []}
-        response = self.client.post(url, payload, format='json')
+        response = self.client_false.post(url, payload, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

@@ -1,0 +1,65 @@
+[
+  {
+    "model": "recetas.recetainsumo",
+    "pk": 1,
+    "fields": {
+      "receta": 1,
+      "insumo": 1,
+      "cantidad": "1.200"
+    }
+  },
+  {
+    "model": "recetas.recetainsumo",
+    "pk": 2,
+    "fields": {
+      "receta": 1,
+      "insumo": 2,
+      "cantidad": "0.500"
+    }
+  },
+  {
+    "model": "recetas.recetainsumo",
+    "pk": 3,
+    "fields": {
+      "receta": 2,
+      "insumo": 6,
+      "cantidad": "0.300"
+    }
+  },
+  {
+    "model": "recetas.recetainsumo",
+    "pk": 4,
+    "fields": {
+      "receta": 2,
+      "insumo": 7,
+      "cantidad": "0.200"
+    }
+  },
+  {
+    "model": "recetas.recetainsumo",
+    "pk": 5,
+    "fields": {
+      "receta": 2,
+      "insumo": 5,
+      "cantidad": "0.300"
+    }
+  },
+  {
+    "model": "recetas.recetainsumo",
+    "pk": 6,
+    "fields": {
+      "receta": 2,
+      "insumo": 9,
+      "cantidad": "0.010"
+    }
+  },
+  {
+    "model": "recetas.recetainsumo",
+    "pk": 7,
+    "fields": {
+      "receta": 2,
+      "insumo": 8,
+      "cantidad": "0.020"
+    }
+  }
+]

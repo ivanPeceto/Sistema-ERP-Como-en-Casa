@@ -1,0 +1,101 @@
+[
+  {
+    "model": "insumos.insumo",
+    "pk": 1,
+    "fields": {
+      "nombre": "Pollo",
+      "descripcion": "Pollo fresco entero",
+      "unidad_medida": "kg",
+      "stock_actual": "50.00",
+      "costo_unitario": "300.00"
+    }
+  },
+  {
+    "model": "insumos.insumo",
+    "pk": 2,
+    "fields": {
+      "nombre": "Papa",
+      "descripcion": "Papa lavada y pelada",
+      "unidad_medida": "kg",
+      "stock_actual": "100.00",
+      "costo_unitario": "50.00"
+    }
+  },
+  {
+    "model": "insumos.insumo",
+    "pk": 3,
+    "fields": {
+      "nombre": "Carne Picada",
+      "descripcion": "Carne vacuna picada",
+      "unidad_medida": "kg",
+      "stock_actual": "40.00",
+      "costo_unitario": "400.00"
+    }
+  },
+  {
+    "model": "insumos.insumo",
+    "pk": 4,
+    "fields": {
+      "nombre": "Cebolla",
+      "descripcion": "Cebolla fresca",
+      "unidad_medida": "kg",
+      "stock_actual": "50.00",
+      "costo_unitario": "60.00"
+    }
+  },
+  {
+    "model": "insumos.insumo",
+    "pk": 5,
+    "fields": {
+      "nombre": "Mozzarella",
+      "descripcion": "Queso mozzarella rallado",
+      "unidad_medida": "kg",
+      "stock_actual": "20.00",
+      "costo_unitario": "800.00"
+    }
+  },
+  {
+    "model": "insumos.insumo",
+    "pk": 6,
+    "fields": {
+      "nombre": "Harina",
+      "descripcion": "Harina de trigo 000",
+      "unidad_medida": "kg",
+      "stock_actual": "200.00",
+      "costo_unitario": "60.00"
+    }
+  },
+  {
+    "model": "insumos.insumo",
+    "pk": 7,
+    "fields": {
+      "nombre": "Tomate",
+      "descripcion": "Tomate fresco",
+      "unidad_medida": "kg",
+      "stock_actual": "80.00",
+      "costo_unitario": "100.00"
+    }
+  },
+  {
+    "model": "insumos.insumo",
+    "pk": 8,
+    "fields": {
+      "nombre": "Ajo",
+      "descripcion": "Ajo fresco",
+      "unidad_medida": "kg",
+      "stock_actual": "10.00",
+      "costo_unitario": "200.00"
+    }
+  },
+  {
+    "model": "insumos.insumo",
+    "pk": 9,
+    "fields": {
+      "nombre": "Albahaca",
+      "descripcion": "Albahaca fresca",
+      "unidad_medida": "kg",
+      "stock_actual": "5.00",
+      "costo_unitario": "500.00"
+    }
+  }
+]

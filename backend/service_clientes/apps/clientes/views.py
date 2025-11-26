@@ -5,7 +5,7 @@ from rest_framework import status
 from .models import Cliente
 from .serializer import ClienteSerializer
 from rest_framework.permissions import IsAuthenticated
-from utils.permissions import IsSuperUser
+from utils.permissions import AdminRecepcionista
 from rest_framework.generics import ListAPIView
 from django.db.models import Q
 
@@ -16,7 +16,7 @@ class ClienteCrearView(APIView):
         Esta vista, que hereda de APIView, permite crear un nuevo cliente mediante una solicitud POST.
         Requiere que el usuario esté autenticado.
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, AdminRecepcionista]
 
     def post(self, request):
         """!
@@ -48,7 +48,7 @@ class ClienteEditarView(APIView):
         Requiere autenticación y privilegios de superusuario.
     """
 
-    permission_classes = [IsAuthenticated, IsSuperUser]
+    permission_classes = [IsAuthenticated, AdminRecepcionista]
 
     def put(self, request):
         """!
@@ -95,7 +95,7 @@ class ClienteEliminarView(APIView):
         Requiere autenticación y privilegios de superusuario.
     """
 
-    permission_classes = [IsAuthenticated, IsSuperUser]
+    permission_classes = [IsAuthenticated, AdminRecepcionista]
 
     def post(self, request):
         """!
@@ -133,7 +133,7 @@ class ClienteListarView(APIView):
         No requiere privilegios de superusuario.
     """
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, AdminRecepcionista]
 
     def get(self, request):
         """!
@@ -163,7 +163,7 @@ class ClienteBuscarView(ListAPIView):
     @property permission_classes: Define los permisos requeridos.
     """
     serializer_class = ClienteSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, AdminRecepcionista]
     
     def get_queryset(self):
         """!

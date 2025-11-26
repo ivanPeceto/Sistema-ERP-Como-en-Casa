@@ -23,6 +23,7 @@ const CrearProductoModal: React.FC<CrearProductoModalProps> = ({
     nombre: '',
     descripcion: '',
     precio_unitario: 0,
+    stock: 0, 
     disponible: true,
     categoria_id: null,
   });
@@ -33,6 +34,7 @@ const CrearProductoModal: React.FC<CrearProductoModalProps> = ({
         nombre: editingProducto.nombre,
         descripcion: editingProducto.descripcion,
         precio_unitario: +editingProducto.precio_unitario,
+        stock: editingProducto.stock,
         disponible: editingProducto.disponible,
         categoria_id: editingProducto.categoria?.id ?? null,
       });
@@ -41,6 +43,7 @@ const CrearProductoModal: React.FC<CrearProductoModalProps> = ({
         nombre: '',
         descripcion: '',
         precio_unitario: 0,
+        stock: 0, 
         disponible: true,
         categoria_id: categorias.length > 0 ? categorias[0].id : null,
       });

@@ -1,0 +1,34 @@
+[
+  {
+    "model": "categorias.categoria",
+    "pk": 1,
+    "fields": {
+      "nombre": "Pollo",
+      "descripcion": "Todos los productos relacionados con pollo: al horno, frito y rostizado."
+    }
+  },
+  {
+    "model": "categorias.categoria",
+    "pk": 2,
+    "fields": {
+      "nombre": "Empanadas",
+      "descripcion": "Empanadas de carne, pollo, jamón y queso, y otras variedades."
+    }
+  },
+  {
+    "model": "categorias.categoria",
+    "pk": 3,
+    "fields": {
+      "nombre": "Pizzas",
+      "descripcion": "Pizzas grandes, medianas y por porción, con variados ingredientes."
+    }
+  },
+  {
+    "model": "categorias.categoria",
+    "pk": 4,
+    "fields": {
+      "nombre": "Bebidas",
+      "descripcion": "Gaseosas, jugos y aguas disponibles para acompañar la comida."
+    }
+  }
+]

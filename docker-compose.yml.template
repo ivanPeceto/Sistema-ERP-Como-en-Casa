@@ -125,7 +125,9 @@ services:
       - pedidos_data:/var/lib/mysql
 
   pedidos:
-    build: ./backend/service_pedidos
+    build: 
+      context: ./backend/service_pedidos
+      dockerfile: Dockerfile
     container_name: pedidos
     restart: unless-stopped
     env_file:

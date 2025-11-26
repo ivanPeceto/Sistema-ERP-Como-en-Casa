@@ -1,0 +1,50 @@
+[
+  {
+    "model": "pedidosProductos.pedidoproductos",
+    "pk": 1,
+    "fields": {
+      "id_pedido": 1,
+      "id_producto": 1,
+      "cantidad_producto": "1.00",
+      "nombre_producto": "Pollo al Horno",
+      "precio_unitario": "1200.00",
+      "aclaraciones": "Sin guarnición"
+    }
+  },
+  {
+    "model": "pedidosProductos.pedidoproductos",
+    "pk": 2,
+    "fields": {
+      "id_pedido": 1,
+      "id_producto": 4,
+      "cantidad_producto": "2.00",
+      "nombre_producto": "Gaseosa 500ml",
+      "precio_unitario": "300.00",
+      "aclaraciones": ""
+    }
+  },
+  {
+    "model": "pedidosProductos.pedidoproductos",
+    "pk": 3,
+    "fields": {
+      "id_pedido": 2,
+      "id_producto": 2,
+      "cantidad_producto": "3.00",
+      "nombre_producto": "Empanada de Carne",
+      "precio_unitario": "250.00",
+      "aclaraciones": "Con extra de cebolla"
+    }
+  },
+  {
+    "model": "pedidosProductos.pedidoproductos",
+    "pk": 4,
+    "fields": {
+      "id_pedido": 3,
+      "id_producto": 3,
+      "cantidad_producto": "1.00",
+      "nombre_producto": "Pizza Napolitana",
+      "precio_unitario": "1500.00",
+      "aclaraciones": "Sin ajo"
+    }
+  }
+]
