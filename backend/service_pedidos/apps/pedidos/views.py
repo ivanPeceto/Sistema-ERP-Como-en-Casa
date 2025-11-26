@@ -1,7 +1,7 @@
 from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from utils.permissions import IsSuperUser
+from utils.permissions import AllowRoles
 from rest_framework.response import Response
 from rest_framework import status
 from apps.pedidos.models import Pedido
@@ -67,7 +67,7 @@ class CrearPedidoView(APIView):
         No requiere privilegios de superusuario.
     """
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, AllowRoles('Administrador', 'Recepcionista')]
 
     def post(self, request):
         """!
@@ -97,7 +97,7 @@ class CrearPedidoView(APIView):
             }
             send_channel_message('app_notifications', message_payload, 10, 0.5)
 
-            return Response(PedidoSerializer(pedido).data, status=status.HTTP_200_OK)
+            return Response(PedidoSerializer(pedido).data, status=status.HTTP_201_CREATED)
         else:
             return Response(pedidoSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -110,7 +110,7 @@ class EliminarPedidoView(APIView):
         de id (opcional), fecha (obligatorio) y numero_pedido (obligatorio).
         Requiere que el usuario esté autenticado y sea superusuario.
     """
-    permission_classes = [IsAuthenticated, IsSuperUser]
+    permission_classes = [IsAuthenticated, AllowRoles('Administrador', 'Recepcionista')]
 
     def post(self, request):
         """!

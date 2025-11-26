@@ -1,21 +1,18 @@
 from django.shortcuts import render
-
-# Create your views here.
-from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Insumo
 from .serializer import InsumoSerializer
 from rest_framework.permissions import IsAuthenticated
-from utils.permissions import IsSuperUser
+from utils.permissions import AllowRoles
 from rest_framework.generics import ListAPIView
 
 class InsumoCrearView(APIView):
     """!
     @brief Vista para la creación de nuevos insumos.
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, AllowRoles('Cocinero', 'Administrador')]
 
     def post(self, request):
         serializer = InsumoSerializer(data=request.data)
@@ -28,7 +25,7 @@ class InsumoEditarView(APIView):
     """!
     @brief Vista para la edición de insumos existentes.
     """
-    permission_classes = [IsAuthenticated, IsSuperUser]
+    permission_classes = [IsAuthenticated, AllowRoles('Cocinero', 'Administrador')]
 
     def put(self, request):
         id = request.query_params.get('id')
@@ -50,7 +47,7 @@ class InsumoEliminarView(APIView):
     """!
     @brief Vista para la eliminación de insumos.
     """
-    permission_classes = [IsAuthenticated, IsSuperUser]
+    permission_classes = [IsAuthenticated, AllowRoles('Cocinero', 'Administrador')]
 
     def post(self, request):
         id = request.query_params.get('id')
