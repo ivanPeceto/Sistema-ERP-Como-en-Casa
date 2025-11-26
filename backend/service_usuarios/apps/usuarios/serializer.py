@@ -13,11 +13,12 @@ class UsuarioSerializer(serializers.ModelSerializer):
         y viceversa.
         Define qué campos del modelo Usuario se incluirán en su representación serializada en JSON.
     """
+    rol = serializers.CharField(source='rol.nombre', read_only=True)
 
     class Meta:
         model = Usuario
         rol_nombre = serializers.CharField(source='rol.nombre', read_only=True)
-        fields = ['id', 'email', 'nombre', 'fecha_creacion', 'rol_nombre']
+        fields = ['id', 'email', 'nombre', 'fecha_creacion', 'rol']
 
 class SignUpSerializer(serializers.ModelSerializer):
     """!
@@ -29,12 +30,11 @@ class SignUpSerializer(serializers.ModelSerializer):
         lo que significa que se puede usar para la deserialización (creación/actualización)
         pero no se incluirá en la representación serializada para proteger la contraseña.
     """
-
     password = serializers.CharField(write_only=True)
 
     class Meta:
         model = Usuario
-        fields = ['email', 'nombre', 'password', 'rol']
+        fields = ['email', 'nombre', 'password']
 
     def create(self, validated_data):
         """!

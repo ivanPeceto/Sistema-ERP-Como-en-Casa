@@ -10,36 +10,39 @@ class UserLoginView(APIView):
     """!
     @brief Vista basada en clase para manejar el inicio de sesión de usuarios.
     @details
-        Esta vista hereda de APIView de Django REST Framework, lo que permite
-        definir métodos para el método HTTP POST.
-        Utiliza LogInSerializer para validar las credenciales del usuario y, si son válidas,
-        genera JWT de acceso y de refresco.
+        Esta vista permite autenticar a un usuario mediante sus credenciales
+        (correo electrónico y contraseña). Si las credenciales son válidas,
+        se generan tokens JWT de acceso y de refresco, que contienen información
+        adicional del usuario.
+
+        Se utiliza `RefreshToken.for_user(user)` de la librería
+        `rest_framework_simplejwt` para crear el token de refresco.
+        A partir de este, se obtiene el token de acceso.
+
+        Ambos tokens incluyen los siguientes claims personalizados:
+        - **email:** correo electrónico del usuario.
+        - **nombre:** nombre completo del usuario.
+        - **is_superuser:** indica si el usuario es administrador.
+        - **rol:** nombre del rol asociado al usuario (por ejemplo, "Administrador").
+
+        El Access Token tiene una duración corta (por defecto, 4 horas),
+        mientras que el Refresh Token tiene una duración más larga (por defecto, 1 día).
     """
 
     def post(self, request):
         """!
         @brief Maneja las solicitudes POST para el inicio de sesión de usuarios.
         @details
-            Recibe los datos de la solicitud (email y contraseña) y los pasa al
-            LogInSerializer para su validación.
-            Si la validación es exitosa, se procede a generar los tokens JWT.
+            Recibe los datos de autenticación (`email` y `password`) y los valida
+            con el `LogInSerializer`.  
+            Si la validación es exitosa, genera y devuelve los tokens JWT
+            junto con los datos del usuario autenticado.
 
-            Se utiliza RefreshToken.for_user(user) de la librería rest_framework_simplejwt
-            para crear un token de refresco. A partir de este, se obtiene el token de acceso.
-            - Access Token: Es el token de menor duración, configurado en 4 horas. 
-            - Refresh Token: Es el token de larga duración, configurado en 1 día.
-
-            Ambos tokens tienen añadida información adicional del usuario
-            (email, nombre, is_superuser) directamente en su payload.
-
-        @param request: El objeto de la solicitud HTTP que contiene los datos de login.
+        @param request: Objeto HTTP con los datos de inicio de sesión.
         @return:
-                - Si el login es exitoso: Respuesta HTTP 200 OK con los tokens JWT
-                  y los datos del usuario.
-                - Si la validación falla: Respuesta HTTP 400 BAD REQUEST con los errores
-                  reportados por el serializador.
+            - **200 OK:** Si el inicio de sesión es exitoso. Devuelve los tokens y el usuario.
+            - **400 BAD REQUEST:** Si las credenciales son incorrectas o los datos son inválidos.
         """
-        
         loginserializer = LogInSerializer(data=request.data)
 
         if loginserializer.is_valid():
@@ -55,46 +58,50 @@ class UserLoginView(APIView):
             refresh_token['email'] = user.email
             refresh_token['nombre'] = user.nombre
             refresh_token['is_superuser'] = user.is_superuser
-            refresh_token['roles'] = roles
+            refresh_token['rol'] = roles[0] if roles else None
 
             access_token['email'] = user.email
             access_token['nombre'] = user.nombre
             access_token['is_superuser'] = user.is_superuser
-            access_token['roles'] = roles
+            access_token['rol'] = roles[0] if roles else None
 
             return Response({
-                    'refresh': str(refresh_token),
-                    'access': str(access_token),
-                    'user': UsuarioSerializer(user).data,
-                })
+                'refresh': str(refresh_token),
+                'access': str(access_token),
+                'user': UsuarioSerializer(user).data,
+            })
+
         return Response(loginserializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+
 class UserSignUpView(APIView):
     """!
-    @brief Vista basada en clase para manejar el registro de nuevos usuarios.
+    @brief Vista para el registro (sign up) de nuevos usuarios.
     @details
-        Hereda de APIView. Utiliza SignUpSerializer para validar los datos de registro
-        y crear un nuevo usuario. Si el registro es exitoso, también genera tokens JWT
-        para el nuevo usuario, permitiendo un inicio de sesión automático tras el registro.
+        Esta vista permite registrar un nuevo usuario en el sistema.
+        Utiliza el `SignUpSerializer` para validar y crear el usuario.
+
+        Una vez creado, se generan los tokens JWT (de acceso y de refresco),
+        que incluyen información del usuario recién registrado.
+
+        Los claims personalizados añadidos al token son:
+        - **email**
+        - **nombre**
+        - **is_superuser**
+        - **rol**
     """
+
     def post(self, request):
         """!
         @brief Maneja las solicitudes POST para el registro de nuevos usuarios.
         @details
-            Recibe los datos de la solicitud (email, nombre, contraseña) y los pasa al
-            SignUpSerializer para su validación y creación del usuario.
-            Si signupserializer.is_valid() es verdadero, se llama a signupserializer.save().
-            Tras la creación exitosa del usuario, se generan tokens JWT
-            Ambos tokens tienen añadida información adicional del usuariO
-            (email, nombre, is_superuser) directamente en su payload.
+            Valida y crea un nuevo usuario. Si el registro es exitoso,
+            se devuelven los tokens JWT y los datos del usuario.
 
-        @param request (rest_framework.request.Request): El objeto de la solicitud HTTP,
-                                                        que contiene los datos de registro.
-        @return rest_framework.response.Response:
-                - Si el registro es exitoso: Respuesta HTTP 200 OK con los tokens JWT
-                  y los datos del nuevo usuario.
-                - Si la validación falla: Respuesta HTTP 400 BAD REQUEST con los errores
-                  reportados por el serializador.
+        @param request: Objeto HTTP con los datos de registro.
+        @return:
+            - **200 OK:** Registro exitoso, devuelve tokens y datos del usuario.
+            - **400 BAD REQUEST:** Si hay errores de validación.
         """
         signupserializer = SignUpSerializer(data=request.data)
 
@@ -111,63 +118,62 @@ class UserSignUpView(APIView):
             refresh_token['email'] = user.email
             refresh_token['nombre'] = user.nombre
             refresh_token['is_superuser'] = user.is_superuser
-            refresh_token['roles'] = roles
+            refresh_token['rol'] = roles[0] if roles else None
 
             access_token['email'] = user.email
             access_token['nombre'] = user.nombre
             access_token['is_superuser'] = user.is_superuser
-            access_token['roles'] = roles
+            access_token['rol'] = roles[0] if roles else None
             
             return Response({
                 'refresh': str(refresh_token),
                 'access': str(access_token),
                 'user': UsuarioSerializer(user).data,
-            },status=status.HTTP_200_OK)
+            }, status=status.HTTP_200_OK)
+
         return Response(signupserializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserTokenRefreshView(APIView):
     """!
-    @brief Vista para refrescar un token de acceso utilizando un refresh token.
+    @brief Vista para renovar el Access Token usando un Refresh Token.
     @details
-        Esta vista permite renovar el token de acceso (Access Token) sin que el usuario
-        tenga que autenticarse nuevamente con sus credenciales.
-        El cliente envía un Refresh Token válido, y el sistema genera un nuevo Access Token
-        con los mismos claims personalizados incluidos originalmente al iniciar sesión o registrarse.
+        Permite al cliente obtener un nuevo token de acceso sin necesidad
+        de volver a autenticarse.  
+        El cliente debe enviar un JSON con el campo `"refresh"` que contenga
+        el Refresh Token válido.
 
-        Los claims personalizados transferidos incluyen:
-        - email: Correo electrónico del usuario.
-        - nombre: Nombre completo del usuario.
-        - is_superuser: Indica si el usuario tiene privilegios de administrador.
-        - roles: Lista de roles asociados al usuario.
+        El nuevo Access Token conserva los mismos claims personalizados:
+        - **email**
+        - **nombre**
+        - **is_superuser**
+        - **rol**
 
-        El Refresh Token sigue siendo válido hasta su expiración (configurada en settings.py),
-        por lo que puede seguir utilizándose para generar nuevos Access Tokens.
-
-        En caso de que el Refresh Token haya expirado o sea inválido,
-        se devuelve un error HTTP 400.
+        Si el Refresh Token ha expirado o es inválido, se devuelve un error 400.
     """
 
     def post(self, request):
         """!
-        @brief Maneja las solicitudes POST para la renovación del Access Token.
+        @brief Genera un nuevo Access Token a partir de un Refresh Token válido.
         @details
-            Espera un cuerpo JSON con la forma:
-                {"refresh": "token_refresh_valido"}
+            Ejemplo de cuerpo de solicitud:
+            ```json
+            {
+                "refresh": "token_refresh_valido"
+            }
+            ```
 
             Si el Refresh Token es válido:
-                - Se genera un nuevo Access Token.
-                - Se copian los claims personalizados (email, nombre, is_superuser, roles)
-                  desde el Refresh Token original al nuevo Access Token.
-                - Se devuelve el nuevo Access Token al cliente.
+            - Se genera un nuevo Access Token.
+            - Se copian los claims personalizados (`email`, `nombre`, `is_superuser`, `rol`).
+            - Se devuelve el nuevo token al cliente.
 
-            Si el Refresh Token no está presente, es inválido o ha expirado,
-            se devuelve un mensaje de error con código HTTP 400.
+            Si el Refresh Token no es válido o ha expirado, se devuelve un error 400.
 
-        @param request: Objeto de la solicitud HTTP con el campo "refresh" en el cuerpo JSON.
+        @param request: Objeto de la solicitud HTTP con el campo "refresh".
         @return:
-                - Si el refresh token es válido: Respuesta HTTP 200 OK con un nuevo Access Token.
-                - Si el refresh token no fue proporcionado o es inválido: Respuesta HTTP 400 BAD REQUEST.
+            - **200 OK:** Si el token fue renovado correctamente.
+            - **400 BAD REQUEST:** Si el token es inválido o no se proporcionó.
         """
         refresh_token_str = request.data.get('refresh')
 
@@ -182,7 +188,7 @@ class UserTokenRefreshView(APIView):
             access_token['email'] = refresh_token.get('email')
             access_token['nombre'] = refresh_token.get('nombre')
             access_token['is_superuser'] = refresh_token.get('is_superuser', False)
-            access_token['roles'] = refresh_token.get('roles', [])
+            access_token['rol'] = refresh_token.get('rol')
 
             return Response({'access': str(access_token)}, status=status.HTTP_200_OK)
 
