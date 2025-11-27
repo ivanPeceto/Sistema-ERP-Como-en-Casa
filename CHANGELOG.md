@@ -1,5 +1,14 @@
-## [ chore/documentation ] - 2025-10-30
 # Changelog
+
+## [ fix/front/user-roles-implementation ] - 2025/11/26
+
+_(Cambios realizados por @ivanPeceto)_
+
+### Changed
+* Refactoriza la lógica de muestra de items  en el sidebar para que algunos iconos sean visibles solo por ciertos usuarios.
+
+### Affects
+* `Frontend/src/components/sidebar/sidebar.tsx`
 
 ## [feature/frontend/cobros-refac] – 2025-11-25
 
@@ -255,6 +264,7 @@ _(Cambios realizados por @jmrodriguezspinker)_
 * `/backend/service_productos/apps/recetas/tests.py`
 * `/backend/service_usuarios/apps/roles/tests.py`
 
+## [ chore/documentation ] - 2025-10-30
 
 _(Cambios realizados por @ivanPeceto)_
 

@@ -23,6 +23,7 @@ const Sidebar: React.FC = () => {
     path?: string;
     label: string;
     icon: React.ReactNode;
+    allowedRoles?: string[];
     children?: { path: string; label: string; icon?: React.ReactNode }[];
   }
 
@@ -30,13 +31,21 @@ const Sidebar: React.FC = () => {
    * Ítems del menú
    */
   const menuItems: MenuItem[] = [
-    { path: '/gestion/roles', label: 'Usuarios', icon: <svg className={styles.icon} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg> },
+    { path: '/gestion/usuarios', label: 'Usuarios', allowedRoles: ['Administrador'], icon: <svg className={styles.icon} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg> },
     { path: '/gestion/clientes', label: 'Clientes', icon: <svg className={styles.icon} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg> },
     { path: '/gestion/productos', label: 'Productos', icon: <svg className={styles.icon} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg> },
     { path: '/gestion/pedidos', label: 'Pedidos', icon: <svg className={styles.icon} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg> },
     { path: '/gestion/recetas', label: 'Recetas', icon: <svg className={styles.icon} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 14c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 20c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z" /></svg> },
   ];
 
+  /** Filtra qué elementos son visibles para cada usuario */
+  const visibleMenuItems = menuItems.filter(item => {
+    // Si no requiere roles específicos, lo mostramos
+    if (!item.allowedRoles) return true;
+    // Si requiere roles, verificamos que el usuario tenga el rol 
+    if (user && item.allowedRoles.includes(user.rol)) return true;
+    return false;
+  });
   /**
    * Usuario actual
    */
@@ -78,7 +87,7 @@ const Sidebar: React.FC = () => {
 
       {/* MENU */}
       <div className={styles.menuSection}>
-        {menuItems.map((item) => {
+        {visibleMenuItems.map((item) => {
           // SI TIENE SUBMENÚ
           if (item.children) {
             const isOpen = openMenus[item.label] || false;
