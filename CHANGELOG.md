@@ -5,9 +5,13 @@
 ### Changed
 * Parsea los datos a decimales en la variable `total` dentro del método `calcular_total` en `/pedidos/models.py`.
 * Reemplaza en `/pedidos/models.py` el método `total_ajustado` por `calcular_credito_real` para corregir errores matemáticos en el cálculo de cobros.
+* Adapta la lógica del serializer de pedidos para seguir las reglas de calculos ajustados.
+* Refactoriza la lógica en `cobros/views.py`.
 
 ### Affects
-+ `backend/service_pedidos/apps/pedidos/models.py`
+* `backend/service_pedidos/apps/pedidos/models.py`
+* `backend/service_pedidos/apps/pedidos/serializer.py`
+* `backend/service_pedidos/apps/cobros/views.py`
 
 _(Cambios realizados por @ivanPeceto)_
 
