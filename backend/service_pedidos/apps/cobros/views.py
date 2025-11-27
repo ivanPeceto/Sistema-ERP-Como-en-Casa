@@ -81,7 +81,7 @@ class CobroViewSet(viewsets.ModelViewSet):
             tipo=tipo,
             monto=transaccion.monto,
             descuento=descuento,   
-            recargo=recargo,
+            recargo=recargo,      
             fecha=transaccion.fecha,
             banco=getattr(transaccion, 'banco', None),
             referencia=getattr(transaccion, 'referencia', None),
@@ -194,5 +194,4 @@ class CobroViewSet(viewsets.ModelViewSet):
         """Devuelve todos los cobros de un pedido específico"""
         cobros = Cobro.objects.filter(pedido_id=pedido_id, estado='activo').order_by('-fecha')
         serializer = self.get_serializer(cobros, many=True)
-
         return Response(serializer.data)

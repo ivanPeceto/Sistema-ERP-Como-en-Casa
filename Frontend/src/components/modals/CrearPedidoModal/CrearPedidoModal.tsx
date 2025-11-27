@@ -3,13 +3,8 @@ import type { ChangeEvent, KeyboardEvent } from 'react';
 import styles from './CrearPedidoModal.module.css';
 import modalStyles from '../../../styles/modalStyles.module.css';
 import { createPedido, getPedidosByDate } from '../../../services/pedido_service';
-<<<<<<< HEAD
 import type { Producto, PedidoItem, PedidoInput, Cliente } from '../../../types/models.d.ts';
 import { buscarClientesPorCoincidencia, createCliente } from '../../../services/client_service';
-=======
-import { getClientes } from '../../../services/client_service';
-import type { Producto, PedidoItem, PedidoInput, Cliente } from '../../../types/models.d.ts';
->>>>>>> 72c06fe5a60c4ba991f43ff77cfb488fe6aec33a
 
 interface CrearPedidoModalProps {
   isOpen: boolean;
@@ -192,7 +187,6 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
 
   /** Handlers de inputs */
   const handleProductSearchTerm = (e: ChangeEvent<HTMLInputElement>) => setPruductSearchTerm(e.target.value);
-  const handleParaHoraChange = (e: ChangeEvent<HTMLInputElement>) => setParaHora(e.target.value);
 
   /** @brief Actualiza el estado del input del cliente */
   const handleClienteInputChange = (e: ChangeEvent<HTMLInputElement>) => {
