@@ -5,7 +5,7 @@ from rest_framework import status
 from .models import Producto
 from .serializer import ProductoSerializer
 from rest_framework.permissions import IsAuthenticated
-from utils.permissions import IsSuperUser
+from utils.permissions import AllowRoles
 from rest_framework.generics import ListAPIView
 
 class ProductoCrearView(APIView):
@@ -17,7 +17,7 @@ class ProductoCrearView(APIView):
         El acceso está restringido a usuarios autenticados.
     """
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, AllowRoles('Recepcionista', 'Administrador')]
 
     def post(self, request):
         """!
@@ -46,7 +46,7 @@ class ProductoEditarView(APIView):
         El ID de la producto a editar se espera como parámetro 'id' en la query string.
         Requiere que el usuario esté autenticado y sea superusuario.
     """
-    permission_classes = [IsAuthenticated, IsSuperUser]
+    permission_classes = [IsAuthenticated, AllowRoles('Recepcionista', 'Administrador')]
 
     def put(self, request):
         """!
@@ -88,7 +88,7 @@ class ProductoEliminarView(APIView):
         El ID del producto a eliminar se espera como parámetro 'id' en la query string.
         Requiere que el usuario esté autenticado y sea superusuario.
     """
-    permission_classes = [IsAuthenticated, IsSuperUser]
+    permission_classes = [IsAuthenticated, AllowRoles('Recepcionista', 'Administrador')]
 
     def post(self, request):
         """!
@@ -141,41 +141,31 @@ class ProductoListarView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class ProductoBuscarView(ListAPIView):
-    """!
-    @brief Vista para buscar productos según criterios.
-    @details
-        Hereda de ListAPIView para facilitar la visualización de listas filtradas.
-        Permite buscar productos por 'id' o 'nombre' (parámetros en query string).
-        Requiere que el usuario esté autenticado.
-        No se requieren privilegios de superusuario para esta acción.
-
-    @property serializer_class: Especifica ProductoSerializer.
-    @property permission_classes: Define los permisos IsAuthenticated.
-    """
-
     serializer_class = ProductoSerializer
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        """!
-        @brief Define el queryset para la búsqueda de productos.
-        @details
-            Filtra las productos según los parámetros 'id' o 'nombre' de la solicitud GET.
-    
-        @return: Queryset de Categoria filtradas.
-        """
         id = self.request.query_params.get('id')
         nombre = self.request.query_params.get('nombre')
 
-        if not id and not nombre:
-            return Response({'detail':'Falta proporcionar al menos id ó nombre del producto a buscar'}, status=status.HTTP_400_BAD_REQUEST)
+        queryset = Producto.objects.all()
 
-        try:
-            if not id:
-                producto = Producto.objects.filter(nombre=nombre, disponible=True)
-                return producto
-            else:
-                producto = Producto.objects.filter(id=id)
-                return producto
-        except:
-            return Producto.objects.none()
+        if id:
+            queryset = queryset.filter(id=id)
+        if nombre:
+            queryset = queryset.filter(nombre__icontains=nombre, disponible=True)
+
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        id = request.query_params.get('id')
+        nombre = request.query_params.get('nombre')
+
+        if not id and not nombre:
+            return Response(
+                {'detail': 'Falta proporcionar al menos id ó nombre del producto a buscar'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        return super().list(request, *args, **kwargs)
+

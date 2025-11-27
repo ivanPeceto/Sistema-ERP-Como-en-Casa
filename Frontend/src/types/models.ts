@@ -1,3 +1,6 @@
+//models.ts
+import type { MetodoCobro, EstadoCobro, PedidoEstado } from "./types";
+
 /**
  * @file models.d.ts
  * @brief Define las interfaces de TypeScript para los modelos de datos principales de la aplicación.
@@ -37,6 +40,15 @@ export interface Categoria {
     nombre: string;
     descripcion: string;
 }
+/**
+ * @interface Rol
+ * @brief Define la estructura de un rol de usuarios.
+ */
+export interface Rol {
+    id: number;
+    nombre: string;
+    descripcion: string;
+}
 
 /**
  * @interface Producto
@@ -47,6 +59,7 @@ export interface Producto {
   nombre: string;
   descripcion: string;
   precio_unitario: number;
+  stock: number, 
   disponible: boolean;
   categoria: Categoria | null;
 }
@@ -61,9 +74,9 @@ export interface Producto {
 export interface PedidoItem extends Partial<Producto> {
     id: number;
     nombre: string;
+    cantidad: number;
     precio_unitario: number;
     aclaraciones?: string;
-    cantidad: number;
     subtotal: number;
 }
 
@@ -78,12 +91,6 @@ export interface Pedido {
   fecha_pedido: string; 
   cliente: string;
   para_hora: string | null; 
-  estado: string; // 'PENDIENTE', 'LISTO', 'ENTREGADO'
-  avisado: boolean;
-  // Deprecated
-  entregado: boolean;
-  //--
-  pagado: boolean;
   total: number;
   productos_detalle: {
       id_producto: number;
@@ -93,6 +100,12 @@ export interface Pedido {
       precio_unitario: number;
       subtotal: number;
   }[];
+  estado: PedidoEstado;
+  entregado: boolean;
+  avisado: boolean;
+  pagado: boolean;
+  total_pagado: number;
+  saldo_pendiente: number;
 }
 
 /**
@@ -106,12 +119,6 @@ export interface PedidoInput {
     fecha_pedido: string;
     cliente: string;
     para_hora: string | null; 
-    estado: string; // 'PENDIENTE', 'LISTO', 'ENTREGADO'
-    avisado: boolean;
-    // Deprecated
-    entregado: boolean;
-    //--
-    pagado: boolean;
     productos: {
         id_producto: number;
         nombre_producto: string;
@@ -119,11 +126,11 @@ export interface PedidoInput {
         precio_unitario: number;
         aclaraciones?: string;
     }[];
+    estado: PedidoEstado;
+    entregado: boolean;
+    avisado: boolean;
+    pagado: boolean;
 }
-
-// Unión de tipos para los estados de pedido para mayor seguridad de tipo
-export type PedidoEstado = 'PENDIENTE' | 'LISTO' | 'ENTREGADO';
-
 
 // --- Tipos de Autenticación ---
 
@@ -136,7 +143,15 @@ export interface User {
   email: string;
   nombre: string;
   is_superuser: boolean;
+  rol: string;
 }
+
+export interface UserForm {
+  email: string;
+  nombre: string;
+  rol?: string;
+}
+
 
 /**
  * @interface RefreshTokenResponse
@@ -219,33 +234,30 @@ export interface RecetaInput {
 }
 
 /**
- * @interface MetodoCobro
- * @brief Define la estructura de un método de cobro.
- */
-export interface MetodoCobro {
-    id: number;
-    nombre: string;
-}
-
-/**
  * @interface Cobro
  * @brief Define la estructura de un cobro.
  * @details Representa un pago o abono asociado a un pedido.
  */
 export interface Cobro {
-    id: number;
-    pedido: number;
-    monto: number;
-    moneda: string;
-    id_metodo_cobro: number;
-    metodo_cobro: MetodoCobro; 
-    descuento: number;
-    recargo: number;
-    descuento_porcentual: number;
-    recargo_porcentual: number;
-    monto_restante: number;
-    pagado_completo?: boolean;
+  id: number;                 
+  pedido: number;             
+  
+  tipo: MetodoCobro;           
+  monto: number;              
+  moneda?: string | null;     
+
+  fecha: string;              
+
+  banco?: string | null;      
+  referencia?: string | null; 
+  cuotas?: number | null;    
+
+  descuento?: number | null;  
+  recargo?: number | null;    
+
+  estado: EstadoCobro;        
 }
+
 
 /**
  * @interface CobroInput
@@ -253,11 +265,12 @@ export interface Cobro {
  */
 export interface CobroInput {
     pedido: number;
-    id_metodo_cobro: number;
+    tipo: MetodoCobro;
     monto?: number; 
     moneda?: string;
-    descuento?: number;
-    recargo?: number;   
-    descuento_porcentual?: number; 
-    recargo_porcentual?: number;   
+    banco?: string | null;      
+    referencia?: string | null; 
+    cuotas?: number | null;    
+    descuento?: number | null;  
+    recargo?: number | null;  
 }

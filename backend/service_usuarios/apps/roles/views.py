@@ -11,7 +11,7 @@ from .serializer import RolSerializer
 
 class RolCrearView(APIView):
     """Vista para la creación de nuevos roles."""
-    permission_classes = [IsAuthenticated, AllowRoles(roles=['Administrador'])]
+    permission_classes = [IsAuthenticated, AllowRoles('Administrador')]
 
     def post(self, request):
         serializer = RolSerializer(data=request.data)
@@ -23,7 +23,7 @@ class RolCrearView(APIView):
 
 class RolEditarView(APIView):
     """Vista para la edición de roles existentes."""
-    permission_classes = [IsAuthenticated, AllowRoles(roles=['Administrador'])]
+    permission_classes = [IsAuthenticated, AllowRoles('Administrador')]
 
     def put(self, request):
         id = request.query_params.get('id')
@@ -40,7 +40,7 @@ class RolEditarView(APIView):
 
 class RolEliminarView(APIView):
     """Vista para eliminar roles."""
-    permission_classes = [IsAuthenticated, AllowRoles(roles=['Administrador'])]
+    permission_classes = [IsAuthenticated, AllowRoles('Administrador')]
 
     def delete(self, request):
         id = request.query_params.get('id')
@@ -54,7 +54,7 @@ class RolEliminarView(APIView):
 
 class RolListarView(APIView):
     """Vista para listar todos los roles."""
-    permission_classes = [IsAuthenticated, AllowRoles(roles=['Administrador'])]
+    permission_classes = [IsAuthenticated, AllowRoles('Administrador')]
 
     def get(self, request):
         roles = Rol.objects.all()
@@ -65,7 +65,7 @@ class RolListarView(APIView):
 class RolBuscarView(ListAPIView):
     """Vista para buscar roles por id o nombre."""
     serializer_class = RolSerializer
-    permission_classes = [IsAuthenticated, AllowRoles(roles=['Administrador'])]
+    permission_classes = [IsAuthenticated, AllowRoles('Administrador')]
 
     def get_queryset(self):
         id = self.request.query_params.get('id')

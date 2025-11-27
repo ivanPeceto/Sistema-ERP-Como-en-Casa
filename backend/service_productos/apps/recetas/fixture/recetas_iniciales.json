@@ -1,0 +1,21 @@
+[
+  {
+    "model": "recetas.receta",
+    "pk": 1,
+    "fields": {
+      "nombre": "Pollo Rostizado Especial",
+      "descripcion": "Pollo rostizado con especias y guarnición.",
+      "productos": [1]
+    }
+  },
+  {
+    "model": "recetas.receta",
+    "pk": 2,
+    "fields": {
+      "nombre": "Pizza Napolitana Gourmet",
+      "descripcion": "Pizza con masa artesanal, tomate, mozzarella y albahaca.",
+      "productos": [3]
+    }
+  }
+]
+

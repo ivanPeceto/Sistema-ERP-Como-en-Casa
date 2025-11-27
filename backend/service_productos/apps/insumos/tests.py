@@ -1,85 +1,181 @@
-from django.test import TestCase
-from rest_framework.test import APIClient
+from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
-from .models import Insumo
-from rest_framework_simplejwt.tokens import AccessToken
+from django.urls import reverse
+from django.contrib.auth.models import User
+from types import SimpleNamespace
+from apps.insumos.models import Insumo
 
-class InsumoAPITestCase(TestCase):
+
+class InsumoAPITestCase(APITestCase):
+    """!
+    @brief Casos de prueba para las vistas del módulo de Insumos.
+    """
+
     def setUp(self):
+        """!
+        @brief Configura el entorno antes de cada prueba.
+        """
+        # Usuario administrador con rol permitido
+        self.admin_user = User.objects.create_user(username='admin', password='admin123')
+        self.admin_user.rol = SimpleNamespace(nombre='Administrador')
+
+        # Usuario no autorizado (rol Cliente)
+        self.cliente_user = User.objects.create_user(username='cliente', password='cliente123')
+        self.cliente_user.rol = SimpleNamespace(nombre='Cliente')
+
+        # Cliente HTTP
         self.client = APIClient()
 
-        # Creamos un token para un SUPERUSUARIO
-        self.superuser_token = AccessToken()
-        self.superuser_token['user_id'] = 1
-        self.superuser_token['nombre'] = 'testsuperuser'
-        self.superuser_token['is_superuser'] = True
-
-        # Creamos un token para un USUARIO REGULAR
-        self.regular_user_token = AccessToken()
-        self.regular_user_token['user_id'] = 2
-        self.regular_user_token['nombre'] = 'testregular'
-        self.regular_user_token['is_superuser'] = False
-        
-        # Creamos un insumo de prueba para usar en los tests de editar, eliminar y buscar
-        self.insumo_de_prueba = Insumo.objects.create(
-            nombre="Queso Muzarella",
-            unidad_medida="kg",
-            stock_actual="10.00",
-            costo_unitario="950.00"
+        # Crear insumo de prueba con todos los campos obligatorios
+        self.insumo = Insumo.objects.create(
+            nombre='Harina',
+            descripcion='Harina de trigo',
+            unidad_medida='kg',
+            stock_actual=100.00,
+            costo_unitario=5.50
         )
 
-    def test_crear_insumo_autenticado(self):
-        """Prueba la creación de un insumo con un usuario regular autenticado."""
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.regular_user_token}')
-        data = {"nombre": "Harina 0000", "unidad_medida": "kg", "stock_actual": "25.50", "costo_unitario": "150.75"}
-        response = self.client.post('/api/productos/insumo/crear/', data, format='json')
+        # URLs
+        self.url_crear = reverse('insumo_crear')
+        self.url_editar = reverse('insumo_editar')
+        self.url_eliminar = reverse('insumo_eliminar')
+        self.url_listar = reverse('insumo_listar')
+        self.url_buscar = reverse('insumo_buscar')
+
+    # =====================================================
+    # CASOS DE ÉXITO - USUARIO CON ROL PERMITIDO
+    # =====================================================
+
+    def test_crear_insumo_valido(self):
+        """Crea un insumo con usuario administrador"""
+        self.client.force_authenticate(user=self.admin_user)
+        data = {
+            'nombre': 'Azúcar',
+            'descripcion': 'Azúcar refinada',
+            'unidad_medida': 'kg',
+            'stock_actual': 50.00,
+            'costo_unitario': 3.25
+        }
+        response = self.client.post(self.url_crear, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(Insumo.objects.filter(nombre='Azúcar').exists())
 
-    def test_listar_insumos_autenticado(self):
-        """Prueba que un usuario regular pueda listar los insumos."""
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.regular_user_token}')
-        response = self.client.get('/api/productos/insumo/listar/')
+    def test_editar_insumo_existente(self):
+        """Edita un insumo existente"""
+        self.client.force_authenticate(user=self.admin_user)
+        data = {
+            'nombre': 'Harina Integral',
+            'descripcion': 'Harina orgánica',
+            'unidad_medida': 'kg',
+            'stock_actual': 90.00,
+            'costo_unitario': 6.00
+        }
+        response = self.client.put(f"{self.url_editar}?id={self.insumo.id}", data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
+        self.assertIn('exitosamente', response.data['detail'])
+        self.insumo.refresh_from_db()
+        self.assertEqual(self.insumo.nombre, 'Harina Integral')
 
-    def test_editar_insumo_como_superuser(self):
-        """Prueba que un superusuario SÍ PUEDE editar un insumo."""
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.superuser_token}')
-        data = {"nombre": "Queso Provolone", "unidad_medida": "kg", "stock_actual": "5.00", "costo_unitario": "1200.00"}
-        url = f"/api/productos/insumo/editar/?id={self.insumo_de_prueba.id}"
-        response = self.client.put(url, data, format='json')
+    def test_eliminar_insumo_existente(self):
+        """Elimina un insumo existente"""
+        self.client.force_authenticate(user=self.admin_user)
+        response = self.client.post(f"{self.url_eliminar}?id={self.insumo.id}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # Verificamos que el nombre se haya actualizado en la BD
-        self.insumo_de_prueba.refresh_from_db()
-        self.assertEqual(self.insumo_de_prueba.nombre, "Queso Provolone")
+        self.assertIn('exitosamente', response.data['detail'])
+        self.assertFalse(Insumo.objects.filter(id=self.insumo.id).exists())
 
-    def test_editar_insumo_como_regular_user_falla(self):
-        """Prueba que un usuario regular NO PUEDE editar un insumo."""
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.regular_user_token}')
-        data = {"nombre": "Queso Provolone"}
-        url = f"/api/productos/insumo/editar/?id={self.insumo_de_prueba.id}"
-        response = self.client.put(url, data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-    def test_eliminar_insumo_como_superuser(self):
-        """Prueba que un superusuario SÍ PUEDE eliminar un insumo."""
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.superuser_token}')
-        url = f"/api/productos/insumo/eliminar/?id={self.insumo_de_prueba.id}"
-        response = self.client.post(url)
+    def test_listar_insumos(self):
+        """Lista todos los insumos"""
+        self.client.force_authenticate(user=self.admin_user)
+        response = self.client.get(self.url_listar)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(Insumo.objects.count(), 0)
-
-    def test_eliminar_insumo_como_regular_user_falla(self):
-        """Prueba que un usuario regular NO PUEDE eliminar un insumo."""
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.regular_user_token}')
-        url = f"/api/productos/insumo/eliminar/?id={self.insumo_de_prueba.id}"
-        response = self.client.post(url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertTrue(len(response.data) >= 1)
 
     def test_buscar_insumo_por_nombre(self):
-        """Prueba la búsqueda de un insumo por su nombre."""
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.regular_user_token}')
-        response = self.client.get('/api/productos/insumo/buscar/?nombre=Muzarella')
+        """Busca un insumo por nombre"""
+        self.client.force_authenticate(user=self.admin_user)
+        response = self.client.get(f"{self.url_buscar}?nombre=Harina")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['nombre'], 'Queso Muzarella')
+        self.assertTrue(any('Harina' in i['nombre'] for i in response.data))
+
+    # =====================================================
+    # CASOS DE ERROR - USUARIO CON ROL PERMITIDO
+    # =====================================================
+
+    def test_crear_insumo_invalido(self):
+        self.client.force_authenticate(user=self.admin_user)
+        response = self.client.post(self.url_crear, {}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_editar_insumo_id_faltante(self):
+        self.client.force_authenticate(user=self.admin_user)
+        data = {'nombre': 'Harina Blanca'}
+        response = self.client.put(self.url_editar, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('Falta proporcionar', response.data['detail'])
+
+    def test_editar_insumo_inexistente(self):
+        self.client.force_authenticate(user=self.admin_user)
+        data = {
+            'nombre': 'Producto Fantasma',
+            'descripcion': 'No existe',
+            'unidad_medida': 'kg',
+            'stock_actual': 10,
+            'costo_unitario': 2.5
+        }
+        response = self.client.put(f"{self.url_editar}?id=9999", data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIn('no encontrado', response.data['detail'])
+
+    def test_eliminar_insumo_id_faltante(self):
+        self.client.force_authenticate(user=self.admin_user)
+        response = self.client.post(self.url_eliminar)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('Falta proporcionar', response.data['detail'])
+
+    def test_eliminar_insumo_inexistente(self):
+        self.client.force_authenticate(user=self.admin_user)
+        response = self.client.post(f"{self.url_eliminar}?id=9999")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('no encontrado', response.data['detail'])
+
+    def test_buscar_insumo_sin_parametros(self):
+        self.client.force_authenticate(user=self.admin_user)
+        response = self.client.get(self.url_buscar)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 0)
+
+    # =====================================================
+    # CASOS DE PERMISOS - USUARIO CON ROL NO AUTORIZADO
+    # =====================================================
+
+    def test_crear_insumo_sin_permiso(self):
+        """Usuario Cliente intenta crear insumo"""
+        self.client.force_authenticate(user=self.cliente_user)
+        data = {
+            'nombre': 'Mantequilla',
+            'descripcion': 'Producto lácteo',
+            'unidad_medida': 'kg',
+            'stock_actual': 30.00,
+            'costo_unitario': 4.20
+        }
+        response = self.client.post(self.url_crear, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_editar_insumo_sin_permiso(self):
+        """Usuario Cliente intenta editar insumo"""
+        self.client.force_authenticate(user=self.cliente_user)
+        data = {
+            'nombre': 'Harina Especial',
+            'unidad_medida': 'kg',
+            'stock_actual': 80.00,
+            'costo_unitario': 5.80
+        }
+        response = self.client.put(f"{self.url_editar}?id={self.insumo.id}", data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_eliminar_insumo_sin_permiso(self):
+        """Usuario Cliente intenta eliminar insumo"""
+        self.client.force_authenticate(user=self.cliente_user)
+        response = self.client.post(f"{self.url_eliminar}?id={self.insumo.id}")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

@@ -1,5 +1,5 @@
 import createAuthApiClient from '../api/apiClient';
-import type { Cobro, CobroInput } from '../types/models';
+import type { Cobro, CobroInput, MetodoCobro } from '../types';
 
 const PEDIDOS_API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const cobroAPIClient = createAuthApiClient(PEDIDOS_API_BASE_URL);
@@ -11,7 +11,7 @@ const cobroAPIClient = createAuthApiClient(PEDIDOS_API_BASE_URL);
  * @returns {Promise<Cobro[]>} Lista de cobros.
  */
 export const getCobrosByPedido = async (idPedido: number): Promise<Cobro[]> => {
-  const response = await cobroAPIClient.get<Cobro[]>(`/api/pedidos/cobros/listar/?id_pedido=${idPedido}`);
+  const response = await cobroAPIClient.get<Cobro[]>(`/api/pedidos/cobros/listar/${idPedido}`);
   return response.data;
 };
 
@@ -19,7 +19,7 @@ export const getCobrosByPedido = async (idPedido: number): Promise<Cobro[]> => {
  * @brief Crea un nuevo cobro (POST a /api/pedidos/cobros/crear/).
  */
 export const createCobro = async (cobroData: CobroInput): Promise<Cobro> => {
-  const response = await cobroAPIClient.post<Cobro>('/api/pedidos/cobros/crear/', cobroData);
+  const response = await cobroAPIClient.post<Cobro>('/api/pedidos/cobros/', cobroData);
   return response.data;
 };
 
@@ -27,7 +27,7 @@ export const createCobro = async (cobroData: CobroInput): Promise<Cobro> => {
  * @brief Actualiza un cobro existente (PUT a /api/pedidos/cobros/editar/?id=...).
  */
 export const updateCobro = async (id: number, cobroData: CobroInput): Promise<any> => {
-  const response = await cobroAPIClient.put(`/api/pedidos/cobros/editar/?id=${id}`, cobroData);
+  const response = await cobroAPIClient.put(`/api/pedidos/cobros/${id}/`, cobroData);
   return response.data;
 };
 
@@ -35,7 +35,7 @@ export const updateCobro = async (id: number, cobroData: CobroInput): Promise<an
  * @brief Elimina un cobro existente (DELETE a /api/pedidos/cobros/eliminar/?id=...).
  */
 export const deleteCobro = async (id: number): Promise<any> => {
-  const response = await cobroAPIClient.delete(`/api/pedidos/cobros/eliminar/?id=${id}`);
+  const response = await cobroAPIClient.delete(`/api/pedidos/cobros/${id}/`);
   return response.data;
 };
 
@@ -44,11 +44,11 @@ export const deleteCobro = async (id: number): Promise<any> => {
  * @details Envía un cobro sin monto para que el backend calcule y aplique el pago total restante.
  * Se debe especificar un método de cobro por defecto (ej. efectivo).
  */
-export const createFullPaymentCobro = async (pedidoId: number, metodoCobroId: number): Promise<Cobro> => {
+export const createFullPaymentCobro = async (pedidoId: number, tipo: MetodoCobro): Promise<Cobro> => {
     const cobroData: CobroInput = {
         pedido: pedidoId,
-        id_metodo_cobro: metodoCobroId,
+        tipo: tipo,
     };
-    const response = await cobroAPIClient.post<Cobro>('/api/pedidos/cobros/crear/', cobroData);
+    const response = await cobroAPIClient.post<Cobro>('/api/pedidos/cobros/', cobroData);
     return response.data;
 }

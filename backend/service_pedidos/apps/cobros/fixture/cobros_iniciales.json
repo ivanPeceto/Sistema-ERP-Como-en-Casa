@@ -1,0 +1,53 @@
+[
+  {
+    "model": "cobros.cobro",
+    "pk": 1,
+    "fields": {
+      "pedido": 1,
+      "tipo": "efectivo",
+      "monto": "1200.00",
+      "moneda": "ARS",
+      "fecha": "2025-11-18",
+      "banco": null,
+      "referencia": null,
+      "cuotas": null,
+      "descuento": "0.00",
+      "recargo": "0.00",
+      "estado": "activo"
+    }
+  },
+  {
+    "model": "cobros.cobro",
+    "pk": 2,
+    "fields": {
+      "pedido": 2,
+      "tipo": "debito",
+      "monto": "250.00",
+      "moneda": "ARS",
+      "fecha": "2025-11-18",
+      "banco": "Banco Nación",
+      "referencia": "TX123456",
+      "cuotas": 1,
+      "descuento": "0.00",
+      "recargo": "0.00",
+      "estado": "activo"
+    }
+  },
+  {
+    "model": "cobros.cobro",
+    "pk": 3,
+    "fields": {
+      "pedido": 3,
+      "tipo": "credito",
+      "monto": "1500.00",
+      "moneda": "ARS",
+      "fecha": "2025-11-18",
+      "banco": "Banco Galicia",
+      "referencia": "CR987654",
+      "cuotas": 3,
+      "descuento": "0.00",
+      "recargo": "0.00",
+      "estado": "activo"
+    }
+  }
+]

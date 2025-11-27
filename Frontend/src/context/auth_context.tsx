@@ -24,6 +24,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
   isLoading: boolean;
+  token: string | null;
   login: (email: string, password: string) => Promise<AuthResponse>;
   logout: () => void;
   register: (email: string, password: string, username: string) => Promise<AuthResponse>;
@@ -43,6 +44,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true); 
+  const [token, setToken] = useState<string | null>(null);
 
   /**
    * @brief Hook de efecto que se ejecuta una sola vez al montar el componente.
@@ -72,6 +74,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = async (email: string, password: string) => {
     const response = await apiLogin(email, password);
     setUser(response.user);
+    setToken(response.access);
     setIsAuthenticated(true);
     return response;
   };
@@ -84,6 +87,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const register = async (email: string, password: string, username: string) => {
     const response = await apiRegister(email, password, username);
     setUser(response.user);
+    setToken(response.access);
     setIsAuthenticated(true);
     return response;
   };
@@ -105,6 +109,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     isAuthenticated,
     user,
     isLoading,
+    token,
     login,
     logout,
     register,
