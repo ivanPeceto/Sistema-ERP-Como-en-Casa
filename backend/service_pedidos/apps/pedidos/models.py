@@ -29,43 +29,44 @@ class Pedido(models.Model):
     def calcular_total(self):
         """Total original del pedido (sin descuentos ni recargos)."""
         productos = PedidoProductos.objects.filter(id_pedido=self.id)
-        total = sum(p.precio_unitario * p.cantidad_producto for p in productos)
+        total = sum(Decimal(p.precio_unitario) * Decimal(p.cantidad_producto) for p in productos)
         return Decimal(total).quantize(Decimal('0.01'))
 
-    def total_ajustado(self):
+    def calcular_credito_real(self):
         """
-        Total final que debe pagar el cliente,
-        luego de aplicar descuentos y recargos.
+        Calcula cuánto de la deuda se ha saldado realmente.
+        Fórmula: Monto Pagado + Descuento - Recargo.
+        
+        Ejemplo Recargo: Pedido $100. Pago Tarjeta $110 (inc. $10 recargo).
+                         Credito = 110 + 0 - 10 = $100. (Cubre la deuda exacta).
+        Ejemplo Descuento: Pedido $100. Pago Efvo $90 (inc. $10 descuento).
+                           Credito = 90 + 10 - 0 = $100. (Cubre la deuda exacta).
         """
-        total = self.calcular_total()
-
-        descuento_total = Decimal('0.00')
-        recargo_total = Decimal('0.00')
-
-        for c in self.cobros.filter(estado='activo'):
-            if c.descuento:
-                descuento_total += total * (Decimal(c.descuento) / 100)
-            if c.recargo:
-                recargo_total += total * (Decimal(c.recargo) / 100)
-
-        total_final = total - descuento_total + recargo_total
-        return total_final.quantize(Decimal('0.01'))
+        credito_total = Decimal('0.00')
+        
+        cobros_activos = self.cobros.filter(estado='activo')
+        
+        for cobro in cobros_activos:
+            monto = cobro.monto or Decimal('0.00')
+            descuento = cobro.descuento or Decimal('0.00')
+            recargo = cobro.recargo or Decimal('0.00')
+            
+            credito_real = monto + descuento - recargo
+            credito_total += credito_real
+            
+        return credito_total
 
     def saldo_pendiente(self):
         """
-        Saldo pendiente exacto:
-        total ajustado (con descuentos/recargos) - total cobrado.
-        Con tolerancia de centavos para evitar falsos negativos.
+        Retorna la deuda restante.
+        Si es negativo, significa que el cliente pagó de más (crédito a favor).
         """
-        total_ajustado = self.total_ajustado()
+        total_pedido = self.calcular_total()
+        credito_real = self.calcular_credito_real()
+        
+        saldo = total_pedido - credito_real
 
-        total_cobrado = sum(
-            Decimal(c.monto) for c in self.cobros.filter(estado='activo')
-        )
-
-        saldo = total_ajustado - total_cobrado
-
-        # tolerancia para evitar casos como saldo = -0.009
+        # Tolerancia para errores de redondeo de centavos
         if abs(saldo) < Decimal("0.01"):
             return Decimal("0.00")
 
@@ -77,7 +78,8 @@ class Pedido(models.Model):
         self.total = self.calcular_total()
 
         if self.pk:
-            self.pagado = self.saldo_pendiente() == 0
+            saldo = self.saldo_pendiente()
+            self.pagado = saldo <= 0
 
         super().save(*args, **kwargs)
 

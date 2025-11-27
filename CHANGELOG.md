@@ -1,5 +1,16 @@
 # Changelog
 
+## [ fix/back/cobros-refac-issues ] - 2025/11/27
+
+### Changed
+* Parsea los datos a decimales en la variable `total` dentro del método `calcular_total` en `/pedidos/models.py`.
+* Reemplaza en `/pedidos/models.py` el método `total_ajustado` por `calcular_credito_real` para corregir errores matemáticos en el cálculo de cobros.
+
+### Affects
++ `backend/service_pedidos/apps/pedidos/models.py`
+
+_(Cambios realizados por @ivanPeceto)_
+
 ## [ fix/front/user-roles-implementation ] - 2025/11/26
 
 _(Cambios realizados por @ivanPeceto)_
