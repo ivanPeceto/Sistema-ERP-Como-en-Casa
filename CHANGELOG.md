@@ -3,6 +3,17 @@
 ## [ fix/back/cobros-refac-issues ] - 2025/11/28
 
 ### Changed
+* Refactoriza los estilos en el modal de creacion de cobros.
+
+### Adds
+* `Frontend/src/components/modals/CrearEditarCobroModal/CrearEditarCobroModal.module.css`
+
+### Affects
+* `Frontend/src/components/modals/CrearEditarCobroModal/CrearEditarCobroModal.tsx`
+
+## [ fix/back/cobros-refac-issues ] - 2025/11/28
+
+### Changed
 * Corrige problemas de actualizacion de total a pagar en los modales de cobros.
 
 ### Affects

@@ -1,0 +1,10 @@
+.doubleInputsContainer {
+    display: flex;
+    justify-content: space-evenly;
+    margin-bottom: 0.5rem;
+}
+
+.inputField {
+  max-width: 10rem;
+  min-width: 8rem;
+}

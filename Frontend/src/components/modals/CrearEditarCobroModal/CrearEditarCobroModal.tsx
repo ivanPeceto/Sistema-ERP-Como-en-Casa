@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import formStyles from "../../../styles/formStyles.module.css";
+import cobroStyles from "./CrearEditarCobroModal.module.css";
 import { createCobro, updateCobro } from "../../../services/cobro_service";
 import {
   type Cobro,
@@ -163,49 +164,36 @@ const CrearEditarCobroModal: React.FC<CrearEditarCobroModalProps> = ({
               <h3 className={formStyles.formSectionTitle}>
                 Detalles del Cobro
               </h3>
-
-              <div className={formStyles.formField}>
-                <label className={formStyles.formLabel}>Monto</label>
-                <input
-                  type="number"
-                  name="monto"
-                  value={formData.monto}
-                  onChange={handleInputChange}
-                  className={formStyles.formInput}
-                  placeholder="0.00"
-                  step="0.01"
-                  required
-                />
-              </div>
-
-              <div className={formStyles.formField}>
-                <label className={formStyles.formLabel}>Método de Cobro</label>
-                <select
-                  name="tipo"
-                  value={formData.tipo}
-                  onChange={handleInputChange}
-                  className={formStyles.formSelect}
-                  required
-                >
-                  {(Object.keys(METODO_COBRO) as MetodoCobro[]).map((m) => (
-                    <option key={m} value={m}>
-                      {METODO_COBRO[m]}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className={formStyles.formField}>
-                <label className={formStyles.formLabel}>Moneda</label>
-                <select
-                  name="moneda"
-                  value={formData.moneda}
-                  onChange={handleInputChange}
-                  className={formStyles.formSelect}
-                >
-                  <option value="ARS">ARS</option>
-                  <option value="USD">USD</option>
-                </select>
+              <div className={cobroStyles.doubleInputsContainer}>
+                <div className={cobroStyles.inputField}>
+                  <label className={formStyles.formLabel}>Monto</label>
+                  <input
+                    type="number"
+                    name="monto"
+                    value={formData.monto}
+                    onChange={handleInputChange}
+                    className={formStyles.formInput}
+                    placeholder="0"
+                    step="0.1"
+                    required
+                  />
+                </div>
+                <div className={cobroStyles.inputField}>
+                  <label className={formStyles.formLabel}>Método de Cobro</label>
+                  <select
+                    name="tipo"
+                    value={formData.tipo}
+                    onChange={handleInputChange}
+                    className={formStyles.formSelect}
+                    required
+                  >
+                    {(Object.keys(METODO_COBRO) as MetodoCobro[]).map((m) => (
+                      <option key={m} value={m}>
+                        {METODO_COBRO[m]}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               {["debito", "credito", "mercadopago"].includes(formData.tipo) && (
@@ -246,39 +234,35 @@ const CrearEditarCobroModal: React.FC<CrearEditarCobroModalProps> = ({
                   />
                 </div>
               )}
+              <div className={cobroStyles.doubleInputsContainer}>
+                <div className={cobroStyles.inputField}>
+                  <label className={formStyles.formLabel}>Descuento (%)</label>
+                  <input
+                    type="number"
+                    name="descuento"
+                    value={formData.descuento}
+                    onChange={handleInputChange}
+                    className={formStyles.formInput}
+                    min={0}
+                    max={100}
+                    step="1"
+                  />
+                </div>
 
-              <div className={formStyles.formField}>
-                <div className={formStyles.twoColumnRow}>
-                  <div className={formStyles.formField}>
-                    <label className={formStyles.formLabel}>Descuento (%)</label>
-                    <input
-                      type="number"
-                      name="descuento"
-                      value={formData.descuento}
-                      onChange={handleInputChange}
-                      className={formStyles.formInput}
-                      min={0}
-                      max={100}
-                      step="1"
-                    />
-                  </div>
-
-                  <div className={formStyles.formField}>
-                    <label className={formStyles.formLabel}>Recargo (%)</label>
-                    <input
-                      type="number"
-                      name="recargo"
-                      value={formData.recargo}
-                      onChange={handleInputChange}
-                      className={formStyles.formInput}
-                      min={0}
-                      max={100}
-                      step="1"
-                    />
-                  </div>
+                <div className={cobroStyles.inputField}>
+                  <label className={formStyles.formLabel}>Recargo (%)</label>
+                  <input
+                    type="number"
+                    name="recargo"
+                    value={formData.recargo}
+                    onChange={handleInputChange}
+                    className={formStyles.formInput}
+                    min={0}
+                    max={100}
+                    step="1"
+                  />
                 </div>
               </div>
-
             </div>
           </div>
 
