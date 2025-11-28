@@ -1,5 +1,14 @@
 # Changelog
 
+## [ fix/back/cobros-refac-issues ] - 2025/11/28
+
+### Changed
+* Corrige problemas de actualizacion de total a pagar en los modales de cobros.
+
+### Affects
+* `Frontend/src/components/modals/GestionCobrosModal/GestionCobrosModal.tsx`
++ `Frontend/src/components/modals/CrearEditarCobroModal/CrearEditarCobroModal.tsx`
+
 ## [ fix/back/cobros-refac-issues ] - 2025/11/27
 
 ### Changed

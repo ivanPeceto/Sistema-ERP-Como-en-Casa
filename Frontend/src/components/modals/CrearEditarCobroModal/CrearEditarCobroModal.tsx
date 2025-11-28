@@ -3,14 +3,11 @@ import type { ChangeEvent, FormEvent } from "react";
 import formStyles from "../../../styles/formStyles.module.css";
 import { createCobro, updateCobro } from "../../../services/cobro_service";
 import {
+  type Cobro,
+  type CobroInput,
   type MetodoCobro,
   METODO_COBRO,
-  METODO_COBRO_LABELS
-} from "../../../types/types";
-import type {
-  Cobro,
-  CobroInput
-} from "../../../types/models"
+} from "../../../types";
 
 interface CrearEditarCobroModalProps {
   isOpen: boolean;
@@ -19,18 +16,19 @@ interface CrearEditarCobroModalProps {
   pedidoId: number;
   editingCobro: Cobro | null;
   saldoPendiente: number;
+  metodosCobro: MetodoCobro[];
 }
 
 interface FormData {
   pedido: number;
   tipo: MetodoCobro;
-  monto: number | "";      // Monto Base
-  descuento: number | "";  // Porcentaje
-  recargo: number | "";    // Porcentaje
+  monto: number | "";
+  descuento: number | "";
+  recargo: number | "";
   moneda: string;
-  banco: string;
-  referencia: string;
-  cuotas: number | "";
+  banco?: string;
+  referencia?: string;
+  cuotas?: number | "";
 }
 
 const CrearEditarCobroModal: React.FC<CrearEditarCobroModalProps> = ({
@@ -40,12 +38,12 @@ const CrearEditarCobroModal: React.FC<CrearEditarCobroModalProps> = ({
   pedidoId,
   editingCobro,
   saldoPendiente,
+  metodosCobro,
 }) => {
-  
   const getInitialFormData = (): FormData => ({
     pedido: pedidoId,
     tipo: "efectivo",
-    monto: saldoPendiente > 0 ? Number(saldoPendiente.toFixed(2)) : "",
+    monto: saldoPendiente,
     descuento: 0,
     recargo: 0,
     moneda: "ARS",
@@ -59,34 +57,12 @@ const CrearEditarCobroModal: React.FC<CrearEditarCobroModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       if (editingCobro) {
-        // --- LÓGICA DE INGENIERÍA INVERSA PARA EDICIÓN ---
-        // El backend nos da: Monto Final (Neto) y Valor Absoluto de Descuento/Recargo.
-        // El formulario necesita: Monto Base y Porcentajes.
-        
-        const valDescuento = Number(editingCobro.descuento || 0);
-        const valRecargo = Number(editingCobro.recargo || 0);
-        const montoFinal = Number(editingCobro.monto);
-
-        // 1. Reconstruir el Monto Base Original
-        // Si hubo descuento: Base = Final + Descuento
-        // Si hubo recargo:   Base = Final - Recargo
-        let montoBase = montoFinal + valDescuento - valRecargo;
-
-        // 2. Recalcular Porcentajes
-        let pctDescuento = 0;
-        let pctRecargo = 0;
-
-        if (montoBase > 0) {
-            if (valDescuento > 0) pctDescuento = (valDescuento / montoBase) * 100;
-            if (valRecargo > 0) pctRecargo = (valRecargo / montoBase) * 100;
-        }
-
         setFormData({
           pedido: editingCobro.pedido,
           tipo: editingCobro.tipo,
-          monto: Number(montoBase.toFixed(2)), // Mostramos el base
-          descuento: Number(pctDescuento.toFixed(2)), // Mostramos %
-          recargo: Number(pctRecargo.toFixed(2)),     // Mostramos %
+          monto: editingCobro.monto,
+          descuento: editingCobro.descuento ?? 0,
+          recargo: editingCobro.recargo ?? 0,
           moneda: editingCobro.moneda ?? "ARS",
           banco: editingCobro.banco ?? "",
           referencia: editingCobro.referencia ?? "",
@@ -104,23 +80,18 @@ const CrearEditarCobroModal: React.FC<CrearEditarCobroModalProps> = ({
     const { name, value } = e.target;
     let newValue: any = value;
 
-    // Conversiones numéricas
-    if (["monto", "cuotas", "descuento", "recargo"].includes(name)) {
-      // Permitir cadena vacía para UX
-      if (value === "") newValue = "";
-      else newValue = Number(value);
-      
-      // Validar rangos de porcentaje
-      if (typeof newValue === 'number' && ["descuento", "recargo"].includes(name)) {
-         if (newValue < 0) newValue = 0;
-         if (newValue > 100) newValue = 100;
-      }
+    if (["monto", "cuotas"].includes(name)) {
+      newValue = Number(value);
+    } else if (["descuento", "recargo"].includes(name)) {
+      newValue = Number(value);
+      if (newValue < 0) newValue = 0;
+      if (newValue > 100) newValue = 100;
     }
 
     setFormData((prev) => {
       let updated = { ...prev, [name]: newValue };
 
-      // Limpiar campos irrelevantes al cambiar tipo
+      // Limpiar campos que no aplican al cambiar el tipo
       if (name === "tipo") {
         if (!["debito", "credito", "mercadopago"].includes(newValue)) {
           updated.banco = "";
@@ -130,6 +101,7 @@ const CrearEditarCobroModal: React.FC<CrearEditarCobroModalProps> = ({
           updated.cuotas = "";
         }
       }
+
       return updated;
     });
   };
@@ -145,9 +117,9 @@ const CrearEditarCobroModal: React.FC<CrearEditarCobroModalProps> = ({
     const dataToSubmit: CobroInput = {
       pedido: pedidoId,
       tipo: formData.tipo,
-      monto: Number(formData.monto), // Enviamos monto BASE
-      descuento: Number(formData.descuento) || 0, // Enviamos %
-      recargo: Number(formData.recargo) || 0,     // Enviamos %
+      monto: Number(formData.monto),
+      descuento: Number(formData.descuento) || 0,
+      recargo: Number(formData.recargo) || 0,
       moneda: formData.moneda,
       banco: ["debito", "credito", "mercadopago"].includes(formData.tipo)
         ? formData.banco
@@ -156,8 +128,10 @@ const CrearEditarCobroModal: React.FC<CrearEditarCobroModalProps> = ({
         ? formData.referencia
         : undefined,
       cuotas:
-        formData.tipo === "credito" && formData.cuotas
-          ? Number(formData.cuotas)
+        formData.tipo === "credito"
+          ? formData.cuotas
+            ? Number(formData.cuotas)
+            : undefined
           : undefined,
     };
 
@@ -171,11 +145,8 @@ const CrearEditarCobroModal: React.FC<CrearEditarCobroModalProps> = ({
       onClose();
     } catch (error: any) {
       console.error("Error al guardar cobro:", error);
-      // Ajuste para capturar errores generales o de campo
       const errorMessage =
-        error.response?.data?.error || 
-        error.response?.data?.detail || 
-        "Error al guardar el cobro.";
+        error.response?.data?.monto || "Error al guardar el cobro.";
       alert(errorMessage);
     }
   };
@@ -190,11 +161,11 @@ const CrearEditarCobroModal: React.FC<CrearEditarCobroModalProps> = ({
           <div className={formStyles.formGrid}>
             <div className={formStyles.formSection}>
               <h3 className={formStyles.formSectionTitle}>
-                Detalles del Pago
+                Detalles del Cobro
               </h3>
 
               <div className={formStyles.formField}>
-                <label className={formStyles.formLabel}>Monto a Pagar (Base)</label>
+                <label className={formStyles.formLabel}>Monto</label>
                 <input
                   type="number"
                   name="monto"
@@ -205,9 +176,6 @@ const CrearEditarCobroModal: React.FC<CrearEditarCobroModalProps> = ({
                   step="0.01"
                   required
                 />
-                {!editingCobro && saldoPendiente > 0 && (
-                    <small style={{color: '#666'}}>Saldo restante: ${saldoPendiente}</small>
-                )}
               </div>
 
               <div className={formStyles.formField}>
@@ -219,31 +187,41 @@ const CrearEditarCobroModal: React.FC<CrearEditarCobroModalProps> = ({
                   className={formStyles.formSelect}
                   required
                 >
-                  {(Object.keys(METODO_COBRO_LABELS) as MetodoCobro[]).map((m) => (
+                  {(Object.keys(METODO_COBRO) as MetodoCobro[]).map((m) => (
                     <option key={m} value={m}>
-                      {METODO_COBRO_LABELS[m]}
+                      {METODO_COBRO[m]}
                     </option>
                   ))}
+                </select>
+              </div>
+
+              <div className={formStyles.formField}>
+                <label className={formStyles.formLabel}>Moneda</label>
+                <select
+                  name="moneda"
+                  value={formData.moneda}
+                  onChange={handleInputChange}
+                  className={formStyles.formSelect}
+                >
+                  <option value="ARS">ARS</option>
+                  <option value="USD">USD</option>
                 </select>
               </div>
 
               {["debito", "credito", "mercadopago"].includes(formData.tipo) && (
                 <>
                   <div className={formStyles.formField}>
-                    <label className={formStyles.formLabel}>
-                        {formData.tipo === 'mercadopago' ? 'Nro Operación' : 'Banco'}
-                    </label>
+                    <label className={formStyles.formLabel}>Banco</label>
                     <input
                       type="text"
                       name="banco"
                       value={formData.banco}
                       onChange={handleInputChange}
                       className={formStyles.formInput}
-                      placeholder={formData.tipo === 'mercadopago' ? 'Ej: 12345678' : 'Ej: Galicia'}
                     />
                   </div>
                   <div className={formStyles.formField}>
-                    <label className={formStyles.formLabel}>Referencia / Lote</label>
+                    <label className={formStyles.formLabel}>Referencia</label>
                     <input
                       type="text"
                       name="referencia"
@@ -265,14 +243,13 @@ const CrearEditarCobroModal: React.FC<CrearEditarCobroModalProps> = ({
                     onChange={handleInputChange}
                     className={formStyles.formInput}
                     min={1}
-                    placeholder="1"
                   />
                 </div>
               )}
 
               <div className={formStyles.formField}>
-                <div style={{display:'flex', gap:'10px'}}>
-                  <div className={formStyles.formField} style={{flex:1}}>
+                <div className={formStyles.twoColumnRow}>
+                  <div className={formStyles.formField}>
                     <label className={formStyles.formLabel}>Descuento (%)</label>
                     <input
                       type="number"
@@ -282,11 +259,11 @@ const CrearEditarCobroModal: React.FC<CrearEditarCobroModalProps> = ({
                       className={formStyles.formInput}
                       min={0}
                       max={100}
-                      placeholder="0"
+                      step="1"
                     />
                   </div>
 
-                  <div className={formStyles.formField} style={{flex:1}}>
+                  <div className={formStyles.formField}>
                     <label className={formStyles.formLabel}>Recargo (%)</label>
                     <input
                       type="number"
@@ -296,7 +273,7 @@ const CrearEditarCobroModal: React.FC<CrearEditarCobroModalProps> = ({
                       className={formStyles.formInput}
                       min={0}
                       max={100}
-                      placeholder="0"
+                      step="1"
                     />
                   </div>
                 </div>
