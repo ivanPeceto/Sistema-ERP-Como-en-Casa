@@ -15,6 +15,8 @@ from apps.pedidos.models import Pedido
 from rest_framework.permissions import IsAuthenticated
 from utils.permissions import AdminOnly, AdminRecepcionista
 
+from utils.channels_helper import send_channel_message
+from apps.pedidos.serializer import PedidoSerializer
 
 class CobroViewSet(viewsets.ModelViewSet):
     """
@@ -144,6 +146,15 @@ class CobroViewSet(viewsets.ModelViewSet):
         
         # Actualizar Pedido (Dispara recálculo de 'pagado')
         pedido.save()
+        message_payload = {
+            'type': 'send.notification', 
+            'message': {
+                'source': 'pedidos', 
+                'action': 'update',
+                'pedido': PedidoSerializer(pedido).data
+            }
+        }
+        send_channel_message('app_notifications', message_payload, 10, 0.5)
 
         serializer = CobroSerializer(cobro)
         return Response({
@@ -194,6 +205,15 @@ class CobroViewSet(viewsets.ModelViewSet):
         cobro.save()
 
         cobro.pedido.save() # Actualizar estado del pedido
+        message_payload = {
+            'type': 'send.notification', 
+            'message': {
+                'source': 'pedidos', 
+                'action': 'update',
+                'pedido': PedidoSerializer(cobro.pedido).data
+            }
+        }
+        send_channel_message('app_notifications', message_payload, 10, 0.5)
 
         serializer = CobroSerializer(cobro)
         return Response({
@@ -215,7 +235,16 @@ class CobroViewSet(viewsets.ModelViewSet):
         cobro.save()
 
         cobro.pedido.save() # Recalcular estado pagado
-
+        message_payload = {
+            'type': 'send.notification', 
+            'message': {
+                'source': 'pedidos', 
+                'action': 'update',
+                'pedido': PedidoSerializer(cobro.pedido).data
+            }
+        }
+        send_channel_message('app_notifications', message_payload, 10, 0.5)
+        
         return Response({"mensaje": "Cobro cancelado correctamente"}, status=204)
 
     @action(detail=False, methods=['get'], url_path='listar/(?P<pedido_id>[^/.]+)')

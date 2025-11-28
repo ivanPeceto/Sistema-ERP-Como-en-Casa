@@ -3,6 +3,14 @@
 ## [ fix/back/cobros-refac-issues ] - 2025/11/28
 
 ### Changed
+* Añade actualización del estado del pedido cuando se ve afectado por un cobro a traves de los websockets.
+
+### Affects
+* `backend/service_pedidos/apps/cobros/views.py`
+
+## [ fix/back/cobros-refac-issues ] - 2025/11/28
+
+### Changed
 * Refactoriza los estilos en el modal de creacion de cobros.
 
 ### Adds
