@@ -241,19 +241,17 @@ export interface RecetaInput {
 export interface Cobro {
   id: number;                 
   pedido: number;             
-  
   tipo: MetodoCobro;           
-  monto: number;              
-  moneda?: string | null;     
-
+  monto: number;          
+  moneda: string;     
   fecha: string;              
 
   banco?: string | null;      
   referencia?: string | null; 
   cuotas?: number | null;    
 
-  descuento?: number | null;  
-  recargo?: number | null;    
+  descuento?: number | null; 
+  recargo?: number | null;  
 
   estado: EstadoCobro;        
 }
@@ -266,11 +264,11 @@ export interface Cobro {
 export interface CobroInput {
     pedido: number;
     tipo: MetodoCobro;
-    monto?: number; 
+    monto?: number;         
     moneda?: string;
     banco?: string | null;      
     referencia?: string | null; 
     cuotas?: number | null;    
-    descuento?: number | null;  
-    recargo?: number | null;  
+    descuento?: number | null;  // Porcentaje (%)
+    recargo?: number | null;    // Porcentaje (%)
 }

@@ -15,6 +15,8 @@ from apps.pedidos.models import Pedido
 from rest_framework.permissions import IsAuthenticated
 from utils.permissions import AdminOnly, AdminRecepcionista
 
+from utils.channels_helper import send_channel_message
+from apps.pedidos.serializer import PedidoSerializer
 
 class CobroViewSet(viewsets.ModelViewSet):
     """
@@ -66,64 +68,100 @@ class CobroViewSet(viewsets.ModelViewSet):
             else:
                 return None
 
-    def _aplicar_decoradores(self, transaccion, descuento, recargo):
-        """Aplica decoradores de descuento y recargo si corresponde."""
-        if descuento > 0:
-            transaccion = Descuento(transaccion, descuento)
-        if recargo > 0:
-            transaccion = Recargo(transaccion, recargo)
-        return transaccion
+    def _procesar_decoradores_y_totales(self, transaccion, porcentaje_descuento, porcentaje_recargo):
+        """
+        Aplica los decoradores y calcula los montos monetarios absolutos 
+        de los descuentos y recargos para guardarlos en BD.
+        """
+        monto_inicial = transaccion.monto
+        
+        # Aplicar decoradores
+        if porcentaje_descuento > 0:
+            transaccion = Descuento(transaccion, porcentaje_descuento)
+        if porcentaje_recargo > 0:
+            transaccion = Recargo(transaccion, porcentaje_recargo)
+            
+        monto_final = transaccion.monto
 
-    def _guardar_cobro_y_actualizar_pedido(self, pedido, transaccion, tipo, descuento=Decimal(0), recargo=Decimal(0)):
-        """Guarda el cobro y actualiza automáticamente el estado de pago del pedido."""
-        cobro = Cobro.objects.create(
-            pedido=pedido,
-            tipo=tipo,
-            monto=transaccion.monto,
-            descuento=descuento,   
-            recargo=recargo,      
-            fecha=transaccion.fecha,
-            banco=getattr(transaccion, 'banco', None),
-            referencia=getattr(transaccion, 'referencia', None),
-            cuotas=getattr(transaccion, 'cuota', None),
-            estado='activo'
-        )
-        pedido.pagado = pedido.saldo_pendiente() == 0
-        pedido.save()
-        return cobro
+        # Calcular valores absolutos 
+        val_descuento = Decimal(0)
+        val_recargo = Decimal(0)
+
+        if porcentaje_descuento > 0:
+            # Cuánto bajó el precio:
+            val_descuento = monto_inicial - monto_final
+            #if val_descuento < 0: val_descuento = 0 
+
+        if porcentaje_recargo > 0:
+            # Cuánto subió el precio:
+            val_recargo = monto_final - monto_inicial
+            #if val_recargo < 0: val_recargo = 0
+
+        return transaccion, val_descuento, val_recargo
 
     def create(self, request, *args, **kwargs):
         data = request.data
         tipo = data.get('tipo')
         pedido_id = data.get('pedido')
+        
+        # Datos opcionales
         referencia = data.get('referencia')
         banco = data.get('banco')
         cuotas = data.get('cuotas')
-        monto = Decimal(data.get('monto', 0))
-        descuento = Decimal(data.get('descuento', 0))
-        recargo = Decimal(data.get('recargo', 0))
+        
+        # Valores numéricos
+        monto_base = Decimal(data.get('monto', 0))
+        pct_descuento = Decimal(data.get('descuento', 0)) # Porcentaje
+        pct_recargo = Decimal(data.get('recargo', 0))     # Porcentaje
 
         try:
             pedido = Pedido.objects.get(pk=pedido_id)
         except Pedido.DoesNotExist:
             return Response({"error": "Pedido no encontrado"}, status=404)
 
-        saldo = pedido.saldo_pendiente()
-
-        if monto <= 0:
+        if monto_base <= 0:
             return Response({"error": "El monto debe ser mayor a 0"}, status=400)
-        if monto > saldo:
-            return Response({"error": f"El monto supera el saldo pendiente ({saldo})"}, status=400)
-
-        transaccion = self._crear_transaccion(tipo, monto, banco, referencia, cuotas)
+            
+        # Transacción Base
+        transaccion = self._crear_transaccion(tipo, monto_base, banco, referencia, cuotas)
         if not transaccion:
             return Response({"error": "Tipo de cobro no válido"}, status=400)
 
-        transaccion = self._aplicar_decoradores(transaccion, descuento, recargo)
-        cobro = self._guardar_cobro_y_actualizar_pedido(pedido, transaccion, tipo, descuento=descuento, recargo=recargo)
+        # Aplica decoradores 
+        transaccion, val_desc, val_rec = self._procesar_decoradores_y_totales(transaccion, pct_descuento, pct_recargo)
+
+        # Guarda cobro
+        cobro = Cobro.objects.create(
+            pedido=pedido,
+            tipo=tipo,
+            monto=transaccion.monto, # Monto final (Neto percibido)
+            descuento=val_desc,      # Monto descontado (Crédito)
+            recargo=val_rec,         # Monto recargado (No Crédito)
+            fecha=transaccion.fecha,
+            banco=getattr(transaccion, 'banco', None),
+            referencia=getattr(transaccion, 'referencia', None),
+            cuotas=getattr(transaccion, 'cuota', None),
+            estado='activo'
+        )
+        
+        # Actualizar Pedido (Dispara recálculo de 'pagado')
+        pedido.save()
+        message_payload = {
+            'type': 'send.notification', 
+            'message': {
+                'source': 'pedidos', 
+                'action': 'update',
+                'pedido': PedidoSerializer(pedido).data
+            }
+        }
+        send_channel_message('app_notifications', message_payload, 10, 0.5)
 
         serializer = CobroSerializer(cobro)
-        return Response({"detalle": transaccion.detalle(), "cobro": serializer.data}, status=201)
+        return Response({
+            "detalle": transaccion.detalle(), 
+            "cobro": serializer.data,
+            "saldo_restante": pedido.saldo_pendiente()
+        }, status=201)
 
     def update(self, request, *args, **kwargs):
         cobro = self.get_object()
@@ -131,62 +169,82 @@ class CobroViewSet(viewsets.ModelViewSet):
             return Response({"error": "No se puede actualizar un cobro cancelado."}, status=400)
 
         data = request.data
+        
+        # Recuperar datos actuales o nuevos
         tipo = data.get('tipo', cobro.tipo)
-        referencia = data.get('referencia', getattr(cobro, 'referencia', None))
-        banco = data.get('banco', getattr(cobro, 'banco', None))
-        cuotas = data.get('cuotas', getattr(cobro, 'cuotas', None))
-        monto = Decimal(data.get('monto', 0))
-        descuento = Decimal(data.get('descuento', 0))
-        recargo = Decimal(data.get('recargo', 0))
+        monto_base = Decimal(data.get('monto', 0)) # El usuario edita el monto base
+        pct_descuento = Decimal(data.get('descuento', 0))
+        pct_recargo = Decimal(data.get('recargo', 0))
 
-        pedido = cobro.pedido
-        saldo = Decimal(pedido.saldo_pendiente()) + Decimal(cobro.monto)
-
-        if monto <= 0:
+        if monto_base <= 0:
             return Response({"error": "El monto debe ser mayor a 0"}, status=400)
-        if monto > saldo:
-            return Response({"error": f"El monto supera el saldo pendiente ({saldo})"}, status=400)
 
-        transaccion = self._crear_transaccion(tipo, monto, banco, referencia, cuotas)
+        # Reconstruir transacción
+        transaccion = self._crear_transaccion(
+            tipo, 
+            monto_base, 
+            data.get('banco', cobro.banco), 
+            data.get('referencia', cobro.referencia), 
+            data.get('cuotas', cobro.cuotas)
+        )
         if not transaccion:
             return Response({"error": "Tipo de cobro no válido"}, status=400)
 
-        transaccion = self._aplicar_decoradores(transaccion, descuento, recargo)
+        # Recalcular
+        transaccion, val_desc, val_rec = self._procesar_decoradores_y_totales(transaccion, pct_descuento, pct_recargo)
 
+        # Actualizar campos
         cobro.tipo = tipo
         cobro.monto = transaccion.monto
+        cobro.descuento = val_desc
+        cobro.recargo = val_rec
         cobro.fecha = transaccion.fecha
         cobro.banco = getattr(transaccion, 'banco', None)
         cobro.referencia = getattr(transaccion, 'referencia', None)
         cobro.cuotas = getattr(transaccion, 'cuota', None)
-        cobro.descuento = descuento
-        cobro.recargo = recargo
         cobro.save()
 
-        # Actualizar estado de pago del pedido
-        pedido.pagado = pedido.saldo_pendiente() == 0
-        pedido.save()
+        cobro.pedido.save() # Actualizar estado del pedido
+        message_payload = {
+            'type': 'send.notification', 
+            'message': {
+                'source': 'pedidos', 
+                'action': 'update',
+                'pedido': PedidoSerializer(cobro.pedido).data
+            }
+        }
+        send_channel_message('app_notifications', message_payload, 10, 0.5)
 
         serializer = CobroSerializer(cobro)
-        return Response({"detalle": transaccion.detalle(), "cobro": serializer.data}, status=200)
+        return Response({
+            "detalle": transaccion.detalle(), 
+            "cobro": serializer.data,
+            "saldo_restante": cobro.pedido.saldo_pendiente()
+        }, status=200)
 
     def destroy(self, request, *args, **kwargs):
         cobro = self.get_object()
-        pedido = cobro.pedido
-
+        
         if cobro.estado == 'cancelado':
             return Response({"error": "Este cobro ya está cancelado."}, status=400)
 
-        if Decimal(pedido.saldo_pendiente()) + Decimal(cobro.monto) < 0:
-            return Response({"error": "No se puede eliminar este cobro, afectaría el saldo del pedido."}, status=400)
-
+        # Eliminamos la restricción de saldo negativo al borrar. 
+        # Si borras un pago, la deuda simplemente aumenta.
+        
         cobro.estado = "cancelado"
         cobro.save()
 
-        # Actualizar estado de pago del pedido
-        pedido.pagado = pedido.saldo_pendiente() == 0
-        pedido.save()
-
+        cobro.pedido.save() # Recalcular estado pagado
+        message_payload = {
+            'type': 'send.notification', 
+            'message': {
+                'source': 'pedidos', 
+                'action': 'update',
+                'pedido': PedidoSerializer(cobro.pedido).data
+            }
+        }
+        send_channel_message('app_notifications', message_payload, 10, 0.5)
+        
         return Response({"mensaje": "Cobro cancelado correctamente"}, status=204)
 
     @action(detail=False, methods=['get'], url_path='listar/(?P<pedido_id>[^/.]+)')

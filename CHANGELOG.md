@@ -1,5 +1,48 @@
 # Changelog
 
+## [ fix/back/cobros-refac-issues ] - 2025/11/28
+
+### Changed
+* Añade actualización del estado del pedido cuando se ve afectado por un cobro a traves de los websockets.
+
+### Affects
+* `backend/service_pedidos/apps/cobros/views.py`
+
+## [ fix/back/cobros-refac-issues ] - 2025/11/28
+
+### Changed
+* Refactoriza los estilos en el modal de creacion de cobros.
+
+### Adds
+* `Frontend/src/components/modals/CrearEditarCobroModal/CrearEditarCobroModal.module.css`
+
+### Affects
+* `Frontend/src/components/modals/CrearEditarCobroModal/CrearEditarCobroModal.tsx`
+
+## [ fix/back/cobros-refac-issues ] - 2025/11/28
+
+### Changed
+* Corrige problemas de actualizacion de total a pagar en los modales de cobros.
+
+### Affects
+* `Frontend/src/components/modals/GestionCobrosModal/GestionCobrosModal.tsx`
++ `Frontend/src/components/modals/CrearEditarCobroModal/CrearEditarCobroModal.tsx`
+
+## [ fix/back/cobros-refac-issues ] - 2025/11/27
+
+### Changed
+* Parsea los datos a decimales en la variable `total` dentro del método `calcular_total` en `/pedidos/models.py`.
+* Reemplaza en `/pedidos/models.py` el método `total_ajustado` por `calcular_credito_real` para corregir errores matemáticos en el cálculo de cobros.
+* Adapta la lógica del serializer de pedidos para seguir las reglas de calculos ajustados.
+* Refactoriza la lógica en `cobros/views.py`.
+
+### Affects
+* `backend/service_pedidos/apps/pedidos/models.py`
+* `backend/service_pedidos/apps/pedidos/serializer.py`
+* `backend/service_pedidos/apps/cobros/views.py`
+
+_(Cambios realizados por @ivanPeceto)_
+
 ## [ fix/front/user-roles-implementation ] - 2025/11/26
 
 _(Cambios realizados por @ivanPeceto)_

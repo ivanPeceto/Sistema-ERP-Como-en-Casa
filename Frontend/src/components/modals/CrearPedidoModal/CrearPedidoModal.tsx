@@ -505,7 +505,7 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
             type="button"
             onClick={handleConfirmarPedido}
             className={`${modalStyles.modalButton} ${modalStyles.modalButtonPrimary}`}
-            disabled={isLoading || !clienteSeleccionado || pedidoItems.length === 0}
+            disabled={isLoading || pedidoItems.length === 0}
           >
             Guardar Pedido
           </button>

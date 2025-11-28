@@ -67,6 +67,7 @@ class PedidoSerializer(serializers.ModelSerializer):
                 precio_unitario=producto['precio_unitario'],
                 aclaraciones=producto['aclaraciones']
             )
+        pedido.save()
         return pedido
 
     def update(self, instance, validated_data):
@@ -74,7 +75,6 @@ class PedidoSerializer(serializers.ModelSerializer):
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
-        instance.save()
 
         # Eliminar productos anteriores y crear los nuevos
         PedidoProductos.objects.filter(id_pedido=instance).delete()
@@ -87,6 +87,7 @@ class PedidoSerializer(serializers.ModelSerializer):
                 precio_unitario=producto['precio_unitario'],
                 aclaraciones=producto['aclaraciones']
             )
+        instance.save()
         return instance
 
     def get_productos_detalle(self, pedido):
@@ -94,7 +95,7 @@ class PedidoSerializer(serializers.ModelSerializer):
         return PedidoProductosSerializer(productos, many=True).data
 
     def get_total(self, pedido):
-        return float(pedido.total_ajustado())
+        return float(pedido.total)
 
     def get_total_pagado(self, pedido):
         cobrado = sum(
