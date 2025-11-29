@@ -1,0 +1,45 @@
+/* Frontend/src/components/modals/EntregaAccionModal/EntregaAccionModal.module.css */
+
+.container {
+  max-width: 400px !important; 
+  text-align: center;
+}
+
+.title {
+  margin-top: 0;
+  color: #333;
+}
+
+.description {
+  color: #666;
+  margin-bottom: 25px;
+  font-size: 0.95rem;
+}
+
+.buttonGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.btnDirecto {
+  background-color: #1c7e40; 
+  justify-content: crgb(51, 185, 38)
+}
+
+.btnEditar {
+  background-color: #f0ad4e; 
+  color: white !important;
+  justify-content: center;
+}
+
+.closeLink {
+  background: none;
+  border: none;
+  color: #999;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.85rem;
+  margin-top: 10px;
+}

@@ -2,6 +2,12 @@
 
 ## [ fix/front/cobros-refac-issues ] - 2025/11/29
 
+### Adds
+* `Frontend/src/components/modals/SiguienteAccionModal/SiguienteAccionModal.tsx`
+* `Frontend/src/components/modals/SiguienteAccionModal/SiguienteAccionModal.module.css`
+
+## [ fix/front/cobros-refac-issues ] - 2025/11/29
+
 ### Fixed
 * Corrige lógica incorrecta en `createFullPaymentCobro` dentro de `cobro_service`.
 

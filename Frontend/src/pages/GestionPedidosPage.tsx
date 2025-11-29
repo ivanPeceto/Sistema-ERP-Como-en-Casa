@@ -20,6 +20,7 @@ import modalStyles from '../styles/modalStyles.module.css';
 import CrearPedidoModal from '../components/modals/CrearPedidoModal/CrearPedidoModal.tsx';
 import EditarPedidoModal from '../components/modals/CrearPedidoModal/EditarPedidoModal.tsx';
 import GestionCobrosModal from '../components/modals/GestionCobrosModal/GestionCobrosModal.tsx';
+import SiguienteAccionModal from '../components/modals/SiguienteAccionModal/SiguienteAccionModal.tsx';
 import { createFullPaymentCobro } from '../services/cobro_service.ts';
 
 import { getPedidosByDate, editarPedido, deletePedido, printPedido } from '../services/pedido_service';
@@ -116,6 +117,14 @@ const GestionPedidosPage: React.FC = () => {
   /** @brief Almacena el pedido asociado al cobro */
   const [pedidoCobrar, setPedidoCobrar] = useState<Pedido | null>(null);
 
+  /** @brief Controla la visibilidad del modal de siguiente estado. */
+  const [isSiguienteAccionModalOpen, setIsSiguienteAccionModalOpen] = useState<boolean>(false);
+
+  /** @brief Almacena el pedido que se quiere cambiar de "listo" a "entregado" */
+  const [pedidoParaEntregar, setPedidoParaEntregar] = useState<Pedido | null>(null);
+
+  /** @brief Maneja el flujo de estados de pedido de "listo" a "entregado" */
+  const [entregarPedidoDirecto, setEntregarPedidoDirecto] = useState <boolean>(false);
 
   const openCobrosModal = useCallback((pedido: Pedido) => {
     setPedidoCobrar(pedido)
@@ -133,6 +142,11 @@ const GestionPedidosPage: React.FC = () => {
   const closeCreateModal = useCallback(() => {
     setIsCreateModalOpen(false);
   }, []);
+
+  const closeSiguienteAccionModal = useCallback(() => {
+    setIsSiguienteAccionModalOpen(false);
+  } 
+  , []);
 
   const handleSocketMessage = useCallback((data: SocketMessage) => {
     if (data.source === 'pedidos') {
@@ -375,11 +389,14 @@ const GestionPedidosPage: React.FC = () => {
     if (pedido.estado === 'PENDIENTE') {
       nuevoEstado = 'LISTO';
     } else if (pedido.estado === 'LISTO') {
+      setPedidoParaEntregar(pedido);
+      setIsSiguienteAccionModalOpen(true);
       nuevoEstado = 'ENTREGADO';
     } else if (pedido.estado === 'ENTREGADO') {
       nuevoEstado = 'PENDIENTE';
     }
 
+    if (!entregarPedidoDirecto && pedido.estado === 'LISTO') return;
     try {
       const payload = prepareUpdatePayload(
         pedido,
@@ -398,6 +415,9 @@ const GestionPedidosPage: React.FC = () => {
         { fecha: getFechaISO(pedido.fecha_pedido), numero: pedido.numero_pedido },
         payload
       );
+      setIsSiguienteAccionModalOpen(false);
+      setPedidoParaEntregar(null);
+      setEntregarPedidoDirecto(false);
       fetchInitialData();
     } catch (error) {
       console.error(`Error al cambiar estado 'entregado' para pedido ${pedido.id}:`, error);
@@ -734,6 +754,13 @@ const GestionPedidosPage: React.FC = () => {
           </div>
         </div>
       )}
+      <SiguienteAccionModal
+          isOpen={isSiguienteAccionModalOpen}
+          onClose={closeSiguienteAccionModal}
+          pedido={pedidoParaEntregar}
+          onEntregarDirecto={() => { setEntregarPedidoDirecto(true);}}
+          onEditarAntes={() => { setIsEditModalOpen(true) }}
+       />
 
       <EditarPedidoModal
         isOpen={isEditModalOpen}
