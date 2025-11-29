@@ -1,5 +1,19 @@
 # Changelog
 
+## [ fix/front/cobros-refac-issues ] - 2025/11/29
+
+### Fixed
+* Corrige lógica incorrecta en `createFullPaymentCobro` dentro de `cobro_service`.
+
+### Changed
+* Refactoriza el método `handleTogglePagado` en `GestionPedidosPage` para simplificar su lógica y adaptarlo al sistema de cobros.
+* Elimina el checkbox de `pagado` en el modal de edición de pedidos.
+
+### Affects
+* `Frontend/src/services/cobro_service.ts`
+* `Frontend/src/pages/GestionPedidosPage.tsx`
+* `Frontend/src/components/modals/CrearPedidoModal/EditarPedidoModal.tsx`
+
 ## [ fix/front/cobros-refac-issues ] - 2025/11/28
 
 ### Changed

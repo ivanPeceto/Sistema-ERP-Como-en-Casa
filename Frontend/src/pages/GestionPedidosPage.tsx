@@ -20,6 +20,7 @@ import modalStyles from '../styles/modalStyles.module.css';
 import CrearPedidoModal from '../components/modals/CrearPedidoModal/CrearPedidoModal.tsx';
 import EditarPedidoModal from '../components/modals/CrearPedidoModal/EditarPedidoModal.tsx';
 import GestionCobrosModal from '../components/modals/GestionCobrosModal/GestionCobrosModal.tsx';
+import { createFullPaymentCobro } from '../services/cobro_service.ts';
 
 import { getPedidosByDate, editarPedido, deletePedido, printPedido } from '../services/pedido_service';
 import { getProductos } from '../services/product_service';
@@ -172,7 +173,7 @@ const GestionPedidosPage: React.FC = () => {
   * @async
   */
   const fetchInitialData = useCallback(async () => {
-    setIsLoading(true);
+    //setIsLoading(true);
     try {
       const [pedidosData, productosData] = await Promise.all([
         getPedidosByDate(searchDate),
@@ -405,25 +406,17 @@ const GestionPedidosPage: React.FC = () => {
   }, [fetchInitialData, prepareUpdatePayload]);
 
   const handleTogglePagado = useCallback(async (pedido: Pedido) => {
+    if (pedido.pagado) return;
+
     try {
-      const payload = prepareUpdatePayload(pedido, { pagado: !pedido.pagado }, pedido.productos_detalle.map(item => ({
-        id: item.id_producto,
-        nombre: item.nombre_producto,
-        cantidad: item.cantidad_producto,
-        precio_unitario: parseFloat(item.precio_unitario.toString()) || 0,
-        subtotal: (parseFloat(item.cantidad_producto.toString()) * (parseFloat(item.precio_unitario.toString()) || 0)) || 0,
-        aclaraciones: item.aclaraciones || '',
-      })));
-      await editarPedido(
-        { fecha: getFechaISO(pedido.fecha_pedido), numero: pedido.numero_pedido },
-        payload
-      );
+      const pedidoPagado: Pedido = pedido;
+      await createFullPaymentCobro(pedidoPagado, "efectivo");
       fetchInitialData();
     } catch (error) {
       console.error(`Error al cambiar estado 'pagado' para pedido ${pedido.id}:`, error);
       console.error('No se pudo actualizar el estado del pedido.');
     }
-  }, [fetchInitialData, prepareUpdatePayload]);
+  }, [fetchInitialData, createFullPaymentCobro]);
 
   const handleToggleAvisado = useCallback(async (pedido: Pedido) => {
     try {
