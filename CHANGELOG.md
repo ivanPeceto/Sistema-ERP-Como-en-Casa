@@ -1,5 +1,17 @@
 # Changelog
 
+## [ fix/front/cobros-refac-issues ] - 2025/11/28
+
+### Changed
+* Ajusta detalles en el frontend y estilos.
+
+### Affects
+* `Frontend/src/components/modals/GestionCobrosModal/GestionCobrosModal.tsx`
+* `Frontend/src/components/modals/CrearEditarCobroModal/CrearEditarCobroModal.tsx`
+
+### Affects 
+* `Frontend/src/components/modals/CrearEditarCobroModal/CrearEditarCobroModal.tsx`
+
 ## [ fix/back/cobros-refac-issues ] - 2025/11/28
 
 ### Changed
