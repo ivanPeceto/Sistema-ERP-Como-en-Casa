@@ -1,10 +1,26 @@
 # Changelog
 
+## [ fix/front/cobros-refac-issues ] - 2025/11/30
+
+### Changed
+* Añade un nuevo endpoint para devolver el saldo pendiente de un pedido.
+
+### Affects
+* `backend/service_pedidos/apps/pedidos/views.py`
+* `backend/service_pedidos/apps/pedidos/urls.py`
+* `Frontend/src/services/pedido_service.ts`
+
 ## [ fix/front/cobros-refac-issues ] - 2025/11/29
 
 ### Adds
 * `Frontend/src/components/modals/SiguienteAccionModal/SiguienteAccionModal.tsx`
 * `Frontend/src/components/modals/SiguienteAccionModal/SiguienteAccionModal.module.css`
+
+### Affects
+* `Frontend/src/pages/GestionPedidosPage.tsx`
+
+### Changed
+* Crea un nuevo modal para el flujo de pedidos "listos" a "entregados" y lo integra en GestionPedidosPage.
 
 ## [ fix/front/cobros-refac-issues ] - 2025/11/29
 

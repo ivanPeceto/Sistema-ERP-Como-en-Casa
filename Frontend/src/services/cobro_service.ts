@@ -46,7 +46,7 @@ export const createFullPaymentCobro = async (pedido: Pedido, tipo: MetodoCobro):
     const idPedido: number = pedido.id;
     const cobroData: CobroInput = {
         pedido: idPedido,
-        monto: pedido.total,
+        monto: pedido.saldo_pendiente,
         tipo: tipo,
     };
     const response = await cobroAPIClient.post<Cobro>('/api/pedidos/cobros/', cobroData);
