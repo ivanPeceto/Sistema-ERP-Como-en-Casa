@@ -7,11 +7,11 @@
 
 .title {
   margin-top: 0;
-  color: #333;
+  color: #ffffff;
 }
 
 .description {
-  color: #666;
+  color: #c0bdbd;
   margin-bottom: 25px;
   font-size: 0.95rem;
 }
@@ -24,12 +24,12 @@
 }
 
 .btnDirecto {
-  background-color: #1c7e40; 
+  background-color: #4cad38; 
   justify-content: crgb(51, 185, 38)
 }
 
 .btnEditar {
-  background-color: #f0ad4e; 
+  background-color: #ee900c; 
   color: white !important;
   justify-content: center;
 }
@@ -37,9 +37,8 @@
 .closeLink {
   background: none;
   border: none;
-  color: #999;
+  color: #c4bebe;
   text-decoration: underline;
   cursor: pointer;
-  font-size: 0.85rem;
-  margin-top: 10px;
+  font-size: 1rem;
 }

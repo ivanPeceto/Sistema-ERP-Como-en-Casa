@@ -8,9 +8,11 @@
 
 ### Affects
 * `Frontend/src/pages/GestionPedidosPage.tsx`
+* `Frontend/src/components/modals/SiguienteAccionModal/SiguienteAccionModal.module.css`
 
 ### Changed
 * Avanza con la integración correcta de los flujos de cobros.
+* Ajusta los estilos en `SiguienteAccionModal.module.css`
 
 ### Changed
 * Añade un nuevo endpoint para devolver el saldo pendiente de un pedido.

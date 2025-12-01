@@ -31,7 +31,7 @@ const SiguienteAccionModal: React.FC<SiguienteAccionModalProps> = ({
         <div className={styles.buttonGroup}>
           <button 
             onClick={onEntregarDirecto} 
-            className={`${formStyles.primaryButton} ${styles.btnDirecto}`}
+            className={`${formStyles.secondaryButton} ${styles.btnDirecto}`}
           >
             Entregar
           </button>
