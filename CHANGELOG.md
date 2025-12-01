@@ -2,6 +2,16 @@
 
 ## [ fix/front/cobros-refac-issues ] - 2025/11/30
 
+### Bugfix
+* `Frontend/src/components/modals/CrearPedidoModal/CrearPedidoModal.tsx`
+* Corrige bug con creacion de pedidos con fechas inconsistentes (ISOString).
+
+### Affects
+* `Frontend/src/pages/GestionPedidosPage.tsx`
+
+### Changed
+* Avanza con la integración correcta de los flujos de cobros.
+
 ### Changed
 * Añade un nuevo endpoint para devolver el saldo pendiente de un pedido.
 

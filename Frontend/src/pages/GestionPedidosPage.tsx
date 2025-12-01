@@ -385,32 +385,44 @@ const GestionPedidosPage: React.FC = () => {
    */
   const executeEntregaFlow = useCallback(async (pedido: Pedido) => {
     try {
+
+      const fechaIso = getFechaISO(pedido.fecha_pedido);
+      const pedidosActualizados = await getPedidosByDate(fechaIso); 
+      const pedidoFresco = pedidosActualizados.find(p => p.id === pedido.id);
+
+      if (!pedidoFresco) {
+        console.error("No se pudo recuperar el pedido actualizado tras la edición.");
+        return;
+      }
+
       // Generar cobro por el saldo restante (si existe deuda)
-      if (!pedido.pagado && (pedido.saldo_pendiente || 0) > 0) {
-        await createFullPaymentCobro(pedido, 'efectivo'); 
+      if (!pedidoFresco.pagado && (pedidoFresco.saldo_pendiente || 0) > 0) {
+        await createFullPaymentCobro(pedidoFresco, 'efectivo'); 
       }
 
       // Cambiar estado a ENTREGADO
-      const payload: PedidoInput = {
-          numero_pedido: pedido.numero_pedido,
-          fecha_pedido: pedido.fecha_pedido,
-          cliente: pedido.cliente,
-          para_hora: pedido.para_hora,
-          estado: 'ENTREGADO',
-          avisado: pedido.avisado,
-          pagado: true, 
-          entregado: true, 
-          productos: pedido.productos_detalle.map(item => ({
-            id_producto: item.id_producto,
-            nombre_producto: item.nombre_producto,
-            cantidad_producto: item.cantidad_producto,
-            precio_unitario: Number(item.precio_unitario),
-            aclaraciones: item.aclaraciones
-          }))
-      };
+      const payload = prepareUpdatePayload(
+        pedidoFresco,
+        {
+          estado: 'ENTREGADO'
+        },
+        pedidoFresco.productos_detalle.map(item => ({
+          id: item.id_producto,
+          nombre: item.nombre_producto,
+          cantidad: item.cantidad_producto,
+          precio_unitario: parseFloat(item.precio_unitario.toString()) || 0,
+          subtotal: (parseFloat(item.cantidad_producto.toString()) * (parseFloat(item.precio_unitario.toString()) || 0)) || 0,
+          aclaraciones: item.aclaraciones || '',
+      })));
 
       await editarPedido(
-        { fecha: pedido.fecha_pedido.split('T')[0], numero: pedido.numero_pedido },
+        { fecha: getFechaISO(pedidoFresco.fecha_pedido), numero: pedidoFresco.numero_pedido },
+        payload
+      );
+      fetchInitialData();
+
+      await editarPedido(
+        { fecha: pedidoFresco.fecha_pedido.split('T')[0], numero: pedidoFresco.numero_pedido },
         payload
       );
 
