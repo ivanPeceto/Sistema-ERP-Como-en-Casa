@@ -20,6 +20,8 @@ import modalStyles from '../styles/modalStyles.module.css';
 import CrearPedidoModal from '../components/modals/CrearPedidoModal/CrearPedidoModal.tsx';
 import EditarPedidoModal from '../components/modals/CrearPedidoModal/EditarPedidoModal.tsx';
 import GestionCobrosModal from '../components/modals/GestionCobrosModal/GestionCobrosModal.tsx';
+import SiguienteAccionModal from '../components/modals/SiguienteAccionModal/SiguienteAccionModal.tsx';
+import { createFullPaymentCobro } from '../services/cobro_service.ts';
 
 import { getPedidosByDate, editarPedido, deletePedido, printPedido } from '../services/pedido_service';
 import { getProductos } from '../services/product_service';
@@ -115,9 +117,17 @@ const GestionPedidosPage: React.FC = () => {
   /** @brief Almacena el pedido asociado al cobro */
   const [pedidoCobrar, setPedidoCobrar] = useState<Pedido | null>(null);
 
+  /** @brief Controla la visibilidad del modal de siguiente estado. */
+  const [isSiguienteAccionModalOpen, setIsSiguienteAccionModalOpen] = useState<boolean>(false);
+
+  /** @brief Almacena el pedido que se quiere cambiar de "listo" a "entregado" */
+  const [pedidoParaEntregar, setPedidoParaEntregar] = useState<Pedido | null>(null);
+
+  /** @brief Bandera para saber si estamos editando como parte del flujo de entrega*/ 
+  const [isEditingForDelivery, setIsEditingForDelivery] = useState<boolean>(false);
 
   const openCobrosModal = useCallback((pedido: Pedido) => {
-    setPedidoCobrar(pedido)
+    setPedidoCobrar(pedido);
     setIsCobrosModalOpen(true);
   }, []);
 
@@ -132,6 +142,11 @@ const GestionPedidosPage: React.FC = () => {
   const closeCreateModal = useCallback(() => {
     setIsCreateModalOpen(false);
   }, []);
+
+  const closeSiguienteAccionModal = useCallback(() => {
+    setIsSiguienteAccionModalOpen(false);
+  } 
+  , []);
 
   const handleSocketMessage = useCallback((data: SocketMessage) => {
     if (data.source === 'pedidos') {
@@ -172,7 +187,7 @@ const GestionPedidosPage: React.FC = () => {
   * @async
   */
   const fetchInitialData = useCallback(async () => {
-    setIsLoading(true);
+    //setIsLoading(true);
     try {
       const [pedidosData, productosData] = await Promise.all([
         getPedidosByDate(searchDate),
@@ -286,10 +301,14 @@ const GestionPedidosPage: React.FC = () => {
    */
   const closeEditModal = useCallback(() => {
     setIsEditModalOpen(false);
-    setEditingPedido(null);
-    setEditingPedidoItems([]);
-    setEditFormData({});
-  }, []);
+    if (isEditingForDelivery && editingPedido) {
+        executeEntregaFlow(editingPedido);
+    } else {
+        setEditingPedido(null);
+        setEditingPedidoItems([]);
+        setEditFormData({});
+    }
+  }, [isEditingForDelivery, editingPedido]);
 
 
   /**
@@ -361,6 +380,78 @@ const GestionPedidosPage: React.FC = () => {
   };
 
   /**
+   * @brief Lógica Central: Paga el saldo restante y marca como entregado.
+   * @details Se ejecuta al confirmar en el modal o al cerrar la edición.
+   */
+  const executeEntregaFlow = useCallback(async (pedido: Pedido) => {
+    try {
+
+      const fechaIso = getFechaISO(pedido.fecha_pedido);
+      const pedidosActualizados = await getPedidosByDate(fechaIso); 
+      const pedidoFresco = pedidosActualizados.find(p => p.id === pedido.id);
+
+      if (!pedidoFresco) {
+        console.error("No se pudo recuperar el pedido actualizado tras la edición.");
+        return;
+      }
+
+      // Generar cobro por el saldo restante (si existe deuda)
+      if (!pedidoFresco.pagado && (pedidoFresco.saldo_pendiente || 0) > 0) {
+        await createFullPaymentCobro(pedidoFresco, 'efectivo'); 
+      }
+
+      // Cambiar estado a ENTREGADO
+      const payload = prepareUpdatePayload(
+        pedidoFresco,
+        {
+          estado: 'ENTREGADO'
+        },
+        pedidoFresco.productos_detalle.map(item => ({
+          id: item.id_producto,
+          nombre: item.nombre_producto,
+          cantidad: item.cantidad_producto,
+          precio_unitario: parseFloat(item.precio_unitario.toString()) || 0,
+          subtotal: (parseFloat(item.cantidad_producto.toString()) * (parseFloat(item.precio_unitario.toString()) || 0)) || 0,
+          aclaraciones: item.aclaraciones || '',
+      })));
+
+      await editarPedido(
+        { fecha: getFechaISO(pedidoFresco.fecha_pedido), numero: pedidoFresco.numero_pedido },
+        payload
+      );
+      fetchInitialData();
+
+      await editarPedido(
+        { fecha: pedidoFresco.fecha_pedido.split('T')[0], numero: pedidoFresco.numero_pedido },
+        payload
+      );
+
+      setPedidoParaEntregar(null);
+      setIsEditingForDelivery(false); 
+      fetchInitialData(); 
+
+    } catch (error) {
+      console.error("Error en flujo de entrega:", error);
+      alert("Hubo un error al finalizar el pedido.");
+    }
+  }, [fetchInitialData]);
+
+  const handleEntregarDirecto = () => {
+    if (pedidoParaEntregar) {
+      executeEntregaFlow(pedidoParaEntregar);
+      setIsSiguienteAccionModalOpen(false);
+    }
+  };
+
+  const handleEditarAntes = () => {
+    if (pedidoParaEntregar) {
+      setIsEditingForDelivery(true);
+      setIsSiguienteAccionModalOpen(false); 
+      openEditModal(pedidoParaEntregar); 
+    }
+  };
+
+  /**
    * @brief Alterna el estado de 'entregado' de un pedido
    * @param {Pedido} pedido - El pedido cuyo estado se va a modificar
    * @returns {Promise<void>}
@@ -374,7 +465,9 @@ const GestionPedidosPage: React.FC = () => {
     if (pedido.estado === 'PENDIENTE') {
       nuevoEstado = 'LISTO';
     } else if (pedido.estado === 'LISTO') {
-      nuevoEstado = 'ENTREGADO';
+      setPedidoParaEntregar(pedido);
+      setIsSiguienteAccionModalOpen(true);
+      return;
     } else if (pedido.estado === 'ENTREGADO') {
       nuevoEstado = 'PENDIENTE';
     }
@@ -405,25 +498,17 @@ const GestionPedidosPage: React.FC = () => {
   }, [fetchInitialData, prepareUpdatePayload]);
 
   const handleTogglePagado = useCallback(async (pedido: Pedido) => {
+    if (pedido.pagado) return;
+
     try {
-      const payload = prepareUpdatePayload(pedido, { pagado: !pedido.pagado }, pedido.productos_detalle.map(item => ({
-        id: item.id_producto,
-        nombre: item.nombre_producto,
-        cantidad: item.cantidad_producto,
-        precio_unitario: parseFloat(item.precio_unitario.toString()) || 0,
-        subtotal: (parseFloat(item.cantidad_producto.toString()) * (parseFloat(item.precio_unitario.toString()) || 0)) || 0,
-        aclaraciones: item.aclaraciones || '',
-      })));
-      await editarPedido(
-        { fecha: getFechaISO(pedido.fecha_pedido), numero: pedido.numero_pedido },
-        payload
-      );
+      const pedidoPagado: Pedido = pedido;
+      await createFullPaymentCobro(pedidoPagado, "efectivo");
       fetchInitialData();
     } catch (error) {
       console.error(`Error al cambiar estado 'pagado' para pedido ${pedido.id}:`, error);
       console.error('No se pudo actualizar el estado del pedido.');
     }
-  }, [fetchInitialData, prepareUpdatePayload]);
+  }, [fetchInitialData, createFullPaymentCobro]);
 
   const handleToggleAvisado = useCallback(async (pedido: Pedido) => {
     try {
@@ -741,6 +826,16 @@ const GestionPedidosPage: React.FC = () => {
           </div>
         </div>
       )}
+      <SiguienteAccionModal
+          isOpen={isSiguienteAccionModalOpen}
+          onClose={() => {
+            setIsSiguienteAccionModalOpen(false);
+            setPedidoParaEntregar(null);
+          }}
+          pedido={pedidoParaEntregar}
+          onEntregarDirecto={handleEntregarDirecto}
+          onEditarAntes={handleEditarAntes}
+       />
 
       <EditarPedidoModal
         isOpen={isEditModalOpen}

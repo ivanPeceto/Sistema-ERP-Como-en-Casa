@@ -260,14 +260,14 @@ const EditarPedidoModal: React.FC<EditarPedidoModalProps> = ({ isOpen, onClose, 
                 <div className={styles.formRowElement}>
                   <label className={modalStyles.formLabel}>Estados Adicionales</label>
                   <div className={modalStyles.checkboxGroupContainer}>
-                    <div className={modalStyles.checkboxContainer}>
+                    {/**<div className={modalStyles.checkboxContainer}>
                       <input type="checkbox" id="pagado" name="pagado" checked={editFormData.pagado || false} onChange={handleEditInputChange} className={modalStyles.checkboxInput}/>
                       <label htmlFor="pagado" className={modalStyles.formLabel}>
                         <span className={`${modalStyles.statusBadge} ${editFormData.pagado ? modalStyles.statusPaid : modalStyles.statusUnpaid}`}>
                           <i className={`fas ${editFormData.pagado ? 'fa-check-circle' : 'fa-exclamation-circle'}`}></i> Pagado
                         </span>
                       </label>
-                    </div>
+                    </div> */}
                     <div className={modalStyles.checkboxContainer}>
                       <input type="checkbox" id="avisado" name="avisado" checked={editFormData.avisado || false} onChange={handleEditInputChange} className={modalStyles.checkboxInput}/>
                       <label htmlFor="avisado" className={modalStyles.formLabel}>

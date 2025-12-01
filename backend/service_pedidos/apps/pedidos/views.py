@@ -278,3 +278,33 @@ class ImprimirPedidoView(APIView):
             return Response({'detail':'Pedido a imprimir no encontrado'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'detail': f'Error interno al procesar la solicitud de impresión: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class SaldoPendientePedidoView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        fecha = request.query_params.get('fecha')
+        numero_pedido = request.query_params.get('numero')
+
+        if not fecha or not numero_pedido:
+            return Response({'detail':'Falta proporcionar fecha o número de pedido.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            fecha_obj = datetime.strptime(fecha, "%Y-%m-%d").date()
+            start_of_day = timezone.make_aware(datetime.combine(fecha_obj, time.min))
+            end_of_day = timezone.make_aware(datetime.combine(fecha_obj, time.max))
+        except:
+            return Pedido.objects.none()
+        
+        queryset = Pedido.objects.filter(fecha_pedido__range=(start_of_day, end_of_day))
+
+        if numero_pedido:
+            pedido = queryset.filter(numero_pedido=numero_pedido)     
+        
+        saldo_pendiente = pedido.saldo_pendiente()
+
+        if saldo_pendiente < 0:
+            saldo_pendiente = 0
+
+        return Response({"pendiente": saldo_pendiente}, status=status.HTTP_200_OK)
+

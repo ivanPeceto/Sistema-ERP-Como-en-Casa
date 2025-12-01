@@ -278,18 +278,24 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
               console.warn("Continuando la creación del pedido con el nombre ingresado tras error al crear cliente.");
           }
       }
-      const today = new Date();
-      const hoy = today.toISOString().split('T')[0];
+      const now = new Date();
+      
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0'); 
+      const day = String(now.getDate()).padStart(2, '0');
+      
+      // Fecha en formato YYYY-MM-DD para buscar en el backend
+      const hoyLocalStr = `${year}-${month}-${day}`;
 
       // Obtener pedidos del día para asignar nuevo número
-      const pedidosDeHoy = await getPedidosByDate(hoy);
+      const pedidosDeHoy = await getPedidosByDate(hoyLocalStr);
       const ultimoNumero = pedidosDeHoy.length === 0 ? 0 : pedidosDeHoy[pedidosDeHoy.length - 1].numero_pedido;
       const nuevoNumeroPedido = ultimoNumero + 1;
 
       // Armar payload
       const pedidoData: PedidoInput = {
         numero_pedido: nuevoNumeroPedido,
-        fecha_pedido: today.toISOString(),
+        fecha_pedido: hoyLocalStr,
         cliente: clienteInput.trim(), 
         para_hora: paraHora || null,
         estado: 'PENDIENTE', 

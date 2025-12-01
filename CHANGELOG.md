@@ -1,5 +1,65 @@
 # Changelog
 
+## [ fix/front/cobros-refac-issues ] - 2025/11/30
+
+### Bugfix
+* `Frontend/src/components/modals/CrearPedidoModal/CrearPedidoModal.tsx`
+* Corrige bug con creacion de pedidos con fechas inconsistentes (ISOString).
+
+### Affects
+* `Frontend/src/pages/GestionPedidosPage.tsx`
+* `Frontend/src/components/modals/SiguienteAccionModal/SiguienteAccionModal.module.css`
+
+### Changed
+* Avanza con la integración correcta de los flujos de cobros.
+* Ajusta los estilos en `SiguienteAccionModal.module.css`
+
+### Changed
+* Añade un nuevo endpoint para devolver el saldo pendiente de un pedido.
+
+### Affects
+* `backend/service_pedidos/apps/pedidos/views.py`
+* `backend/service_pedidos/apps/pedidos/urls.py`
+* `Frontend/src/services/pedido_service.ts`
+
+## [ fix/front/cobros-refac-issues ] - 2025/11/29
+
+### Adds
+* `Frontend/src/components/modals/SiguienteAccionModal/SiguienteAccionModal.tsx`
+* `Frontend/src/components/modals/SiguienteAccionModal/SiguienteAccionModal.module.css`
+
+### Affects
+* `Frontend/src/pages/GestionPedidosPage.tsx`
+
+### Changed
+* Crea un nuevo modal para el flujo de pedidos "listos" a "entregados" y lo integra en GestionPedidosPage.
+
+## [ fix/front/cobros-refac-issues ] - 2025/11/29
+
+### Fixed
+* Corrige lógica incorrecta en `createFullPaymentCobro` dentro de `cobro_service`.
+
+### Changed
+* Refactoriza el método `handleTogglePagado` en `GestionPedidosPage` para simplificar su lógica y adaptarlo al sistema de cobros.
+* Elimina el checkbox de `pagado` en el modal de edición de pedidos.
+
+### Affects
+* `Frontend/src/services/cobro_service.ts`
+* `Frontend/src/pages/GestionPedidosPage.tsx`
+* `Frontend/src/components/modals/CrearPedidoModal/EditarPedidoModal.tsx`
+
+## [ fix/front/cobros-refac-issues ] - 2025/11/28
+
+### Changed
+* Ajusta detalles en el frontend y estilos.
+
+### Affects
+* `Frontend/src/components/modals/GestionCobrosModal/GestionCobrosModal.tsx`
+* `Frontend/src/components/modals/CrearEditarCobroModal/CrearEditarCobroModal.tsx`
+
+### Affects 
+* `Frontend/src/components/modals/CrearEditarCobroModal/CrearEditarCobroModal.tsx`
+
 ## [ fix/back/cobros-refac-issues ] - 2025/11/28
 
 ### Changed

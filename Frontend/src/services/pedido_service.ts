@@ -96,3 +96,8 @@ export const printPedido = async ({ fecha, numero }: { fecha: string; numero: nu
   const response = await pedidoAPICLient.post(`/api/pedidos/imprimir/?fecha=${fecha}&numero=${numero}`);
   return response.data;
 };
+
+export const getSaldoPendientePedido = async ({fecha, numero}: {fecha: string, numero: number}): Promise<any[]> => {
+  const response = await pedidoAPICLient.get(`/api/pedidos/saldo_pendiente/?fecha=${fecha}&numero=${numero}`);
+  return response.data;
+};

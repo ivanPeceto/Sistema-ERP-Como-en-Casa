@@ -1,5 +1,5 @@
 import createAuthApiClient from '../api/apiClient';
-import type { Cobro, CobroInput, MetodoCobro } from '../types';
+import type { Cobro, CobroInput, MetodoCobro, Pedido } from '../types';
 
 const PEDIDOS_API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const cobroAPIClient = createAuthApiClient(PEDIDOS_API_BASE_URL);
@@ -41,12 +41,12 @@ export const deleteCobro = async (id: number): Promise<any> => {
 
 /**
  * @brief Crea un cobro para saldar el total de un pedido.
- * @details Envía un cobro sin monto para que el backend calcule y aplique el pago total restante.
- * Se debe especificar un método de cobro por defecto (ej. efectivo).
  */
-export const createFullPaymentCobro = async (pedidoId: number, tipo: MetodoCobro): Promise<Cobro> => {
+export const createFullPaymentCobro = async (pedido: Pedido, tipo: MetodoCobro): Promise<Cobro> => {
+    const idPedido: number = pedido.id;
     const cobroData: CobroInput = {
-        pedido: pedidoId,
+        pedido: idPedido,
+        monto: pedido.saldo_pendiente,
         tipo: tipo,
     };
     const response = await cobroAPIClient.post<Cobro>('/api/pedidos/cobros/', cobroData);

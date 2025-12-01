@@ -170,7 +170,7 @@ const CrearEditarCobroModal: React.FC<CrearEditarCobroModalProps> = ({
                   <input
                     type="number"
                     name="monto"
-                    value={formData.monto}
+                    value={ Number(formData.monto) >= 0 ? formData.monto : 0}
                     onChange={handleInputChange}
                     className={formStyles.formInput}
                     placeholder="0"
@@ -196,7 +196,7 @@ const CrearEditarCobroModal: React.FC<CrearEditarCobroModalProps> = ({
                 </div>
               </div>
 
-              {["debito", "credito", "mercadopago"].includes(formData.tipo) && (
+              {["debito", "credito"].includes(formData.tipo) && (
                 <>
                   <div className={formStyles.formField}>
                     <label className={formStyles.formLabel}>Banco</label>

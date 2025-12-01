@@ -104,16 +104,13 @@ const GestionCobrosModal: React.FC<GestionCobrosModalProps> = ({ isOpen, onClose
   const renderCobrosList = () => (
     <>
       <div className={styles.cobrosResumen}>
-        <span><strong>Total:</strong> ${pedido.total}</span>
         <span><strong>Abonado:</strong> ${resumen.totalAbonado}</span>
-        <span style={{ color: resumen.pagadoCompleto ? '#1c7e40' : '#cc404e' }}>
-          <strong>Restante:</strong> ${resumen.saldoPendiente.toFixed(1)}
+        <span >
+          <strong>Restante:</strong> <span style={{ color: resumen.pagadoCompleto ? '#66FF00' : '#FF0000' }}>${resumen.saldoPendiente.toFixed(1)}</span>
         </span>
-        {resumen.pagadoCompleto && <span style={{ color: '#1c7e40', fontWeight: 'bold', marginLeft: '15px' }}>¡Pedido totalmente abonado!</span>}
       </div>
 
       <div className={formStyles.formSection}>
-        <h3 className={formStyles.formSectionTitle}>Lista de Cobros</h3>
         <div className={styles.cobrosList}>
           {cobros.length > 0 ? (
             cobros.map(cobro => (
@@ -141,7 +138,6 @@ const GestionCobrosModal: React.FC<GestionCobrosModalProps> = ({ isOpen, onClose
         <button 
           onClick={handleCreate} 
           className={formStyles.primaryButton}
-          disabled={resumen.pagadoCompleto}
           title={resumen.pagadoCompleto ? 'No se puede crear más cobros, pedido totalmente abonado' : ''}
         >
           Nuevo Cobro
@@ -157,25 +153,14 @@ const GestionCobrosModal: React.FC<GestionCobrosModalProps> = ({ isOpen, onClose
     <div className={formStyles.modalOverlay}>
       <div className={formStyles.modalContent}>
         <div className={styles.headerBar}>
-          {currentView === 'metodos' && (
-            <button 
-              onClick={() => {
-                setCurrentView('cobros'); 
-              }} 
-              style={GREEN_BACK_BUTTON_STYLE}
-            >
-              Volver
-            </button>
-          )}
           <h2>
-            {currentView === 'cobros' 
-              ? `Cobros de Pedido #${pedido.numero_pedido}` 
-              : 'Métodos de Cobro'}
+            {`Pedido #${pedido.numero_pedido}`}
           </h2>
-          {currentView === 'cobros' && <span className={styles.spacer}></span>}
+          <span><strong>Total:</strong> <span style={{fontSize: '1.5rem', color: '#66FF00'}}>${pedido.total}</span></span>
+          <span className={styles.spacer}></span>
         </div>
         
-        {currentView === 'cobros' && renderCobrosList()}
+        {renderCobrosList()}
         
       </div>
       
