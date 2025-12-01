@@ -4,7 +4,7 @@ import styles from './CrearPedidoModal.module.css';
 import modalStyles from '../../../styles/modalStyles.module.css';
 import { createPedido, getPedidosByDate } from '../../../services/pedido_service';
 import type { Producto, PedidoItem, PedidoInput, Cliente } from '../../../types/models.d.ts';
-import { buscarClientesPorCoincidencia, createCliente } from '../../../services/client_service';
+import { buscarClientesPorCoincidencia, createCliente, getClientes } from '../../../services/client_service';
 
 interface CrearPedidoModalProps {
   isOpen: boolean;

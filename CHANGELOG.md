@@ -1,5 +1,14 @@
 # Changelog
 
+## [ fix/clientes-refactor-bugs ] - 2025/12/01
+
+### Bugfix
+* Corrige bug de sistema de clientes no funcional.
+
+### Affects
+* `Frontend/src/components/modals/CrearPedidoModal/CrearPedidoModal.tsx`
+* `start_server.sh`
+
 ## [ fix/front/cobros-refac-issues ] - 2025/11/30
 
 ### Bugfix
