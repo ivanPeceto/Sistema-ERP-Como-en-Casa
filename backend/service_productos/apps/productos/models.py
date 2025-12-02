@@ -16,5 +16,26 @@ class Producto(models.Model):
     disponible = models.BooleanField(default=True, db_column='disponible_producto')
     categoria = models.ForeignKey("categorias.Categoria", db_column=("id_categoria"), on_delete=models.CASCADE)
 
+    stock = models.IntegerField(db_column='stock_producto', null=True, blank=True, default=0)
+
+    receta = models.ForeignKey(
+        "recetas.Receta",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_column="id_receta",
+        related_name="productos_que_la_usan"
+    )
+
+    # Define cuánto de la receta consume 1 unidad de este producto.
+    # Ej: 1 Empanada consume 1 unidad de la receta "Empanada". 
+    # O 1 Docena consume 12 unidades de la receta.
+    cantidad_receta = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2, 
+        default=1, 
+        db_column="cantidad_consumo_receta"
+    )
+    
     class Meta:
         db_table = 'producto'
