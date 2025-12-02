@@ -19,6 +19,8 @@ import MainLayout from '../Layouts/MainLayout';
 import ProtectedRoute from './protected_route';
 import GestionUsuariosPage from '../pages/GestionUsuariosPage';
 
+import GestionProductosAndCategoriasPage from '../pages/GestionProductosAndCategoriasPage';
+
 const router = createBrowserRouter([
   {
     path: '/',
@@ -48,9 +50,14 @@ const router = createBrowserRouter([
             path: 'productos',
             element: (
               <ProtectedRoute allowedRoles={['Administrador', 'Cocinero']}>
-                <GestionProductosPage />
+                <GestionProductosAndCategoriasPage/>
               </ProtectedRoute>
             ),
+            //element: (
+            //  <ProtectedRoute allowedRoles={['Administrador', 'Cocinero']}>
+            //    <GestionProductosPage />
+            //  </ProtectedRoute>
+           // ),
           },
           {
             path: 'clientes',

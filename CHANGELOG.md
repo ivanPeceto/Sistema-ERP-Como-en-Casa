@@ -1,5 +1,20 @@
 # Changelog
 
+## [ refac/front/productos-categorias-page ] - 2025/12/01
+
+### Adds
+* `Frontend/src/pages/GestionProductosAndCategoriasPage.tsx`
+  * Nuevo componente para renderizar las paginas de productos y categorias a la vez
+
+### Changed
+* `Frontend/src/router/index.tsx`
+  * Adapta los nuevos componentes a la navegación en index.tsx.
+* `Frontend/src/styles/gestionCategoriaPage.module.css`
+* `Frontend/src/styles/gestionProductosPage.module.css`
+* `Frontend/src/pages/GestionProductosPage.tsx`
+* `Frontend/src/pages/GestionCategoriasPage.tsx`
+  * Ajusta estilos y html para adaptarlos al nuevo layout combinado.
+
 ## [ fix/clientes-refactor-bugs ] - 2025/12/01
 
 ### Bugfix

@@ -123,12 +123,12 @@ const GestionCategoriasPage: React.FC = () => {
     <div className={styles.pageContainer}>
       <h1>Gestion de Categorias</h1>
       <div className={styles.toolbar}>
-        <button 
+        {/*<button 
           onClick={() => navigate('/gestion/productos')} 
           className={`${styles.addButton} ${styles.secondaryButton}`}
         >
           Volver
-        </button>
+        </button>*/}
         <button onClick={() => openModal()} className={styles.addButton}>
           Nueva Categoría
         </button>

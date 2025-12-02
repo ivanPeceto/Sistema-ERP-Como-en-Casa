@@ -19,6 +19,7 @@
 
 .pageContainer h1 {
   text-align: center;
+  font-size: 2rem;
   margin-bottom: 20px;
   color: #ffffff;
 }
@@ -28,10 +29,11 @@
 .toolbar {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: top;
   margin-bottom: 20px;
   gap: 15px;
   flex-wrap: wrap;
+  min-height: 10vh;
 }
 
 .searchBarContainer {
@@ -66,6 +68,7 @@
   font-size: 0.9rem;
   transition: background-color 0.2s ease;
   white-space: nowrap;
+  max-height: 2.5rem;
 }
 
 .viewButton {
