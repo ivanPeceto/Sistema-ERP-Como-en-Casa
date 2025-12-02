@@ -100,6 +100,7 @@ const GestionRecetasPage: React.FC = () => {
 
     return (
         <div className={styles.pageContainer}>
+            <h1>Gestión de Recetas</h1>
             <div className={styles.toolbar}>
                 {/* Reorganizmos los botones de la misma forma que en la página de productos */}
                 <div className={styles.searchBarContainer}>
@@ -131,14 +132,14 @@ const GestionRecetasPage: React.FC = () => {
                             key={receta.id}
                             className={`${styles.listItem}`}
                         >
+                            <div className={styles.itemInfo}>
+                                <strong>{receta.nombre}</strong>
+                                <span>{receta.descripcion}</span>
+                            </div>
                             <div className={styles.itemActions}>
                                 <button onClick={() => openViewModal(receta)} className={`${styles.viewButton} ${styles.secondaryButton}`}>Ver</button>
                                 <button onClick={() => openModal(receta)} className={styles.editButton}>Editar</button>
                                 <button onClick={() => handleDelete(receta.id)} className={styles.deleteButton}>Eliminar</button>
-                            </div>
-                            <div className={styles.itemInfo}>
-                                <strong>{receta.nombre}</strong>
-                                <span>{receta.descripcion}</span>
                             </div>
                         </div>
                     ))

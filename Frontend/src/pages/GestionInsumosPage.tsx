@@ -156,14 +156,6 @@ const GestionInsumosPage: React.FC<GestionInsumosPageProps> = () => {
 
       <div className={styles.toolbar}>
         <div className={styles.toolbarButtons}>
-          <button
-              onClick={() => navigate('/gestion/recetas')}
-              className={`${styles.addButton} ${styles.secondaryButton}`}
-          >
-            Volver
-          </button>
-        </div>
-        <div className={styles.toolbarButtons}>
           <button onClick={() => openModal()} className={styles.addButton}>
             Nuevo Insumo
           </button>

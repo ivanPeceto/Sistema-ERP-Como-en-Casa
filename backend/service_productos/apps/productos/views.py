@@ -7,7 +7,7 @@ from .serializer import ProductoSerializer
 from .logic import procesar_venta_producto
 from rest_framework.permissions import IsAuthenticated
 from utils.permissions import AllowRoles
-from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyApiView 
+from rest_framework.generics import ListAPIView
 
 class ActualizarStockProductoView(APIView):
     """
