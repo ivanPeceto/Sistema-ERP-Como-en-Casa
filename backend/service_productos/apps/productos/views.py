@@ -1,12 +1,44 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Producto
 from .serializer import ProductoSerializer
+from .logic import procesar_venta_producto
 from rest_framework.permissions import IsAuthenticated
 from utils.permissions import AllowRoles
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyApiView 
+
+class ActualizarStockProductoView(APIView):
+    """
+    Endpoint llamado por el servicio de Pedidos o Frontend cuando se confirma una venta.
+    Recibe: { "producto_id": 1, "cantidad": 2 }
+    """
+    permission_classes = [IsAuthenticated] 
+
+    def post(self, request):
+        producto_id = request.data.get('producto_id')
+        cantidad = request.data.get('cantidad')
+
+        if not producto_id or cantidad is None:
+            return Response(
+                {"error": "Se requieren 'producto_id' y 'cantidad'"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        producto = get_object_or_404(Producto, id=producto_id)
+
+        try:
+            procesar_venta_producto(producto, cantidad)
+            return Response(
+                {"detail": "Stock actualizado correctamente"}, 
+                status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            return Response(
+                {"error": f"Error al actualizar stock: {str(e)}"}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 class ProductoCrearView(APIView):
     """!

@@ -5,6 +5,9 @@
 ### Changed
 * `backend/service_productos/apps/productos/models.py`
   * Refactoriza el modelo de productos para volver a manejar stock y tener una asociación lógica con las recetas.
+* `backend/service_productos/apps/productos/views.py`
+* `backend/service_productos/apps/productos/urls.py`
+  * Integra un nuevo endpoint para afectar el stock de productos e insumos.
 
 ### Added
 * `backend/service_productos/apps/productos/logic.py`

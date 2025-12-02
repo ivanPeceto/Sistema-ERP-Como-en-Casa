@@ -4,7 +4,8 @@ from apps.productos.views import (
     ProductoEditarView,
     ProductoEliminarView,
     ProductoListarView,
-    ProductoBuscarView
+    ProductoBuscarView,
+    ActualizarStockProductoView,
 )
 
 urlpatterns = [
@@ -13,4 +14,5 @@ urlpatterns = [
     path('eliminar/', ProductoEliminarView.as_view(), name='producto_eliminar'),
     path('listar/', ProductoListarView.as_view(), name='producto_listar'),
     path('buscar/', ProductoBuscarView.as_view(), name='producto_buscar'),
+    path('consumir-stock/', ActualizarStockProductoView.as_view(), name='producto-consumir-stock'),
 ]
