@@ -1,5 +1,12 @@
 # Changelog
 
+## [ refactor/back/recetas-insumos ] - 2025/12/02
+
+
+### Affects
+* `backend/service_productos/apps/recetas/models.py`
+  * Refactoriza el modelo de recetas para cumplir con la inclusión de sub-recetas. Por ejemplo: la receta para una empanada de carne incluye la receta del relleno de carne.
+
 ## [ refac/front/productos-categorias-page ] - 2025/12/01
 
 ### Adds

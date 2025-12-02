@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.db import models
 
 # Create your models here.
@@ -14,12 +15,31 @@ class Receta(models.Model):
     nombre = models.CharField(max_length=100, db_column='nombre_receta')
     descripcion = models.TextField(db_column='descripcion_receta', blank=True, null=True)
     
-    productos = models.ManyToManyField("productos.Producto", related_name="recetas", db_table='receta_producto')
-
     insumos = models.ManyToManyField("insumos.Insumo", through='RecetaInsumo', related_name='recetas')
+
+    sub_recetas = models.ManyToManyField(
+        "self",
+        through='RecetaSubReceta',
+        symmetrical=False,
+        related_name='es_ingrediente_de'
+    )
 
     class Meta:
         db_table = 'receta'
+
+    def calcular_costo(self):
+        costo_total = Decimal('0.00')
+
+        # Sumar costo de insumos directos
+        for detalle in self.recetainsumo_set.all():
+            costo_total += detalle.insumo.costo_unitario * detalle.cantidad
+
+        # Sumar costo de sub-recetas (Recursividad)
+        for detalle_sub in self.recetasubreceta_principal.all():
+            sub_receta = detalle_sub.receta_hija
+            costo_total += sub_receta.calcular_costo() * detalle_sub.cantidad
+
+        return costo_total
 
 
 class RecetaInsumo(models.Model):
@@ -35,3 +55,15 @@ class RecetaInsumo(models.Model):
     class Meta:
         db_table = 'receta_insumo'
         unique_together = ('receta', 'insumo') # Asegura que un insumo no se repita en la misma receta
+
+class RecetaSubReceta(models.Model):
+    """ 
+    @brief Cantidad de una 'Receta Hija' necesaria para la 'Receta Padre'.
+    """
+    receta_padre = models.ForeignKey(Receta, on_delete=models.CASCADE, related_name='recetasubreceta_principal', db_column='id_receta_padre')
+    receta_hija = models.ForeignKey(Receta, on_delete=models.CASCADE, related_name='recetasubreceta_componente', db_column='id_receta_hija')
+    cantidad = models.DecimalField(max_digits=10, decimal_places=2, db_column='cantidad_sub_receta')
+
+    class Meta:
+        db_table = 'receta_sub_receta'
+        unique_together = ('receta_padre', 'receta_hija')
