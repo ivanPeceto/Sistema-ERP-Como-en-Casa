@@ -1,5 +1,20 @@
 # Changelog
 
+## [ refactor/front/recetas-insumos ] - 2025/12/02
+
+### Adds
+* `Frontend/src/pages/GestionRecetasAndInsumosPage.tsx`
+  * Nuevo componente para renderizar las paginas de recetas e insumo a la vez
+
+### Changed
+* `Frontend/src/router/index.tsx`
+  * Adapta los nuevos componentes a la navegación en index.tsx.
+* `Frontend/src/styles/GestionRecetasPage.module.css`
+* `Frontend/src/styles/GestionInsumosPage.module.css`
+* `Frontend/src/pages/GestionRecetasPage.tsx`
+* `Frontend/src/pages/GestionInsumosPage.tsx`
+  * Ajusta estilos y html para adaptarlos al nuevo layout combinado.
+
 ## [ refactor/back/recetas-insumos ] - 2025/12/02
 
 ### Changed
