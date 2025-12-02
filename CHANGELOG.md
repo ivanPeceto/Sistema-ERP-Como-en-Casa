@@ -1,5 +1,26 @@
 # Changelog
 
+## [ refactor/back/recetas-insumos ] - 2025/12/02
+
+### Changed
+* `backend/service_productos/apps/productos/models.py`
+  * Refactoriza el modelo de productos para volver a manejar stock y tener una asociación lógica con las recetas.
+* `backend/service_productos/apps/productos/views.py`
+* `backend/service_productos/apps/productos/urls.py`
+  * Integra un nuevo endpoint para afectar el stock de productos e insumos.
+
+### Added
+* `backend/service_productos/apps/productos/logic.py`
+  * Añade un nuevo módulo de lógica para manejo de stocks en productos e insumos (en el caso de los productos con recetas/sub_recetas).
+
+## [ refactor/back/recetas-insumos ] - 2025/12/02
+
+### Changed
+* `backend/service_productos/apps/recetas/models.py`
+  * Refactoriza el modelo de recetas para cumplir con la inclusión de sub-recetas. Por ejemplo: la receta para una empanada de carne incluye la receta del relleno de carne.
+* `backend/service_productos/apps/recetas/serializer.py`
+  * Refactoriza el serializer de recetas para manejar la nueva estructura anidada de insumos y sub recetas.
+
 ## [ refac/front/productos-categorias-page ] - 2025/12/01
 
 ### Adds

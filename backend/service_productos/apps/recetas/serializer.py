@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from .models import Receta, RecetaInsumo
-from apps.insumos.models import Insumo
+from .models import Receta, RecetaInsumo, RecetaSubReceta
 from apps.insumos.serializer import InsumoSerializer
 
 class RecetaInsumoSerializer(serializers.ModelSerializer):
@@ -9,69 +8,67 @@ class RecetaInsumoSerializer(serializers.ModelSerializer):
     @details
         Muestra los detalles completos del insumo y la cantidad requerida.
     """
-    insumo = InsumoSerializer(read_only=True)
+    insumo_nombre = serializers.ReadOnlyField(source='insumo.nombre')
+    insumo_unidad = serializers.ReadOnlyField(source='insumo.unidad_medida')
+    insumo_id = serializers.IntegerField()
 
     class Meta:
         model = RecetaInsumo
-        fields = ['insumo', 'cantidad']
+        fields = ['insumo_id', 'insumo_nombre', 'insumo_unidad', 'cantidad']
 
-class RecetaInsumoWriteSerializer(serializers.Serializer):
-    """!
-    @brief Serializer auxiliar para la ESCRITURA de insumos en una receta.
-    @details
-        Espera el ID de un insumo y la cantidad.
-    """
-    insumo_id = serializers.IntegerField()
-    cantidad = serializers.DecimalField(max_digits=10, decimal_places=2)
+class RecetaSubRecetaSerializer(serializers.ModelSerializer):
+    receta_hija_nombre = serializers.ReadOnlyField(source='receta_hija.nombre')
+    receta_hija_id = serializers.IntegerField()
 
+    class Meta:
+        model = RecetaSubReceta
+        fields = ['receta_hija_id', 'receta_hija_nombre', 'cantidad']
 
 class RecetaSerializer(serializers.ModelSerializer):
-    """!
-    @brief Serializador principal para el modelo Receta.
-    @details
-        Maneja la lógica de lectura y escritura para la receta y sus insumos.
-    """
-    # Para LECTURA: Muestra la lista de insumos con sus detalles y cantidades
-    insumos = RecetaInsumoSerializer(source='recetainsumo_set', many=True, read_only=True)
-    
-    # Para ESCRITURA: Espera una lista de objetos con 'insumo_id' y 'cantidad'
-    insumos_data = serializers.ListField(child=RecetaInsumoWriteSerializer(), write_only=True)
+    insumos = RecetaInsumoSerializer(source='recetainsumo_set', many=True)
+    sub_recetas = RecetaSubRecetaSerializer(source='recetasubreceta_principal', many=True, required=False)
+    costo_estimado = serializers.SerializerMethodField()
 
     class Meta:
         model = Receta
-        fields = ['id', 'nombre', 'descripcion', 'insumos', 'insumos_data']
+        fields = ['id', 'nombre', 'descripcion', 'insumos', 'sub_recetas', 'costo_estimado']
+
+    def get_costo_estimado(self, obj):
+        return obj.calcular_costo()
 
     def create(self, validated_data):
-        """!
-        @brief Crea una nueva Receta y sus relaciones con Insumos.
-        """
-        insumos_data = validated_data.pop('insumos_data')
+        insumos_data = validated_data.pop('recetainsumo_set', [])
+        sub_recetas_data = validated_data.pop('recetasubreceta_principal', [])
+        
         receta = Receta.objects.create(**validated_data)
         
-        for insumo_data in insumos_data:
-            RecetaInsumo.objects.create(
-                receta=receta,
-                insumo_id=insumo_data['insumo_id'],
-                cantidad=insumo_data['cantidad']
-            )
+        # Crear relaciones Insumos
+        for item in insumos_data:
+            RecetaInsumo.objects.create(receta=receta, **item)
+            
+        # Crear relaciones Sub-Recetas
+        for item in sub_recetas_data:
+            RecetaSubReceta.objects.create(receta_padre=receta, **item)
+            
         return receta
 
     def update(self, instance, validated_data):
-        """!
-        @brief Actualiza una Receta y sus relaciones con Insumos.
-        @details
-            Elimina las relaciones antiguas y crea las nuevas.
-        """
-        insumos_data = validated_data.pop('insumos_data')
+        # Lógica de actualización (borrar previos y recrear para simplicidad)
+        insumos_data = validated_data.pop('recetainsumo_set', [])
+        sub_recetas_data = validated_data.pop('recetasubreceta_principal', [])
+
         instance.nombre = validated_data.get('nombre', instance.nombre)
         instance.descripcion = validated_data.get('descripcion', instance.descripcion)
         instance.save()
 
+        # Actualizar Insumos
         instance.recetainsumo_set.all().delete()
-        for insumo_data in insumos_data:
-            RecetaInsumo.objects.create(
-                receta=instance,
-                insumo_id=insumo_data['insumo_id'],
-                cantidad=insumo_data['cantidad']
-            )
+        for item in insumos_data:
+            RecetaInsumo.objects.create(receta=instance, **item)
+
+        # Actualizar Sub-Recetas
+        instance.recetasubreceta_principal.all().delete()
+        for item in sub_recetas_data:
+            RecetaSubReceta.objects.create(receta_padre=instance, **item)
+
         return instance
