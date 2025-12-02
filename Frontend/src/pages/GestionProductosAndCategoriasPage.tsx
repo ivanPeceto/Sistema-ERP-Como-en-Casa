@@ -1,5 +1,4 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import GestionProductosPage from '../pages/GestionProductosPage';
 import GestionCategoriasPage from '../pages/GestionCategoriasPage';
 

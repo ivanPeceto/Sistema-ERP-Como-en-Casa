@@ -134,6 +134,7 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
 
   return (
     <div className={styles.pageContainer}>
+      <h1>Gestion de Productos</h1>
       <div className={styles.toolbar}>
         <div className={styles.searchBarContainer}>
           <input
@@ -148,12 +149,12 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
           </button>
         </div>
         <div className={styles.toolbarButtons}>
-          <button
+          {/*<button
             onClick={() => navigate('/gestion/categorias')}
             className={`${styles.addButton} ${styles.secondaryButton}`}
           >
             Gestionar Categorías
-          </button>
+          </button>*/}
         </div>
       </div>
 
@@ -176,14 +177,14 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
               key={producto.id}
               className={`${styles.listItem} ${!producto.disponible ? styles.itemNoDisponible : ''}`}
             >
-              <div className={styles.itemActions}>
-                <button onClick={() => openModal(producto)} className={styles.editButton}>Editar</button>
-                <button onClick={() => handleDelete(producto.id)} className={styles.deleteButton}>Eliminar</button>
-              </div>
               <div className={styles.itemInfo}>
                 <strong>{producto.nombre}</strong>
                 <span>Precio: ${(+producto.precio_unitario).toFixed(2)}</span>
                 {producto.categoria && <small>Categoría: {producto.categoria.nombre}</small>}
+              </div>
+              <div className={styles.itemActions}>
+                <button onClick={() => openModal(producto)} className={styles.editButton}>Editar</button>
+                <button onClick={() => handleDelete(producto.id)} className={styles.deleteButton}>Eliminar</button>
               </div>
             </div>
           ))
