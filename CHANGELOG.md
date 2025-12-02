@@ -6,6 +6,10 @@
 * `backend/service_productos/apps/productos/models.py`
   * Refactoriza el modelo de productos para volver a manejar stock y tener una asociación lógica con las recetas.
 
+### Added
+* `backend/service_productos/apps/productos/logic.py`
+  * Añade un nuevo módulo de lógica para manejo de stocks en productos e insumos (en el caso de los productos con recetas/sub_recetas).
+
 ## [ refactor/back/recetas-insumos ] - 2025/12/02
 
 ### Changed
