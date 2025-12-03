@@ -209,6 +209,12 @@ export interface RecetaInsumo {
 
 }
 
+export interface RecetaSubReceta {
+    receta_hija_id: number;
+    receta_hija_nombre: string;
+    cantidad: number;
+}
+
 /**
  * @interface Receta
  * @brief Define la estructura de un objeto Receta tal como se recibe del backend (lectura).
@@ -218,6 +224,8 @@ export interface Receta {
     nombre: string;
     descripcion: string;
     insumos: RecetaInsumo[];
+    sub_recetas: RecetaSubReceta[]; 
+    costo_estimado?: number; 
 }
 
 /**
@@ -231,8 +239,11 @@ export interface RecetaInput {
         insumo_id: number;
         cantidad: number;
     }[];
+    sub_recetas_data: { 
+        receta_hija_id: number;
+        cantidad: number;
+    }[];
 }
-
 /**
  * @interface Cobro
  * @brief Define la estructura de un cobro.

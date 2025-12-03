@@ -1,5 +1,11 @@
 # Changelog
 
+## [ refactor/front/recetas-insumos ] - 2025/12/03
+
+### Changed
+* `Frontend/src/types/models.ts`
+  * Añade SubRecetas como nuevo tipo y ajusta los tipso ya existentes al nuevo modelo diseñado en el backend.
+
 ## [ refactor/front/recetas-insumos ] - 2025/12/02
 
 ### Adds
