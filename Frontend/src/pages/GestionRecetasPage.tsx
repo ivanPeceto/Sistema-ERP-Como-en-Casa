@@ -10,7 +10,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import type { ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styles from '../styles/gestionProductosPage.module.css';
+import styles from '../styles/gestionRecetasPage.module.css';
 import formStyles from '../styles/formStyles.module.css';
 import { getRecetas, deleteReceta } from '../services/receta_service';
 import { getInsumos } from '../services/insumo_service';
@@ -19,7 +19,7 @@ import CrearRecetaModal from '../components/modals/CrearRecetaModal/CrearRecetaM
 
 interface GestionRecetasPageProps {}
 
-const GestionRecetasPage: React.FC = () => {
+const GestionRecetasPage: React.FC<GestionRecetasPageProps> = () => {
     const navigate = useNavigate();
     const [recetas, setRecetas] = useState<Receta[]>([]);
     const [filteredRecetas, setFilteredRecetas] = useState<Receta[]>([]);
@@ -61,7 +61,7 @@ const GestionRecetasPage: React.FC = () => {
             results = results.filter(r =>
                 r.nombre.toLowerCase().includes(lowercasedValue) ||
                 r.descripcion?.toLowerCase().includes(lowercasedValue) ||
-                r.insumos.some(ri => ri.insumo.nombre.toLowerCase().includes(lowercasedValue))
+                r.insumos.some(ri => ri.insumo_nombre.toLowerCase().includes(lowercasedValue))
             );
         }
         setFilteredRecetas(results);
@@ -98,11 +98,74 @@ const GestionRecetasPage: React.FC = () => {
         }
     };
 
+    const renderViewModalContent = () => {
+        if (!viewingReceta) return null;
+        
+        return (
+            <div className={formStyles.modalOverlay}>
+                <div className={`${formStyles.modalContent} ${styles.viewModalContent}`}>
+                    <div className={styles.viewGrid}>
+                        
+                        <div className={styles.detailColumn}>
+                            <h2 className={styles.recipeTitle}>{viewingReceta.nombre}</h2>
+                            <h4 className={styles.columnHeader}>Descripción / Pasos</h4>
+                            <p className={styles.columnContent}>
+                                {viewingReceta.descripcion || <span className={styles.emptyText}>Sin descripción disponible.</span>}
+                            </p>
+                        </div>
+
+                        <div className={styles.detailColumn}>
+                            <h4 className={styles.columnHeader}>Insumos</h4>
+                            {viewingReceta.insumos.length > 0 ? (
+                                <ul className={styles.ingredientList}>
+                                    {viewingReceta.insumos.map((ri, index) => (
+                                        <li key={index} className={styles.ingredientItem}>
+                                            <span style={{color: '#09c935', fontWeight:'bold'}}>{ri.cantidad} {ri.insumo_unidad}</span>
+                                            {' '} de {ri.insumo_nombre}
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p className={styles.emptyText}>No requiere insumos directos.</p>
+                            )}
+                        </div>
+
+                        <div className={styles.detailColumn}>
+                            <h4 className={styles.columnHeader}>Composición (Sub-Recetas)</h4>
+                            {viewingReceta.sub_recetas && viewingReceta.sub_recetas.length > 0 ? (
+                                <ul className={styles.ingredientList}>
+                                    {viewingReceta.sub_recetas.map((sr, index) => (
+                                        <li key={index} className={styles.ingredientItem}>
+                                            <span style={{color: '#ffc107', fontWeight:'bold'}}>{sr.cantidad} un.</span>
+                                            {' '} de {sr.receta_hija_nombre}
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p className={styles.emptyText}>No incluye sub-recetas.</p>
+                            )}
+                        </div>
+                    </div>
+
+                    {viewingReceta.costo_estimado !== undefined && (
+                        <div className={styles.costSection}>
+                            <span className={styles.costLabel}>Costo Estimado: <span className={styles.costValue}>${viewingReceta.costo_estimado}</span></span>
+                            
+                            <button type="button" onClick={closeViewModal} className={formStyles.secondaryButton}>
+                                Cerrar
+                            </button>
+
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+    };
+
     return (
         <div className={styles.pageContainer}>
             <h1>Gestión de Recetas</h1>
             <div className={styles.toolbar}>
-                {/* Reorganizmos los botones de la misma forma que en la página de productos */}
                 <div className={styles.searchBarContainer}>
                     <input
                         type="text"
@@ -113,14 +176,6 @@ const GestionRecetasPage: React.FC = () => {
                     />
                     <button onClick={() => openModal()} className={styles.addButton}>
                         Nueva Receta
-                    </button>
-                </div>
-                <div className={styles.toolbarButtons}>
-                    <button
-                        onClick={() => navigate('/gestion/insumos')}
-                        className={`${styles.addButton} ${styles.secondaryButton}`}
-                    >
-                        Gestionar Insumos
                     </button>
                 </div>
             </div>
@@ -134,7 +189,9 @@ const GestionRecetasPage: React.FC = () => {
                         >
                             <div className={styles.itemInfo}>
                                 <strong>{receta.nombre}</strong>
-                                <span>{receta.descripcion}</span>
+                                <span style={{fontSize:'0.85rem', color:'#666'}}>
+                                  {receta.insumos.length} insumos {receta.sub_recetas?.length > 0 && ` + ${receta.sub_recetas.length} sub-recetas`}
+                                </span>
                             </div>
                             <div className={styles.itemActions}>
                                 <button onClick={() => openViewModal(receta)} className={`${styles.viewButton} ${styles.secondaryButton}`}>Ver</button>
@@ -148,36 +205,7 @@ const GestionRecetasPage: React.FC = () => {
                 )}
             </div>
 
-            {viewingReceta && (
-                <div className={formStyles.modalOverlay}>
-                    <div className={formStyles.modalContent}>
-                        <h2>Insumos para "{viewingReceta.nombre}"</h2>
-                        <div className={formStyles.formSection}>
-                            <h3 className={formStyles.formSectionTitle}>Lista de Insumos</h3>
-                            {viewingReceta.insumos.length > 0 ? (
-                                <ul>
-                                    {viewingReceta.insumos.map((ri, index) => (
-                                        <li key={index}>
-                                            <strong>{ri.insumo.nombre}</strong>: {ri.cantidad} {ri.insumo.unidad_medida}
-                                        </li>
-                                    ))}
-                                </ul>
-                            ) : (
-                                <p>No hay insumos definidos para esta receta.</p>
-                            )}
-                        </div>
-                        <div className={formStyles.formButtons}>
-                            <button
-                                type="button"
-                                onClick={closeViewModal}
-                                className={formStyles.secondaryButton}
-                            >
-                                Cerrar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {renderViewModalContent()}
 
             <CrearRecetaModal
               isOpen={isCrearRecetaModalOpen}
@@ -185,6 +213,7 @@ const GestionRecetasPage: React.FC = () => {
               fetchRecetas={fetchRecetas}
               editingReceta={editingReceta}
               insumos={insumos}
+              recetasDisponibles={recetas} 
             />
         </div>
     );

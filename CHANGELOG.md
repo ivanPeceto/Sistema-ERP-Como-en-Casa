@@ -5,6 +5,11 @@
 ### Changed
 * `Frontend/src/types/models.ts`
   * Añade SubRecetas como nuevo tipo y ajusta los tipso ya existentes al nuevo modelo diseñado en el backend.
+* `Frontend/src/components/modals/CrearRecetaModal/CrearRecetaModal.tsx`
+* `Frontend/src/components/modals/CrearRecetaModal/CrearRecetaModal.module.css`
+  * Refactoriza completamente el modal de creación de recetas.
+* `Frontend/src/pages/GestionRecetasPage.tsx`
+  * Añade los campos necesarios para el modal refactorizado y modulariza el modal de "ver".
 
 ## [ refactor/front/recetas-insumos ] - 2025/12/02
 

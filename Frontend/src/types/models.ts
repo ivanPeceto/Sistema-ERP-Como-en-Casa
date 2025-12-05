@@ -204,9 +204,10 @@ export interface Insumo {
  * @brief Modelo intermedio que detalla un insumo dentro de una receta.
  */
 export interface RecetaInsumo {
-    insumo: Insumo;
+    insumo_id: number;
+    insumo_nombre: string;
+    insumo_unidad: string;
     cantidad: number;
-
 }
 
 export interface RecetaSubReceta {
@@ -235,11 +236,11 @@ export interface Receta {
 export interface RecetaInput {
     nombre: string;
     descripcion: string;
-    insumos_data: {
+    insumos: {
         insumo_id: number;
         cantidad: number;
     }[];
-    sub_recetas_data: { 
+    sub_recetas: { 
         receta_hija_id: number;
         cantidad: number;
     }[];

@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react';
+/**
+ * @file CrearRecetaModal.tsx
+ * @brief Modal para crear o editar recetas con soporte para Insumos y Sub-Recetas.
+ */
+import React, { useState, useEffect } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import formStyles from '../../../styles/formStyles.module.css';
+import recetasStyles from  './CrearRecetaModal.module.css';
 import { createReceta, updateReceta } from '../../../services/receta_service';
 import { type Receta, type RecetaInput, type Insumo } from '../../../types/models';
-
-interface RecetaInsumoForm {
-  insumo_id: number;
-  cantidad: number;
-}
 
 interface CrearRecetaModalProps {
   isOpen: boolean;
@@ -15,6 +15,7 @@ interface CrearRecetaModalProps {
   fetchRecetas: () => void;
   editingReceta: Receta | null;
   insumos: Insumo[];
+  recetasDisponibles: Receta[]; 
 }
 
 const CrearRecetaModal: React.FC<CrearRecetaModalProps> = ({
@@ -23,11 +24,13 @@ const CrearRecetaModal: React.FC<CrearRecetaModalProps> = ({
   fetchRecetas,
   editingReceta,
   insumos,
+  recetasDisponibles
 }) => {
     const [formData, setFormData] = useState<RecetaInput>({
         nombre: '',
         descripcion: '',
-        insumos_data: [],
+        insumos: [],
+        sub_recetas: [] 
     });
 
     useEffect(() => {
@@ -35,45 +38,83 @@ const CrearRecetaModal: React.FC<CrearRecetaModalProps> = ({
           setFormData({
               nombre: editingReceta.nombre,
               descripcion: editingReceta.descripcion,
-              insumos_data: editingReceta.insumos.map(ri => ({
-                  insumo_id: ri.insumo.id,
+              insumos: editingReceta.insumos.map(ri => ({
+                  insumo_id: ri.insumo_id,
                   cantidad: ri.cantidad,
               })),
+              sub_recetas: editingReceta.sub_recetas.map(sr => ({
+                  receta_hija_id: sr.receta_hija_id,
+                  cantidad: sr.cantidad
+              }))
           });
       } else {
           setFormData({
               nombre: '',
               descripcion: '',
-              insumos_data: insumos.length > 0 ? [{ insumo_id: insumos[0].id, cantidad: 0 }] : [],
+              insumos: [],
+              sub_recetas: []
           });
       }
-    }, [editingReceta, insumos]);
+    }, [editingReceta, isOpen]); 
 
+    // --- Handlers Generales ---
     const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = event.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleInsumoChange = (index: number, field: keyof RecetaInsumoForm, value: string) => {
-        const newInsumosData = [...formData.insumos_data];
-        newInsumosData[index] = {
-            ...newInsumosData[index],
-            [field]: field === 'cantidad' ? parseFloat(value) : parseInt(value),
-        };
-        setFormData(prev => ({ ...prev, insumos_data: newInsumosData }));
-    };
-  
+    // --- Lógica de Insumos ---
     const addInsumo = () => {
+        if (insumos.length === 0) return alert("No hay insumos registrados.");
         setFormData(prev => ({
             ...prev,
-            insumos_data: [...prev.insumos_data, { insumo_id: insumos[0]?.id || 0, cantidad: 0 }],
+            insumos: [...prev.insumos, { insumo_id: insumos[0].id, cantidad: 0 }],
         }));
     };
-  
+
     const removeInsumo = (index: number) => {
-        const newInsumosData = [...formData.insumos_data];
-        newInsumosData.splice(index, 1);
-        setFormData(prev => ({ ...prev, insumos_data: newInsumosData }));
+        const newData = [...formData.insumos];
+        newData.splice(index, 1);
+        setFormData(prev => ({ ...prev, insumos: newData }));
+    };
+
+    const handleInsumoChange = (index: number, field: 'insumo_id' | 'cantidad', value: string) => {
+        const newData = [...formData.insumos];
+        newData[index] = {
+            ...newData[index],
+            [field]: field === 'cantidad' ? parseFloat(value) : parseInt(value),
+        };
+        setFormData(prev => ({ ...prev, insumos: newData }));
+    };
+
+    // --- Lógica de Sub-Recetas ---
+    const addSubReceta = () => {
+        // Filtramos para no sugerir la misma receta que estamos editando 
+        const disponibles = editingReceta 
+            ? recetasDisponibles.filter(r => r.id !== editingReceta.id)
+            : recetasDisponibles;
+
+        if (disponibles && disponibles.length === 0) return alert("No hay otras recetas disponibles para agregar.");
+
+        setFormData(prev => ({
+            ...prev,
+            sub_recetas: [...prev.sub_recetas, { receta_hija_id: disponibles[0].id, cantidad: 0 }],
+        }));
+    };
+
+    const removeSubReceta = (index: number) => {
+        const newData = [...formData.sub_recetas];
+        newData.splice(index, 1);
+        setFormData(prev => ({ ...prev, sub_recetas: newData }));
+    };
+
+    const handleSubRecetaChange = (index: number, field: 'receta_hija_id' | 'cantidad', value: string) => {
+        const newData = [...formData.sub_recetas];
+        newData[index] = {
+            ...newData[index],
+            [field]: field === 'cantidad' ? parseFloat(value) : parseInt(value),
+        };
+        setFormData(prev => ({ ...prev, sub_recetas: newData }));
     };
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -88,95 +129,125 @@ const CrearRecetaModal: React.FC<CrearRecetaModalProps> = ({
             onClose();
         } catch (error: any) {
             console.error('Error al guardar receta:', error);
-            const errorMessage = error.response?.data?.detail || 'Error al guardar el producto.';
-            console.error(errorMessage);
-            alert(errorMessage);
+            const msg = error.response?.data?.detail || 'Error al procesar la solicitud.';
+            alert(msg);
         }
     };
 
     if (!isOpen) return null;
 
+    const opcionesRecetas = editingReceta 
+        ? recetasDisponibles.filter(r => r.id !== editingReceta.id) 
+        : recetasDisponibles;
+
     return (
         <div className={formStyles.modalOverlay}>
-            <div className={formStyles.modalContent}>
+            <div className={formStyles.modalContent} style={{maxWidth: 'fit-content'}}>
                 <h2>{editingReceta ? 'Editar Receta' : 'Nueva Receta'}</h2>
                 <form onSubmit={handleSubmit} className={formStyles.formContainer}>
-                    <div className={formStyles.formGrid}>
-                        <div className={formStyles.formSection}>
-                            <h3 className={formStyles.formSectionTitle}>Información Básica</h3>
-                            <div className={formStyles.formField}>
-                                <label className={`${formStyles.formLabel} ${formStyles.requiredLabel}`} htmlFor="nombre">Nombre</label>
-                                <input
-                                    type="text"
-                                    id="nombre"
-                                    name="nombre"
-                                    value={formData.nombre}
-                                    onChange={handleInputChange}
-                                    required
-                                    className={formStyles.formInput}
-                                />
-                            </div>
-                            <div className={formStyles.formField}>
-                                <label className={formStyles.formLabel} htmlFor="descripcion">Descripción</label>
-                                <textarea
-                                    id="descripcion"
-                                    name="descripcion"
-                                    value={formData.descripcion}
-                                    onChange={handleInputChange}
-                                    className={formStyles.formTextarea}
-                                />
+                    <div className={recetasStyles.innerLayoutRow} >
+                        <div className={recetasStyles.innerLayoutCol}>
+                            <div className={formStyles.formSection}>
+                                <div className={formStyles.formField}>
+                                    <label className={formStyles.formLabel}>Nombre</label>
+                                    <input
+                                        type="text"
+                                        name="nombre"
+                                        value={formData.nombre}
+                                        onChange={handleInputChange}
+                                        required
+                                        className={formStyles.formInput}
+                                    />
+                                </div>
+                                <div className={formStyles.formField}>
+                                    <label className={formStyles.formLabel}>Descripción</label>
+                                    <textarea
+                                        name="descripcion"
+                                        value={formData.descripcion}
+                                        onChange={handleInputChange}
+                                        className={recetasStyles.formTextarea}
+                                    />
+                                </div>
                             </div>
                         </div>
-                        {/* El contenedor principal es formSection, que no tiene scroll global. */}
-                        <div className={formStyles.formSection}>
-                            <h3 className={formStyles.formSectionTitle}>Insumos</h3>
-                            {/* ESTE ES EL DIV QUE APLICA EL SCROLL SOLO A LA LISTA DE INSUMOS */}
-                            <div className={formStyles.insumosListContainer}>
-                                {formData.insumos_data.map((insumoItem, index) => (
-                                    <div key={index} className={formStyles.formField}>
-                                        <label className={formStyles.formLabel}>Insumo #{index + 1}</label>
-                                        <div className={formStyles.inlineFormFields}>
+                        <div className={recetasStyles.innerLayoutCol}>
+                            <div className={formStyles.formSection} style={{minWidth: '20rem'}}>
+                                <h3 className={formStyles.formSectionTitle}>
+                                    Insumos Base
+                                    <button type="button" onClick={addInsumo} className={recetasStyles.addButton} >
+                                        +
+                                    </button>
+                                </h3>
+                                <div className={formStyles.insumosListContainer} style={{maxHeight:'6rem', overflowY:'auto'}}>
+                                    {formData.insumos.map((item, index) => (
+                                        <div key={`ins-${index}`} className={formStyles.inlineFormFields} style={{marginBottom:'10px'}}>
                                             <select
-                                                value={insumoItem.insumo_id}
+                                                value={item.insumo_id}
                                                 onChange={(e) => handleInsumoChange(index, 'insumo_id', e.target.value)}
-                                                required
                                                 className={formStyles.formSelect}
+                                                style={{flex: 2}}
                                             >
-                                                {insumos.map(insumo => (
-                                                    <option key={insumo.id} value={insumo.id}>{insumo.nombre} ({insumo.unidad_medida})</option>
+                                                {insumos.map(ins => (
+                                                    <option key={ins.id} value={ins.id}>{ins.nombre} ({ins.unidad_medida})</option>
                                                 ))}
                                             </select>
                                             <input
                                                 type="number"
-                                                value={insumoItem.cantidad}
+                                                value={item.cantidad}
                                                 onChange={(e) => handleInsumoChange(index, 'cantidad', e.target.value)}
                                                 step="0.01"
-                                                required
                                                 className={formStyles.formInput}
+                                                style={{flex: 1}}
+                                                placeholder="Cant."
                                             />
-                                            <button type="button" onClick={() => removeInsumo(index)} className={formStyles.deleteButton}>X</button>
+                                            <button type="button" onClick={() => removeInsumo(index)} className={formStyles.deleteButton}>×</button>
                                         </div>
-                                    </div>
-                                ))}
+                                    ))}
+                                    {formData.insumos.length === 0 && <p style={{color:'#999', fontSize:'0.9rem', fontStyle:'italic'}}>Sin insumos directos.</p>}
+                                </div>
                             </div>
-                            {/* El botón "Añadir Insumo" queda fuera del área de scroll */}
-                            <button type="button" onClick={addInsumo} className={formStyles.secondaryButton}>
-                                Añadir Insumo
-                            </button>
+                        </div>
+                        <div className={recetasStyles.innerLayoutCol}>
+                            <div className={formStyles.formSection} style={{minWidth: '20rem'}}>
+                                <h3 className={formStyles.formSectionTitle}>
+                                    Sub-Recetas
+                                    <button type="button" onClick={addSubReceta} className={recetasStyles.addButton}>
+                                        + 
+                                    </button>
+                                </h3>
+                                <div className={formStyles.insumosListContainer} style={{maxHeight:'250px', overflowY:'auto'}}>
+                                    {formData.sub_recetas.map((item, index) => (
+                                        <div key={`sub-${index}`} className={formStyles.inlineFormFields} style={{marginBottom:'10px'}}>
+                                            <select
+                                                value={item.receta_hija_id}
+                                                onChange={(e) => handleSubRecetaChange(index, 'receta_hija_id', e.target.value)}
+                                                className={formStyles.formSelect}
+                                                style={{flex: 2}}
+                                            >
+                                                {opcionesRecetas.map(rec => (
+                                                    <option key={rec.id} value={rec.id}>{rec.nombre}</option>
+                                                ))}
+                                            </select>
+                                            <input
+                                                type="number"
+                                                value={item.cantidad}
+                                                onChange={(e) => handleSubRecetaChange(index, 'cantidad', e.target.value)}
+                                                step="0.01"
+                                                className={formStyles.formInput}
+                                                style={{flex: 1}}
+                                                placeholder="Cant."
+                                            />
+                                            <button type="button" onClick={() => removeSubReceta(index)} className={formStyles.deleteButton}>×</button>
+                                        </div>
+                                    ))}
+                                    {formData.sub_recetas.length === 0 && <p style={{color:'#999', fontSize:'0.9rem', fontStyle:'italic'}}>Sin sub-recetas.</p>}
+                                </div>
+                            </div>   
                         </div>
                     </div>
                     <div className={formStyles.formButtons}>
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className={formStyles.secondaryButton}
-                        >
-                            Cancelar
-                        </button>
-                        <button
-                            type="submit"
-                            className={formStyles.primaryButton}
-                        >
+                        <button type="button" onClick={onClose} className={formStyles.secondaryButton}>Cancelar</button>
+                        <button type="submit" className={formStyles.primaryButton}>
                             {editingReceta ? 'Actualizar' : 'Crear'}
                         </button>
                     </div>
