@@ -184,3 +184,24 @@
     padding-right: 10px;
     margin-bottom: 10px;
 }
+
+.formGrid {
+  display: flex;
+  grid-template-columns: 1fr 1fr;
+}
+
+.formGridSectionStart {
+  grid-column-start: 1;
+  grid-column-end: 1;
+  margin-right: 0.5rem;
+}
+
+.formGridSectionEnd {
+  grid-column-start: 2;
+  grid-column-end: 2;
+  margin-left: 0.5rem;
+}
+
+.createProductoModal{
+  max-width: fit-content;
+}

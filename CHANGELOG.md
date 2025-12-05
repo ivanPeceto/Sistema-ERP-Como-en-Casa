@@ -1,5 +1,18 @@
 # Changelog
 
+## [ refactor/front/recetas-insumos ] - 2025/12/05
+
+### Changed
+* `backend/service_productos/apps/productos/serializer.py`
+  * Añade campos faltantes en el serializer.
+* `Frontend/src/types/models.ts`
+  * Añade nuevos campos en types de productos.
+* `Frontend/src/components/modals/CrearProductoModal.tsx`
+* `Frontend/src/styles/formStyles.module.css`
+  * Refactoriza el modal para permitir  el manejo de stock
+* `Frontend/src/pages/GestionProductosPage.tsx`
+  * Añade importaciones pertinentes a recetas y métodos para cargarlas y parsearlas al modal de creación de productos refactorizado.
+
 ## [ refactor/front/recetas-insumos ] - 2025/12/03
 
 ### Changed

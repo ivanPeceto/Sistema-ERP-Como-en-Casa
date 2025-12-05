@@ -59,9 +59,12 @@ export interface Producto {
   nombre: string;
   descripcion: string;
   precio_unitario: number;
-  stock: number, 
   disponible: boolean;
   categoria: Categoria | null;
+  stock: number;              
+  receta_nombre?: string;     
+  receta?: number | null;     
+  cantidad_receta: number;    
 }
 
 /**
@@ -181,9 +184,11 @@ export interface ProductoInput {
   nombre: string;
   descripcion: string;
   precio_unitario: number;
-  stock: number;
   disponible: boolean;
   categoria_id: number | null;
+  stock?: number;
+  receta_id?: number | null; 
+  cantidad_receta?: number;
 }
 
 
