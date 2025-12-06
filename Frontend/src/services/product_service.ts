@@ -87,3 +87,17 @@ export const cambiarDisponibilidad = async (producto: Producto): Promise<Product
   const response = await productAPIClient.put(`/api/productos/editar/?id=${producto.id}`, actualizado);
   return response.data;
 };
+
+/**
+ * @brief Notifica al sistema de productos que se ha realizado una venta para descontar stock.
+ * @details Llama al endpoint '/api/productos/consumir-stock/' que maneja la lógica recursiva (recetas/insumos).
+ * @param {number} productoId El ID del producto vendido.
+ * @param {number} cantidad La cantidad vendida.
+ */
+export const consumirStock = async (productoId: number, cantidad: number): Promise<any> => {
+    const response = await productAPIClient.post('/api/productos/consumir-stock/', {
+        producto_id: productoId,
+        cantidad: cantidad
+    });
+    return response.data;
+};

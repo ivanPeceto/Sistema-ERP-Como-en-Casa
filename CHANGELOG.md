@@ -2,6 +2,12 @@
 
 ## [ refactor/front/recetas-insumos ] - 2025/12/05
 
+### Changed 
+* `Frontend/src/services/product_service.ts`
+  * Añade un nuevo método al servicio para llamar al endpoint "consumir-stock" del microservicio de productos.
+
+## [ refactor/front/recetas-insumos ] - 2025/12/05
+
 ### Changed
 * `backend/service_productos/apps/productos/serializer.py`
   * Añade campos faltantes en el serializer.
