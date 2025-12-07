@@ -1,5 +1,12 @@
 # Changelog
 
+## [ fix/front/recetas-styles ] - 2025/12/07
+
+### Changed
+* `Frontend/src/pages/GestionRecetasPage.tsx`
+* `Frontend/src/styles/gestionRecetasPage.module.css`
+  * Corrige el html y css de los botones 'Ver', 'Editar' y 'Eliminar' para ser consistentes con el del resto de modulos. También elimina algunas aclaraciones innecesarias del modal de 'Ver' recetas.
+
 ## [ refactor/front/admin-panel ] - 2025/12/07 
 
 ### Changed
