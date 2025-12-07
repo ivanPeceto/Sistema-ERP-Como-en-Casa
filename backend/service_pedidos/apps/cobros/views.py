@@ -253,3 +253,11 @@ class CobroViewSet(viewsets.ModelViewSet):
         cobros = Cobro.objects.filter(pedido_id=pedido_id, estado='activo').order_by('-fecha')
         serializer = self.get_serializer(cobros, many=True)
         return Response(serializer.data)
+
+    @action(detail=False, methods=['get'], url_path='total/(?F<fecha>')
+    def total_by_date(self, request, fecha=None):
+        """Devuelve el total de ingresos brutos por cobros en un día específico"""
+        cobros = Cobro.objects.filter(fecha=fecha, estado='activo')
+        for cobro in cobros:
+            total += float(cobro.monto)
+        return Response({'total': total}, status=200)
