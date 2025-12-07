@@ -59,9 +59,12 @@ export interface Producto {
   nombre: string;
   descripcion: string;
   precio_unitario: number;
-  stock: number, 
   disponible: boolean;
   categoria: Categoria | null;
+  stock: number;              
+  receta_nombre?: string;     
+  receta?: number | null;     
+  cantidad_receta: number;    
 }
 
 /**
@@ -181,9 +184,11 @@ export interface ProductoInput {
   nombre: string;
   descripcion: string;
   precio_unitario: number;
-  stock: number;
   disponible: boolean;
   categoria_id: number | null;
+  stock?: number;
+  receta_id?: number | null; 
+  cantidad_receta?: number;
 }
 
 
@@ -204,9 +209,16 @@ export interface Insumo {
  * @brief Modelo intermedio que detalla un insumo dentro de una receta.
  */
 export interface RecetaInsumo {
-    insumo: Insumo;
+    insumo_id: number;
+    insumo_nombre: string;
+    insumo_unidad: string;
     cantidad: number;
+}
 
+export interface RecetaSubReceta {
+    receta_hija_id: number;
+    receta_hija_nombre: string;
+    cantidad: number;
 }
 
 /**
@@ -218,6 +230,8 @@ export interface Receta {
     nombre: string;
     descripcion: string;
     insumos: RecetaInsumo[];
+    sub_recetas: RecetaSubReceta[]; 
+    costo_estimado?: number; 
 }
 
 /**
@@ -227,12 +241,15 @@ export interface Receta {
 export interface RecetaInput {
     nombre: string;
     descripcion: string;
-    insumos_data: {
+    insumos: {
         insumo_id: number;
         cantidad: number;
     }[];
+    sub_recetas: { 
+        receta_hija_id: number;
+        cantidad: number;
+    }[];
 }
-
 /**
  * @interface Cobro
  * @brief Define la estructura de un cobro.

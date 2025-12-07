@@ -5,13 +5,13 @@ import styles from './CrearPedidoModal.module.css'; // Usamos los mismos estilos
 import modalStyles from '../../../styles/modalStyles.module.css';
 import { editarPedido } from '../../../services/pedido_service.ts';
 import type { Producto, Pedido, PedidoInput, PedidoItem } from '../../../types/models.ts';
+import { consumirStock } from '../../../services/product_service.ts';
 
-// Define las props que el modal va a recibir
 interface EditarPedidoModalProps {
   isOpen: boolean;
   onClose: () => void;
-  editingPedido: Pedido | null; // El pedido que se va a editar
-  productos: Producto[]; // La lista de productos disponibles
+  editingPedido: Pedido | null;
+  productos: Producto[]; 
   fetchInitialDataParent: () => void;
 }
 
@@ -188,6 +188,31 @@ const EditarPedidoModal: React.FC<EditarPedidoModalProps> = ({ isOpen, onClose, 
         { fecha: getFechaISO(editingPedido.fecha_pedido), numero: editingPedido.numero_pedido },
         payload
       );
+      try {
+          const stockUpdates = editingPedidoItems.map(newItem => {
+              const originalItem = editingPedido.productos_detalle.find(
+                  oldItem => oldItem.id_producto === newItem.id
+              );
+              
+              const originalQty = originalItem ? parseFloat(originalItem.cantidad_producto.toString()) : 0;
+              const newQty = newItem.cantidad;
+              
+              const delta = newQty - originalQty;
+
+              // Solo consumimos stock si el delta es positivo 
+              if (delta > 0) {
+                  console.log(`Descontando stock extra para ${newItem.nombre}: ${delta}u`);
+                  return consumirStock(newItem.id, delta);
+              }
+              return Promise.resolve();
+          });
+
+          await Promise.all(stockUpdates);
+          
+      } catch (stockErr) {
+          console.error("Error actualizando stock al editar:", stockErr);
+      }
+
       onClose();
       fetchInitialDataParent();
     } catch (err) {

@@ -14,7 +14,8 @@ import styles from '../styles/gestionProductosPage.module.css';
 import formStyles from '../styles/formStyles.module.css';
 import { getProductos, deleteProducto } from '../services/product_service';
 import { getCategorias } from '../services/category_service';
-import { type Producto, type Categoria } from '../types/models';
+import { getRecetas } from '../services/receta_service';
+import { type Producto, type Categoria, type Receta } from '../types/models';
 import CrearProductoModal from '../components/modals/CrearProductoModal';
 
 interface GestionProductosPageProps {}
@@ -28,6 +29,7 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [filteredProductos, setFilteredProductos] = useState<Producto[]>([]);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [recetas, setRecetas] = useState<Receta[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
   
   const [isCrearProductoModalOpen, setIsCrearProductoModalOpen] = useState<boolean>(false);
@@ -62,10 +64,20 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
     }
   }, []);
 
+  const fetchRecetas = useCallback(async () => {
+    try {
+      const data = await getRecetas();
+      setRecetas(data);
+    } catch (error) {
+      console.error('Error al cargar recetas:', error);
+    }
+  }, []);
+
   useEffect(() => {
     fetchProductos();
     fetchCategorias();
-  }, [fetchProductos, fetchCategorias]);
+    fetchRecetas();
+  }, [fetchProductos, fetchCategorias, fetchRecetas]);
 
   /** @brief Extrae una lista de nombres de categorías únicas a partir de los productos. */
   const categoriasUnicas = useMemo(() => {
@@ -199,6 +211,7 @@ const GestionProductosPage: React.FC<GestionProductosPageProps> = () => {
         fetchProductos={fetchProductos}
         editingProducto={editingProducto}
         categorias={categorias}
+        recetas={recetas}
       />
     </div>
   );

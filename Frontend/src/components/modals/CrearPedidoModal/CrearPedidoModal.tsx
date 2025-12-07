@@ -5,6 +5,7 @@ import modalStyles from '../../../styles/modalStyles.module.css';
 import { createPedido, getPedidosByDate } from '../../../services/pedido_service';
 import type { Producto, PedidoItem, PedidoInput, Cliente } from '../../../types/models.d.ts';
 import { buscarClientesPorCoincidencia, createCliente, getClientes } from '../../../services/client_service';
+import { consumirStock } from '../../../services/product_service.ts';
 
 interface CrearPedidoModalProps {
   isOpen: boolean;
@@ -311,22 +312,28 @@ const CrearPedidoModal: React.FC<CrearPedidoModalProps> = ({ isOpen, onClose, pr
           precio_unitario: item.precio_unitario,
           aclaraciones: item.aclaraciones || ''
         })),
-        estado: 'PENDIENTE',
-        entregado: false,
-        avisado: false,
-        pagado: false
       };
 
 
-      // Depuración: revisar payload
       console.log("Payload a enviar al backend:", pedidoData);
-
-      // Llamada al backend
       await createPedido(pedidoData);
+
+      try {
+          const actualizaciones = pedidoItems.map(item => 
+              consumirStock(item.id, item.cantidad)
+          );
+          
+          await Promise.all(actualizaciones);
+          console.log("Stock actualizado correctamente para todos los productos.");
+          
+      } catch (stockError) {
+          console.error("ERROR: El pedido se creó, pero hubo un problema actualizando el stock:", stockError);
+      }
 
       // Reset del modal y cierre
       resetModalState();
       onClose();
+      
     } catch (err: any) {
       console.error("Error al crear pedido:", err);
       // Si el backend devuelve mensaje, se puede mostrar

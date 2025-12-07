@@ -20,6 +20,7 @@ import ProtectedRoute from './protected_route';
 import GestionUsuariosPage from '../pages/GestionUsuariosPage';
 
 import GestionProductosAndCategoriasPage from '../pages/GestionProductosAndCategoriasPage';
+import GestionRecetasAndInsumosPage from '../pages/GestionRecetasAndInsumosPage';
 
 const router = createBrowserRouter([
   {
@@ -103,8 +104,11 @@ const router = createBrowserRouter([
             path: 'recetas',
             element: (
               <ProtectedRoute allowedRoles={['Administrador', 'Cocinero']}>
-                <GestionRecetasPage />
+                <GestionRecetasAndInsumosPage/>
               </ProtectedRoute>
+              /*<ProtectedRoute allowedRoles={['Administrador', 'Cocinero']}>
+                <GestionRecetasPage />
+              </ProtectedRoute>*/
             ),
           },
           {

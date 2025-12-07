@@ -1,3 +1,45 @@
+.innerLayoutRow {
+  display: flex;
+  flex-direction: row;
+}
+
+.innerLayoutCol {
+  display:flex;
+  flex-direction: row;
+  width: fit-content;
+  padding-left: 0.5rem;
+}
+
+.formTextarea {
+  width: 100%;
+  max-width: 230px; 
+  padding: 8px;
+  border: 1px solid #555;
+  border-radius: 4px;
+  font-size: 1em;
+  background-color: #35394b; 
+  color: #fff !important; 
+  transition: all 0.3s ease;
+  height: 6rem;
+}
+
+.addButton {
+  margin-left: 0.5rem;
+  padding: 3px 10px; 
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  font-size: 1em;
+  background-color: #a7fd1c;
+}
+
+.addButton:hover {
+  background-color: #274e3b;
+  color: white;
+}
+
 .insumosListContainer {
   /* Define una altura máxima. Si el contenido de adentro la supera, aparecerá el scroll.
      Puedes ajustar este valor. 130px es aprox. para 2 o 3 items. */

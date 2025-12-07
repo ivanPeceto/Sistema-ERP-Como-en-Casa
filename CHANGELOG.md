@@ -1,5 +1,60 @@
 # Changelog
 
+## [ refactor/front/recetas-insumos ] - 2025/12/06 (YANKED)
+
+### Changed
+* `backend/service_productos/apps/productos/serializer.py` 
+  * Corrige error crítico en el serializer, faltaba definir el campo "receta" para poder procesarlo.
+* `Frontend/src/components/modals/CrearPedidoModal/EditarPedidoModal.tsx`
+  * Añade un nuevo bloque de lógica en handleEditSubmit para calcular el delta de productos agregados y consumir el stock solo de los que se agregaron.
+
+## [ refactor/front/recetas-insumos ] - 2025/12/05
+
+### Changed 
+* `Frontend/src/services/product_service.ts`
+  * Añade una nueva función al servicio para llamar al endpoint "consumir-stock" del microservicio de productos.
+* `Frontend/src/components/modals/CrearPedidoModal/CrearPedidoModal.tsx`
+  * Modifica la función `handleConfirmarPedido` para que al crear un pedido actualice el stock en paralelo para todos los items.
+
+## [ refactor/front/recetas-insumos ] - 2025/12/05
+
+### Changed
+* `backend/service_productos/apps/productos/serializer.py`
+  * Añade campos faltantes en el serializer.
+* `Frontend/src/types/models.ts`
+  * Añade nuevos campos en types de productos.
+* `Frontend/src/components/modals/CrearProductoModal.tsx`
+* `Frontend/src/styles/formStyles.module.css`
+  * Refactoriza el modal para permitir  el manejo de stock
+* `Frontend/src/pages/GestionProductosPage.tsx`
+  * Añade importaciones pertinentes a recetas y métodos para cargarlas y parsearlas al modal de creación de productos refactorizado.
+
+## [ refactor/front/recetas-insumos ] - 2025/12/03
+
+### Changed
+* `Frontend/src/types/models.ts`
+  * Añade SubRecetas como nuevo tipo y ajusta los tipso ya existentes al nuevo modelo diseñado en el backend.
+* `Frontend/src/components/modals/CrearRecetaModal/CrearRecetaModal.tsx`
+* `Frontend/src/components/modals/CrearRecetaModal/CrearRecetaModal.module.css`
+  * Refactoriza completamente el modal de creación de recetas.
+* `Frontend/src/pages/GestionRecetasPage.tsx`
+  * Añade los campos necesarios para el modal refactorizado y modulariza el modal de "ver".
+
+## [ refactor/front/recetas-insumos ] - 2025/12/02
+
+### Adds
+* `Frontend/src/pages/GestionRecetasAndInsumosPage.tsx`
+  * Nuevo componente para renderizar las paginas de recetas e insumo a la vez
+
+### Changed
+* `Frontend/src/router/index.tsx`
+  * Adapta los nuevos componentes a la navegación en index.tsx.
+* `Frontend/src/styles/GestionRecetasPage.module.css`
+* `Frontend/src/styles/GestionInsumosPage.module.css`
+* `Frontend/src/pages/GestionRecetasPage.tsx`
+* `Frontend/src/pages/GestionInsumosPage.tsx`
+  * Ajusta estilos y html para adaptarlos al nuevo layout combinado.
+
 ## [ refactor/back/recetas-insumos ] - 2025/12/02
 
 ### Changed
