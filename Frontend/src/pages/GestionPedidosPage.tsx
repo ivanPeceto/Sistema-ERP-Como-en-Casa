@@ -25,6 +25,7 @@ import { createFullPaymentCobro } from '../services/cobro_service.ts';
 
 import { getPedidosByDate, editarPedido, deletePedido, printPedido } from '../services/pedido_service';
 import { getProductos } from '../services/product_service';
+import { getIngresosBrutosByDate } from '../services/cobro_service.ts';
 import type {
   Producto,
   Pedido, PedidoInput, PedidoItem, PedidoEstado,
@@ -569,14 +570,11 @@ const GestionPedidosPage: React.FC = () => {
 
   /**
    * @brief Calcula el total de ventas del día, lo guarda en el estado y abre el modal.
-   * @details Suma el campo 'total' de todos los pedidos cargados para la fecha seleccionada.
    */
   const handleCalcularTotalVentas = useCallback(() => {
-    const totalDelDia = pedidos.reduce((acumulador, pedido) => {
-      return acumulador + (Number(pedido.total) || 0);
-    }, 0);
+    const totalDelDia = getIngresosBrutosByDate(searchDate);
 
-    setTotalVentasDia(totalDelDia);
+    setTotalVentasDia(totalDelDia.total);
     setIsTotalVentasModalOpen(true);
   }, [pedidos]); // Se recalcula si la lista de pedidos cambia
 
