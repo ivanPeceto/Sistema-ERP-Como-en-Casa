@@ -5,6 +5,8 @@
 ### Changed
 * `backend/service_productos/apps/productos/serializer.py` 
   * Corrige error crítico en el serializer, faltaba definir el campo "receta" para poder procesarlo.
+* `Frontend/src/components/modals/CrearPedidoModal/EditarPedidoModal.tsx`
+  * Añade un nuevo bloque de lógica en handleEditSubmit para calcular el delta de productos agregados y consumir el stock solo de los que se agregaron.
 
 ## [ refactor/front/recetas-insumos ] - 2025/12/05
 
