@@ -37,10 +37,13 @@
 }
 
 .searchInput {
+  color: #ffffff;
   width: 100%;
+  max-width: 300px;
   padding: 10px 15px;
   margin-right: 1rem;
-  border: 1px solid #807575;
+  border: 1.75px solid #807575;
+  background-color: #303644;
   border-radius: 4px;
   font-size: 1rem;
 }
