@@ -1,5 +1,11 @@
 # Changelog
 
+## [ refactor/front/recetas-insumos ] - 2025/12/06 (YANKED)
+
+### Changed
+* `backend/service_productos/apps/productos/serializer.py` 
+  * Corrige error crítico en el serializer, faltaba definir el campo "receta" para poder procesarlo.
+
 ## [ refactor/front/recetas-insumos ] - 2025/12/05
 
 ### Changed 
