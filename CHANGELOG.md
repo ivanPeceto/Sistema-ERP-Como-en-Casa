@@ -4,7 +4,9 @@
 
 ### Changed 
 * `Frontend/src/services/product_service.ts`
-  * Añade un nuevo método al servicio para llamar al endpoint "consumir-stock" del microservicio de productos.
+  * Añade una nueva función al servicio para llamar al endpoint "consumir-stock" del microservicio de productos.
+* `Frontend/src/components/modals/CrearPedidoModal/CrearPedidoModal.tsx`
+  * Modifica la función `handleConfirmarPedido` para que al crear un pedido actualice el stock en paralelo para todos los items.
 
 ## [ refactor/front/recetas-insumos ] - 2025/12/05
 
