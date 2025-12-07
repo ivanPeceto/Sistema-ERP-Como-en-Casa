@@ -108,7 +108,7 @@ const GestionRecetasPage: React.FC<GestionRecetasPageProps> = () => {
                         
                         <div className={styles.detailColumn}>
                             <h2 className={styles.recipeTitle}>{viewingReceta.nombre}</h2>
-                            <h4 className={styles.columnHeader}>Descripción / Pasos</h4>
+                            <h4 className={styles.columnHeader}>Descripción</h4>
                             <p className={styles.columnContent}>
                                 {viewingReceta.descripcion || <span className={styles.emptyText}>Sin descripción disponible.</span>}
                             </p>
@@ -131,7 +131,7 @@ const GestionRecetasPage: React.FC<GestionRecetasPageProps> = () => {
                         </div>
 
                         <div className={styles.detailColumn}>
-                            <h4 className={styles.columnHeader}>Composición (Sub-Recetas)</h4>
+                            <h4 className={styles.columnHeader}>Sub-Recetas</h4>
                             {viewingReceta.sub_recetas && viewingReceta.sub_recetas.length > 0 ? (
                                 <ul className={styles.ingredientList}>
                                     {viewingReceta.sub_recetas.map((sr, index) => (
@@ -194,9 +194,9 @@ const GestionRecetasPage: React.FC<GestionRecetasPageProps> = () => {
                                 </span>
                             </div>
                             <div className={styles.itemActions}>
-                                <button onClick={() => openViewModal(receta)} className={`${styles.viewButton} ${styles.secondaryButton}`}>Ver</button>
+                                <button onClick={() => openViewModal(receta)} className={`${styles.viewButton} ${formStyles.secondaryButton}`}>Ver</button>
                                 <button onClick={() => openModal(receta)} className={styles.editButton}>Editar</button>
-                                <button onClick={() => handleDelete(receta.id)} className={styles.deleteButton}>Eliminar</button>
+                                <button onClick={() => handleDelete(receta.id)} className={formStyles.deleteButton}>Eliminar</button>
                             </div>
                         </div>
                     ))

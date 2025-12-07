@@ -37,10 +37,13 @@
 }
 
 .searchInput {
+  color: #ffffff;
   width: 100%;
+  max-width: 300px;
   padding: 10px 15px;
   margin-right: 1rem;
-  border: 1px solid #807575;
+  border: 1.75px solid #807575;
+  background-color: #303644;
   border-radius: 4px;
   font-size: 1rem;
 }
@@ -114,21 +117,22 @@
 }
 
 .editButton {
-  background-color: #ffc107;
+  background-color: #e7eb02;
   color: #333;
-}
-.editButton:hover {
-  background-color: #e0a800;
+
 }
 
+.editButton:hover {
+  background-color: #bebdbd;
+}
 .deleteButton {
   background-color: #dc3545;
   color: white;
   margin-left: 10px;
 }
 .viewButton {
-  background-color: #dc3545;
-  color: white;
+  background-color: #d4d7ff;
+  color: rgb(61, 61, 61);
 }
 .deleteButton:hover {
   background-color: #c82333;
