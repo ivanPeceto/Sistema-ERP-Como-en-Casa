@@ -1,5 +1,11 @@
 # Changelog
 
+## [ refactor/front/admin-panel ] - 2025/12/07 
+
+### Changed
+* `Frontend/src/pages/GestionUsuariosPage.tsx`
+  * Corrige importación de estilos obsoltea. Previamente importaba los  estilos de 'GestionClientesPage' los cuales son de fondo claro, cuando ahora se usa fondo oscuro.
+
 ## [ refactor/front/recetas-insumos ] - 2025/12/06 (YANKED)
 
 ### Changed
