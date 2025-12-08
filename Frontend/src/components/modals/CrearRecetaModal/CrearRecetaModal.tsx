@@ -197,7 +197,7 @@ const CrearRecetaModal: React.FC<CrearRecetaModalProps> = ({
                                                 onChange={(e) => handleInsumoChange(index, 'cantidad', e.target.value)}
                                                 step="0.01"
                                                 className={formStyles.formInput}
-                                                style={{flex: 1}}
+                                                style={{maxWidth: '6rem'}}
                                                 placeholder="Cant."
                                             />
                                             <button type="button" onClick={() => removeInsumo(index)} className={formStyles.deleteButton}>×</button>
@@ -234,7 +234,7 @@ const CrearRecetaModal: React.FC<CrearRecetaModalProps> = ({
                                                 onChange={(e) => handleSubRecetaChange(index, 'cantidad', e.target.value)}
                                                 step="0.01"
                                                 className={formStyles.formInput}
-                                                style={{flex: 1}}
+                                                style={{maxWidth: '6rem'}}
                                                 placeholder="Cant."
                                             />
                                             <button type="button" onClick={() => removeSubReceta(index)} className={formStyles.deleteButton}>×</button>
