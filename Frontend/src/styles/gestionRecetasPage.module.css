@@ -16,6 +16,7 @@
 
 .pageContainer h1 {
   text-align: center;
+  font-size: 2rem;
   margin-bottom: 20px;
   color: #ffffff;
 }
@@ -63,9 +64,10 @@
 }
 
 .addButton {
-  background-color: #09c935;
+  background-color: #1c7e40;
   color: white;
 }
+
 .addButton:hover {
   background-color: #09c935;
 }
