@@ -3,6 +3,11 @@
 ## [ fix/front/recetas ] - 2025/12/08
 
 ### Changed
+* Arregla inconsistencias en el css de recetas. 
+
+## [ fix/front/recetas ] - 2025/12/08
+
+### Changed
 * `Frontend/src/components/modals/CrearRecetaModal/CrearRecetaModal.tsx`
   * Ajusta el ancho máximo del input de "cantidad de receta/insumo" para que no sea tan poequeño
 
