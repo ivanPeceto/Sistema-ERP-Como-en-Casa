@@ -3,6 +3,15 @@
 ## [ refactor/cobros-total-calculo ] - 2025/12/07
 
 ### Changed
+* `Frontend/src/types/models.ts`
+* `Frontend/src/services/cobro_service.ts`
+  * Añade la interfaz `totalPayload` para ayudara a manejar el mensaje esperado del back en este nuevo endoint
+* `Frontend/src/pages/GestionPedidosPage.tsx`
+  * Refactoriza la función `handleCalcularTotalVentas` para que utilice el nuevo endpoint.
+
+## [ refactor/cobros-total-calculo ] - 2025/12/07
+
+### Changed
 * `backend/service_pedidos/apps/cobros/views.py`
   * Añade al viewset de cobros un nuevo método `total_by_date` que devuelve los ingresos brutos según los cobros que hubo en un día el cual se parsea a través de la url.
 * `Frontend/src/services/cobro_service.ts`

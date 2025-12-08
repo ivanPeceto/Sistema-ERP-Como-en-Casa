@@ -1,5 +1,6 @@
 import createAuthApiClient from '../api/apiClient';
 import type { Cobro, CobroInput, MetodoCobro, Pedido } from '../types';
+import type { totalPayload } from '../types';
 
 const PEDIDOS_API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const cobroAPIClient = createAuthApiClient(PEDIDOS_API_BASE_URL);
@@ -9,8 +10,8 @@ const cobroAPIClient = createAuthApiClient(PEDIDOS_API_BASE_URL);
  * @param {string} fecha La fecha de los pedidos a buscar, en formato "YYYY-MM-DD".
  * @returns {Promise<any>} Los ingresos brutos del día.
  */
-export const getIngresosBrutosByDate = async (fecha: string): Promise<any> => {
-  const response = await cobroAPIClient.get(`/api/pedidos/cobros/total/${fecha}`);
+export const getIngresosBrutosByDate = async (fecha: string): Promise<totalPayload> => {
+  const response = await cobroAPIClient.get<totalPayload>(`/api/pedidos/cobros/total/${fecha}`);
   return response.data;
 };
 

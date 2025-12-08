@@ -23,6 +23,13 @@ export interface Cliente {
   direccion?: string;
 }
 
+/**
+ * @brief Define la estructura del endpoint /api/pedidos/cobros/total/${fecha}
+ */
+export interface totalPayload {
+  total: number;
+}
+
 export type SocketMessage = {
     source: 'pedidos' | 'productos';
     action: 'create' | 'update' | 'delete';

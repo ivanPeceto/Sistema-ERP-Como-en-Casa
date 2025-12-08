@@ -254,7 +254,7 @@ class CobroViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(cobros, many=True)
         return Response(serializer.data)
 
-    @action(detail=False, methods=['get'], url_path='total/?P(<fecha>\d{4}-\d{2}-\d{2})')
+    @action(detail=False, methods=['get'], url_path='total/(?P<fecha>\d{4}-\d{2}-\d{2})')
     def total_by_date(self, request, fecha=None):
         """Devuelve el total de ingresos brutos por cobros en un día específico"""
         total = 0
