@@ -25,6 +25,7 @@ import { createFullPaymentCobro } from '../services/cobro_service.ts';
 
 import { getPedidosByDate, editarPedido, deletePedido, printPedido } from '../services/pedido_service';
 import { getProductos } from '../services/product_service';
+import { getIngresosBrutosByDate } from '../services/cobro_service.ts';
 import type {
   Producto,
   Pedido, PedidoInput, PedidoItem, PedidoEstado,
@@ -569,16 +570,14 @@ const GestionPedidosPage: React.FC = () => {
 
   /**
    * @brief Calcula el total de ventas del día, lo guarda en el estado y abre el modal.
-   * @details Suma el campo 'total' de todos los pedidos cargados para la fecha seleccionada.
    */
-  const handleCalcularTotalVentas = useCallback(() => {
-    const totalDelDia = pedidos.reduce((acumulador, pedido) => {
-      return acumulador + (Number(pedido.total) || 0);
-    }, 0);
-
+  const handleCalcularTotalVentas = useCallback(async () => {
+    const data = await getIngresosBrutosByDate(searchDate);
+    console.log("Datos recibidos:", data);
+    const totalDelDia: number = Number(data.total)
     setTotalVentasDia(totalDelDia);
     setIsTotalVentasModalOpen(true);
-  }, [pedidos]); // Se recalcula si la lista de pedidos cambia
+  }, [searchDate]); // Se recalcula si la lista de pedidos cambia
 
   /**
    * @brief Cierra el modal de total de ventas.
@@ -855,7 +854,7 @@ const GestionPedidosPage: React.FC = () => {
             <div className={styles.detailSection}>
               <p><strong>Fecha:</strong> {new Date(searchDate + 'T00:00:00').toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
               <p style={{ fontSize: '1.8rem', marginTop: '20px' }}>
-                <strong>Total: ${totalVentasDia.toFixed(2)}</strong>
+                <strong>Total: ${Number(totalVentasDia).toFixed(0)}</strong>
               </p>
             </div>
             <div className={styles.modalActions}>
