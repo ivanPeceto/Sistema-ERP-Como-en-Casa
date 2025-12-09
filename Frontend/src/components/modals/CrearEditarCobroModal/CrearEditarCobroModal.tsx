@@ -159,7 +159,6 @@ const CrearEditarCobroModal: React.FC<CrearEditarCobroModalProps> = ({
       <div className={formStyles.modalContent}>
         <h2>{editingCobro ? "Editar Cobro" : "Nuevo Cobro"}</h2>
         <form onSubmit={handleSubmit} className={formStyles.formContainer}>
-          <div className={formStyles.formGrid}>
             <div className={formStyles.formSection}>
               <h3 className={formStyles.formSectionTitle}>
                 Detalles del Cobro
@@ -264,7 +263,6 @@ const CrearEditarCobroModal: React.FC<CrearEditarCobroModalProps> = ({
                 </div>
               </div>
             </div>
-          </div>
 
           <div className={formStyles.formButtons}>
             <button
