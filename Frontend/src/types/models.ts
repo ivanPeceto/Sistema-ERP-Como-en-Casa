@@ -160,6 +160,7 @@ export interface UserForm {
   email: string;
   nombre: string;
   rol?: string;
+  password?: string;
 }
 
 

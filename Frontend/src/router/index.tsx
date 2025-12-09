@@ -50,7 +50,7 @@ const router = createBrowserRouter([
           {
             path: 'productos',
             element: (
-              <ProtectedRoute allowedRoles={['Administrador', 'Cocinero']}>
+              <ProtectedRoute allowedRoles={['Administrador']}>
                 <GestionProductosAndCategoriasPage/>
               </ProtectedRoute>
             ),

@@ -33,6 +33,7 @@ const GestionUsuariosPage: React.FC = () => {
     email: '',
     nombre: '',
     rol: '',
+    password: '',
   });
 
   // --------------------------------------------------------
@@ -240,7 +241,17 @@ const GestionUsuariosPage: React.FC = () => {
                     required
                   />
                 </div>
-
+                <div className={formStyles.formField}>
+                  <label className={formStyles.formLabel} htmlFor="password">
+                    Contraseña
+                  </label>
+                  <input
+                    id="password"
+                    name="password"
+                    onChange={handleInputChange}
+                    className={formStyles.formInput}
+                  />
+                </div>
                 <div className={formStyles.formField}>
                   <label className={formStyles.formLabel} htmlFor="rol">
                     Rol
@@ -261,6 +272,7 @@ const GestionUsuariosPage: React.FC = () => {
                     ))}
                   </select>
                 </div>
+                
               </div>
 
               <div className={formStyles.formButtons}>
